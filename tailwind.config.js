@@ -1,0 +1,76 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        background: '#f8fafc',
+        'on-background': '#0f172a',
+        surface: '#ffffff',
+        'surface-variant': '#f1f5f9',
+        'on-surface': '#0f172a',
+        'on-surface-variant': '#475569',
+        'surface-container-lowest': '#ffffff',
+        'surface-container-low': '#f8fafc',
+        'surface-container': '#f1f5f9',
+        'surface-container-high': '#e2e8f0',
+        'surface-container-highest': '#cbd5e1',
+        primary: {
+          DEFAULT: '#6D02A5',
+          hover: '#BB88D3',
+          light: '#8A50BA',
+        },
+        'on-primary': '#ffffff',
+        'primary-container': '#e0e7ff',
+        'on-primary-container': '#312e81',
+        secondary: '#0ea5e9',
+        'on-secondary': '#ffffff',
+        'secondary-container': '#e0f2fe',
+        'on-secondary-container': '#0c4a6e',
+        'secondary-fixed': '#38bdf8',
+        'on-secondary-fixed': '#082f49',
+        tertiary: '#8b5cf6',
+        'on-tertiary': '#ffffff',
+        error: '#ef4444',
+        'on-error': '#ffffff',
+        'error-container': '#fee2e2',
+        'outline': '#94a3b8',
+        'outline-variant': '#e2e8f0',
+      },
+      spacing: {
+        'xs': '0.5rem',
+        'sm': '1rem',
+        'md': '1.5rem',
+        'lg': '2rem',
+        'xl': '3rem',
+        'xxl': '4rem',
+      },
+      fontSize: {
+        'display-lg': ['3.5rem', { lineHeight: '1.15', fontWeight: '800' }],
+        'headline-lg': ['2.25rem', { lineHeight: '1.25', fontWeight: '700' }],
+        'headline-md': ['1.5rem', { lineHeight: '1.35', fontWeight: '700' }],
+        'body-lg': ['1.125rem', { lineHeight: '1.7', fontWeight: '400' }],
+        'body-md': ['1rem', { lineHeight: '1.6', fontWeight: '400' }],
+        'label-md': ['0.875rem', { lineHeight: '1.4', fontWeight: '600' }],
+        'label-sm': ['0.75rem', { lineHeight: '1.4', fontWeight: '600' }],
+      },
+      fontFamily: {
+        arabic: ['Cairo', 'sans-serif'],
+        sans: ['Cairo', 'Outfit', 'sans-serif'],
+      },
+      maxWidth: {
+        'container-max': '1280px',
+      },
+      boxShadow: {
+        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+        'soft': '0 20px 50px -15px rgba(15, 23, 42, 0.06)',
+        'glow': '0 10px 30px -5px rgba(79, 70, 229, 0.35)',
+        'glow-secondary': '0 10px 30px -5px rgba(14, 165, 233, 0.35)',
+      }
+    },
+  },
+  plugins: [],
+}
