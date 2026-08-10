@@ -10,8 +10,10 @@ import {
   Sparkles,
   SlidersHorizontal
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function CoursesPage() {
+  const { t } = useTranslation();
   const [courses, setCourses] = useState([]);
   const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState('');
@@ -63,7 +65,7 @@ export default function CoursesPage() {
   const isFiltered = search !== '' || selectedCat !== '' || selectedLevel !== '';
 
   return (
-    <div className="min-h-screen pb-20 pt-6 px-4 sm:px-6 lg:px-12 max-w-container-max mx-auto space-y-10 " dir="rtl">
+    <div className="min-h-screen pb-20 pt-6 px-4 sm:px-6 lg:px-12 max-w-container-max mx-auto space-y-10">
       
       {/* 1. Header & Hero Title */}
       <div className="relative rounded-3xl bg-surface-container-low/70 border border-outline-variant/40 p-6 sm:p-10 backdrop-blur-xl overflow-hidden shadow-sm">
@@ -71,13 +73,13 @@ export default function CoursesPage() {
         <div className="relative z-10 max-w-2xl space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">
             <GraduationCap size={15} />
-            <span>الدليل الأكاديمي الشامل</span>
+            <span>{t('coursesPage.header.badge')}</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-extrabold text-on-surface tracking-tight">
-            الدورات التدريبية المتاحة
+            {t('coursesPage.header.title')}
           </h1>
           <p className="text-on-surface-variant text-sm sm:text-base leading-relaxed">
-            استكشف مجموعة واسعة من الدورات الطبية المتخصصة المصممة بعناية لتأهيلك ومساعدتك في تطوير قدراتك الإكلينيكية والأكاديمية.
+            {t('coursesPage.header.subtitle')}
           </p>
         </div>
 
@@ -91,7 +93,7 @@ export default function CoursesPage() {
             <Search size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant/70" />
             <input 
               type="text" 
-              placeholder="ابحث باسم الدورة أو المحاضر..." 
+              placeholder={t('coursesPage.filters.searchPlaceholder')} 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pr-10 pl-4 py-3 bg-surface/80 border border-outline-variant/50 rounded-2xl text-sm text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
@@ -106,7 +108,7 @@ export default function CoursesPage() {
               onChange={(e) => setSelectedCat(e.target.value)}
               className="w-full pr-10 pl-4 py-3 bg-surface/80 border border-outline-variant/50 rounded-2xl text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
             >
-              <option value="">جميع التصنيفات</option>
+              <option value="">{t('coursesPage.filters.allCategories')}</option>
               {categories.map(cat => (
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
@@ -121,10 +123,10 @@ export default function CoursesPage() {
               onChange={(e) => setSelectedLevel(e.target.value)}
               className="w-full pr-10 pl-4 py-3 bg-surface/80 border border-outline-variant/50 rounded-2xl text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
             >
-              <option value="">جميع المستويات</option>
-              <option value="beginner">مبتدئ</option>
-              <option value="intermediate">متوسط</option>
-              <option value="advanced">متقدم</option>
+              <option value="">{t('coursesPage.filters.allLevels')}</option>
+              <option value="beginner">{t('coursesPage.filters.beginner')}</option>
+              <option value="intermediate">{t('coursesPage.filters.intermediate')}</option>
+              <option value="advanced">{t('coursesPage.filters.advanced')}</option>
             </select>
           </div>
 
@@ -135,7 +137,7 @@ export default function CoursesPage() {
               className="flex-1 bg-primary text-on-primary font-bold text-sm rounded-2xl py-3 px-4 hover:bg-primary-hover transition-all duration-200 flex items-center justify-center gap-2 shadow-glow"
             >
               <Search size={16} />
-              <span>بحث</span>
+              <span>{t('coursesPage.filters.searchButton')}</span>
             </button>
             
             {isFiltered && (
@@ -143,7 +145,7 @@ export default function CoursesPage() {
                 type="button" 
                 onClick={handleResetFilters}
                 className="p-3 bg-surface-container-high text-on-surface-variant hover:text-error rounded-2xl border border-outline-variant/40 transition-colors"
-                title="إعادة ضبط الفلاتر"
+                title={t('coursesPage.filters.resetTitle')}
               >
                 <RotateCcw size={18} />
               </button>
@@ -174,9 +176,9 @@ export default function CoursesPage() {
             <BookOpen size={32} />
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-bold text-on-surface">لم يتم العثور على أي دورات</h3>
+            <h3 className="text-lg font-bold text-on-surface">{t('coursesPage.empty.title')}</h3>
             <p className="text-sm text-on-surface-variant max-w-md mx-auto">
-              لم نجد أي نتائج مطابقة لخيارات البحث أو الفلترة المحددة. جرب تغيير كلمات البحث أو إعادة الضبط.
+              {t('coursesPage.empty.subtitle')}
             </p>
           </div>
           {isFiltered && (
@@ -185,7 +187,7 @@ export default function CoursesPage() {
               className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary font-bold text-sm rounded-xl hover:bg-primary/20 transition-colors"
             >
               <RotateCcw size={16} />
-              <span>عرض جميع الدورات</span>
+              <span>{t('coursesPage.empty.viewAll')}</span>
             </button>
           )}
         </div>

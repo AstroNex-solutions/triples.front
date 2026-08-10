@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import API from '../api/axios';
 import CourseCard from '../components/CourseCard';
 import { 
@@ -10,6 +11,7 @@ import {
 } from 'lucide-react';
 
 export default function HomePage() {
+  const { t, i18n } = useTranslation();
   const [courses, setCourses] = useState([]);
   const [banners, setBanners] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
@@ -42,11 +44,6 @@ export default function HomePage() {
     fetchData();
   }, []);
 
-  const banner = banners[0] || {
-    title_ar: 'ارتقِ بمسيرتك الطبية مع أفضل الخبراء',
-    badge_ar: 'مستقبل التعليم الطبي الحديث',
-    description_ar: 'تعليم طبي مهني متميز بأدوات تعلم ذكية مصممة خصيصاً لتناسب احتياجات الأطباء وطلاب الطب المعاصرين. ابدأ رحلتك الآن نحو التميز.'
-  };
 
   const toggleFaq = (index) => {
     setActiveFaq(activeFaq === index ? null : index);
@@ -70,10 +67,10 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex flex-col w-full bg-background text-on-background font-sans overflow-hidden dir-rtl ">
+    <div className="flex flex-col w-full bg-background text-on-background font-sans overflow-hidden">
       
       {/* 1. Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center pt-20 pb-20 overflow-hidden bg-gradient-to-b from-primary-container/30 via-surface to-background" dir="rtl">
+      <section className="relative min-h-[90vh] flex items-center pt-20 pb-20 overflow-hidden bg-gradient-to-b from-primary-container/30 via-surface to-background">
         
         {/* خلفية تفاعلية بوضوح أعلى */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
@@ -106,19 +103,19 @@ export default function HomePage() {
           {/* النصوص والأزرار */}
           <motion.div 
             initial="hidden" animate="visible" variants={staggerContainer}
-            className="flex flex-col items-start text-right"
+            className="flex flex-col items-start"
           >
             <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-container border border-primary/20 mb-6 shadow-sm">
               <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-on-primary-container font-bold text-sm">{banner.badge_ar}</span>
+              <span className="text-on-primary-container font-bold text-sm">{t('home.banner.badge')}</span>
             </motion.div>
             
             <motion.h1 variants={fadeUp} className="text-2xl lg:text-3xl font-extrabold text-on-background mb-6 leading-tight">
-              {banner.title_ar}
+              {t('home.banner.title')}
             </motion.h1>
             
             <motion.p variants={fadeUp} className="text-lg text-on-surface-variant mb-8 max-w-xl leading-relaxed">
-              {banner.description_ar}
+              {t('home.banner.description')}
             </motion.p>
             
             <motion.div variants={fadeUp} className="flex flex-wrap gap-4 justify-start w-full">
@@ -126,14 +123,14 @@ export default function HomePage() {
                 to="/register" 
                 className="px-8 py-4 bg-primary hover:bg-primary-hover text-on-primary font-bold rounded-2xl shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2"
               >
-                ابدأ التعلم مجاناً
+                {t('home.buttons.startFree')}
               </Link>
               <Link 
                 to="/courses" 
                 className="px-8 py-4 bg-surface text-on-surface hover:text-primary font-bold rounded-2xl border border-outline-variant hover:border-primary/40 transition-all duration-200 flex items-center justify-center gap-2 shadow-sm"
               >
                 <PlayCircle className="w-5 h-5 text-primary" />
-                استكشف الدورات
+                {t('home.buttons.exploreCourses')}
               </Link>
             </motion.div>
 
@@ -150,7 +147,7 @@ export default function HomePage() {
                     <Star key={index} className="w-4 h-4 fill-current" />
                   ))}
                 </div>
-                <span className="text-on-surface-variant font-medium">انضم لأكثر من <b className="text-on-background font-bold">15,000+</b> طبيب وطالب</span>
+                <span className="text-on-surface-variant font-medium">{t('home.stats.joinMoreThan')} <b className="text-on-background font-bold">15,000+</b> {t('home.stats.doctorsAndStudents')}</span>
               </div>
             </motion.div>
           </motion.div>
@@ -166,7 +163,6 @@ export default function HomePage() {
             <div className="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-3xl blur-lg opacity-30 group-hover:opacity-100 transition duration-1000"></div>
 
             <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-surface bg-surface">
-              {/* صورة高清 واضحة جداً */}
               <img
                 alt="Medical Education"
                 className="w-full h-[460px] object-cover rounded-2xl"
@@ -183,8 +179,8 @@ export default function HomePage() {
                   <ShieldCheck className="w-7 h-7" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-on-surface-variant/70 uppercase tracking-wider">اعتماد دولي</div>
-                  <div className="font-bold text-on-surface text-base">منهج معتمد طبياً</div>
+                  <div className="text-xs font-bold text-on-surface-variant/70 uppercase tracking-wider">{t('home.floatingCards.card1.badge')}</div>
+                  <div className="font-bold text-on-surface text-base">{t('home.floatingCards.card1.title')}</div>
                 </div>
               </motion.div>
 
@@ -198,8 +194,8 @@ export default function HomePage() {
                   <Activity className="w-6 h-6 animate-pulse" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-on-surface-variant/70">محتوى حديث</div>
-                  <div className="text-sm font-bold text-on-surface ml-3">محدث لعام 2026</div>
+                  <div className="text-xs font-bold text-on-surface-variant/70">{t('home.floatingCards.card2.badge')}</div>
+                  <div className="text-sm font-bold text-on-surface ml-3">{t('home.floatingCards.card2.title')}</div>
                 </div>
               </motion.div>
             </div>
@@ -209,12 +205,12 @@ export default function HomePage() {
       </section>
 
       {/* 2. Features Section (توضيح الأيقونات كلياً) */}
-      <section className="py-20 bg-surface relative" dir="rtl">
+      <section className="py-20 bg-surface relative">
         <div className="max-w-7xl mx-auto px-4 lg:px-8">
           <div className="text-center mb-16 max-w-2xl mx-auto">
-            <h2 className="text-3xl font-extrabold text-on-background mb-4">منظومة تعليمية متكاملة</h2>
+            <h2 className="text-3xl font-extrabold text-on-background mb-4">{t('home.features.title')}</h2>
             <p className="text-on-surface-variant">
-              وفرنا لك أحدث التقنيات وأفضل الأساليب التعليمية لضمان تفوقك وحصولك على أعلى الدرجات.
+              {t('home.features.subtitle')}
             </p>
           </div>
 
@@ -222,20 +218,20 @@ export default function HomePage() {
             {[
               {
                 icon: <Play className="w-7 h-7 text-white" />,
-                title: 'محاضرات تفاعلية',
-                desc: 'شاهد محاضراتك بجودة عالية مع نظام تشغيل ذكي يضمن لك أفضل تجربة مشاهدة تعليمية وتفاعل مستمر.',
+                title: t('home.features.items.interactiveLectures.title'),
+                desc: t('home.features.items.interactiveLectures.desc'),
                 iconBg: 'bg-primary shadow-primary/30'
               },
               {
                 icon: <Brain className="w-7 h-7 text-white" />,
-                title: 'بنك الأسئلة المتقدم',
-                desc: 'آلاف الأسئلة لتقييم مستواك، مع شرح مفصل لكل إجابة لمساعدتك على فهم أعمق للمادة العلمية.',
+                title: t('home.features.items.questionBank.title'),
+                desc: t('home.features.items.questionBank.desc'),
                 iconBg: 'bg-tertiary shadow-tertiary/30'
               },
               {
                 icon: <BookOpen className="w-7 h-7 text-white" />,
-                title: 'بطاقات المراجعة الذكية',
-                desc: 'تذكر المعلومات الطبية المعقدة بسهولة باستخدام تقنيات التكرار المتباعد والبطاقات الذكية المتطورة.',
+                title: t('home.features.items.flashcards.title'),
+                desc: t('home.features.items.flashcards.desc'),
                 iconBg: 'bg-secondary shadow-secondary/30'
               }
             ].map((feature, i) => (
@@ -263,15 +259,15 @@ export default function HomePage() {
       </section>
 
       {/* 3. Featured Courses */}
-      <section className="py-20 bg-background border-y border-outline-variant" dir="rtl">
+      <section className="py-20 bg-background border-y border-outline-variant">
         <div className="max-w-7xl mx-auto px-4 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-6">
             <div>
-              <h2 className="text-3xl font-extrabold text-on-background mb-2">أحدث الدورات المميزة</h2>
-              <p className="text-on-surface-variant">استكشف الكورسات المصممة خصيصاً لرفع كفاءتك الطبية</p>
+              <h2 className="text-3xl font-extrabold text-on-background mb-2">{t('home.featuredCourses.title')}</h2>
+              <p className="text-on-surface-variant">{t('home.featuredCourses.subtitle')}</p>
             </div>
             <Link to="/courses" className="px-6 py-3 bg-surface hover:bg-primary hover:text-on-primary text-primary font-bold rounded-xl border border-outline-variant transition-all duration-200 shadow-sm">
-              عرض جميع الدورات
+              {t('home.featuredCourses.viewAll')}
             </Link>
           </div>
 
@@ -297,15 +293,15 @@ export default function HomePage() {
         </div>
       </section>
       {/* 4. Student Reviews Section */}
-      <section className="py-20 bg-background relative overflow-hidden" dir="rtl">
+      <section className="py-20 bg-background relative overflow-hidden">
         {/* Abstract Background Shapes */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2"></div>
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-secondary/5 rounded-full blur-3xl -z-10 -translate-x-1/2 translate-y-1/2"></div>
         
         <div className="max-w-7xl mx-auto px-4 lg:px-8">
           <div className="text-center mb-16 max-w-2xl mx-auto">
-            <h2 className="text-3xl font-extrabold text-on-background mb-4">آراء طلابنا</h2>
-            <p className="text-on-surface-variant">نفخر بقصص نجاح طلابنا وتجاربهم المتميزة في منصتنا التعليمية</p>
+            <h2 className="text-3xl font-extrabold text-on-background mb-4">{t('home.reviews.title')}</h2>
+            <p className="text-on-surface-variant">{t('home.reviews.subtitle')}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -348,7 +344,7 @@ export default function HomePage() {
               ))
             ) : (
               <div className="col-span-full text-center text-on-surface-variant opacity-70">
-                لا توجد تقييمات متاحة حالياً.
+                {t('home.reviews.empty')}
               </div>
             )}
           </div>
@@ -356,17 +352,17 @@ export default function HomePage() {
       </section>
 
       {/* 5. Partnership Section */}
-      <section className="py-20 bg-surface-variant/30 border-y border-outline-variant/50 relative" dir="rtl">
+      <section className="py-20 bg-surface-variant/30 border-y border-outline-variant/50 relative">
         <div className="max-w-7xl mx-auto px-4 lg:px-8">
           <div className="text-center mb-12">
             <span className="inline-block py-1 px-3 rounded-full bg-primary/10 text-primary text-xs font-bold mb-4 tracking-wider">
-              شركاء النجاح
+              {t('home.partners.badge')}
             </span>
             <h2 className="text-2xl md:text-3xl font-extrabold text-on-background mb-4">
-              نفتخر بشراكاتنا الأكاديمية والمهنية
+              {t('home.partners.title')}
             </h2>
             <p className="text-on-surface-variant text-sm md:text-base max-w-2xl mx-auto">
-              نتعاون مع نخبة من الجامعات والمستشفيات والمراكز التعليمية لتقديم محتوى طبي موثوق ومعتمد يساهم في الارتقاء بمستوى التعليم الطبي.
+              {t('home.partners.subtitle')}
             </p>
           </div>
 
@@ -375,27 +371,23 @@ export default function HomePage() {
             {partners.length > 0 ? (
               partners.map((partner) => (
                 <motion.div key={partner.id} whileHover={{ scale: 1.1, opacity: 1 }} className="flex flex-col items-center gap-2 cursor-pointer transition-opacity">
-                  {partner.logo ? (
-                    <img src={partner.logo.startsWith('http') ? partner.logo : `http://localhost:5000/uploads/${partner.logo}`} alt={partner.name} className="h-12 object-contain grayscale hover:grayscale-0 transition-all" />
-                  ) : (
-                    <Building className="w-12 h-12 text-on-surface-variant" />
-                  )}
+                  <img src={import.meta.env.VITE_API_URL + partner.logo} alt={partner.name} className="h-12 object-contain grayscale hover:grayscale-0 transition-all" />
                   <span className="text-xs font-bold text-on-surface-variant">{partner.name}</span>
                 </motion.div>
               ))
             ) : (
-              <span className="text-sm text-on-surface-variant">شركاؤنا قريباً</span>
+              <span className="text-sm text-on-surface-variant">{t('home.partners.empty')}</span>
             )}
           </div>
         </div>
       </section>
 
       {/* 6. FAQ Section */}
-      <section className="py-20 bg-surface" dir="rtl">
+      <section className="py-20 bg-surface">
         <div className="max-w-3xl mx-auto px-4 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-extrabold text-on-background mb-3">الأسئلة الشائعة</h2>
-            <p className="text-on-surface-variant">كل ما تود معرفته عن منصتنا وبرامجنا التعليمية</p>
+            <h2 className="text-3xl font-extrabold text-on-background mb-3">{t('home.faq.title')}</h2>
+            <p className="text-on-surface-variant">{t('home.faq.subtitle')}</p>
           </div>
           <div className="flex flex-col gap-4">
             {faqs.length > 0 ? (
@@ -407,7 +399,7 @@ export default function HomePage() {
                 >
                   <div className="flex items-center justify-between p-5">
                     <h4 className={`font-bold text-base transition-colors duration-200 ${activeFaq === index ? 'text-primary' : 'text-on-surface'}`}>
-                      {faq.question_ar || faq.question}
+                      {faq[`question_${i18n.language}`] || faq.question_ar || faq.question}
                     </h4>
                     <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${activeFaq === index ? 'rotate-180 text-primary' : 'text-outline'}`} />
                   </div>
@@ -421,7 +413,7 @@ export default function HomePage() {
                         transition={{ duration: 0.25 }}
                       >
                         <div className="p-5 pt-0 text-on-surface-variant text-sm leading-relaxed border-t border-outline-variant/50 mt-2">
-                          {faq.answer_ar || faq.answer}
+                          {faq[`answer_${i18n.language}`] || faq.answer_ar || faq.answer}
                         </div>
                       </motion.div>
                     )}
@@ -430,7 +422,7 @@ export default function HomePage() {
               ))
             ) : (
               <div className="text-center text-on-surface-variant opacity-70">
-                لا توجد أسئلة شائعة متاحة حالياً.
+                {t('home.faq.empty')}
               </div>
             )}
           </div>

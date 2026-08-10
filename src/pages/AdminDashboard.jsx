@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 import {
   Users, BookOpen, Tag, GraduationCap, FileText, ClipboardList, Ticket, Package,
   Star, Image, Mail, BookMarked, LayoutDashboard, ChevronLeft,
-  ChevronRight, Globe, Handshake, HelpCircle, CheckCircle2, AlertCircle, Database, Target
+  ChevronRight, Globe, Handshake, HelpCircle, CheckCircle2, AlertCircle, Database, Target, LogOut
 } from 'lucide-react';
 
 import { Avatar } from './adminComponents/ui/SharedUI';
 import DashboardSection from './adminComponents/sections/DashboardSection';
 import UsersSection from './adminComponents/sections/UsersSection';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 import SessionsSection from './adminComponents/sections/SessionsSection';
 import CategoriesSection from './adminComponents/sections/CategoriesSection';
 import CoursesSection from './adminComponents/sections/CoursesSection';
@@ -72,6 +75,14 @@ export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [globalMsg, setGlobalMsg] = useState({ type: '', text: '' });
+  
+  const { logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
 
   const showMsg = (type, text) => {
     setGlobalMsg({ type, text });
@@ -79,7 +90,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="flex bg-background font-sans pb-14" dir="rtl">
+    <div className="flex bg-background font-sans ">
       {/* Sidebar Navigation */}
       <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} shrink-0 bg-surface-container-low/60 border-l border-outline-variant/30 backdrop-blur-2xl transition-all duration-300 sticky top-0 h-screen flex flex-col z-30`}>
         {/* Sidebar Header */}
@@ -131,6 +142,18 @@ export default function AdminDashboard() {
             </div>
           ))}
         </div>
+        
+        {/* Logout Button */}
+        <div className="p-4 border-t border-outline-variant/20">
+          <button
+            onClick={handleLogout}
+            title={!sidebarOpen ? 'تسجيل الخروج' : undefined}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-rose-500 hover:bg-rose-500/10 transition-all cursor-pointer"
+          >
+            <LogOut size={18} className="shrink-0" />
+            {sidebarOpen && <span>تسجيل الخروج</span>}
+          </button>
+        </div>
       </aside>
 
       {/* Main Layout Content */}
@@ -145,6 +168,7 @@ export default function AdminDashboard() {
             </span>
           </div>
           <div className="flex items-center gap-3">
+            <LanguageSwitcher />
             <Avatar name="Admin User" size="sm" />
           </div>
         </header>

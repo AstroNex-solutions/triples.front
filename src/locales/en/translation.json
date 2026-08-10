@@ -1,0 +1,238 @@
+{
+  "navbar": {
+    "home": "Home",
+    "courses": "Courses",
+    "library": "Library",
+    "articles": "Articles",
+    "assessment": "Assessments",
+    "about": "About Us",
+    "contact": "Contact Us",
+    "login": "Login",
+    "register": "Register",
+    "marquee": {
+      "msg1": "🚀 Triple S Academy platform is under continuous development",
+      "msg2": "✨ We are always working to provide you with an exceptional educational experience",
+      "msg3": "💡 We are happy to receive your feedback and suggestions for development"
+    },
+    "cartTitle": "Subscriptions Cart",
+    "dashboard": "Dashboard",
+    "logout": "Logout",
+    "loginShort": "Login",
+    "registerShort": "Register"
+  },
+  "home": {
+    "banner": {
+      "badge": "The Premier Medical Academy",
+      "title": "Elevate Your Medical Expertise with Advanced Tools",
+      "description": "An integrated educational platform providing interactive lectures, comprehensive question banks, and smart flashcards to help you easily pass board and fellowship exams with top scores."
+    },
+    "buttons": {
+      "startFree": "Start for Free",
+      "exploreCourses": "Explore Courses"
+    },
+    "stats": {
+      "joinMoreThan": "Join over",
+      "doctorsAndStudents": "outstanding doctors & students"
+    },
+    "floatingCards": {
+      "card1": {
+        "badge": "International Accreditation",
+        "title": "100% Certified Curriculum"
+      },
+      "card2": {
+        "badge": "Continuous Updates",
+        "title": "Daily Updated Content"
+      }
+    },
+    "features": {
+      "title": "Everything You Need for Academic Excellence",
+      "subtitle": "An integrated educational system designed specifically to meet the needs of medical students and doctors on their journey to excellence.",
+      "items": {
+        "interactiveLectures": {
+          "title": "Interactive Lectures",
+          "desc": "Simplified and direct explanations with clinical examples to enhance understanding and medical retention."
+        },
+        "questionBank": {
+          "title": "Smart Question Banks",
+          "desc": "Thousands of board-style questions with detailed explanations for every answer."
+        },
+        "flashcards": {
+          "title": "Flashcards",
+          "desc": "Effective spaced repetition tool for easily memorizing and recalling medical terminology and pharmacology."
+        }
+      }
+    },
+    "featuredCourses": {
+      "title": "Featured Courses",
+      "subtitle": "Start your educational journey with the best courses designed for your success",
+      "viewAll": "View All Courses"
+    },
+    "reviews": {
+      "title": "Our Doctors' Success Stories",
+      "subtitle": "We are proud of our colleagues' achievements after using our platform. Hear their experiences.",
+      "empty": "No reviews available right now."
+    },
+    "partners": {
+      "badge": "Success Partners",
+      "title": "Proud to Partner with Top Medical Institutions",
+      "subtitle": "We work side by side with prestigious organizations to provide reliable, locally and internationally accredited medical content.",
+      "empty": "No partners added yet."
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Comprehensive answers to our students' most common inquiries",
+      "empty": "No FAQs available right now."
+    }
+  },
+  "footer": {
+    "description": "The leading platform in interactive medical education. We help doctors and medical students achieve academic excellence through smart study tools and integrated question banks.",
+    "rights": "All rights reserved",
+    "terms": "Terms & Conditions",
+    "privacy": "Privacy Policy",
+    "certified": "Certified platform for continuing medical education",
+    "quickLinks": "Quick Links",
+    "allCourses": "All Courses",
+    "blogAndNews": "Blog and Medical News",
+    "contactAndSupport": "Contact and Support",
+    "helpCenter": "Help Center & Academic Support",
+    "quickChannels": "Quick Communication Channels",
+    "scanQr": "Scan QR Code",
+    "youtubeChannel": "Educational Channel",
+    "sharePlatform": "Share Platform",
+    "poweredBy": "All Rights Reserved. Powered by"
+  },
+  "splash": {
+    "description": "Leadership and academic excellence to qualify future medical cadres at global standards.",
+    "subtitle": "Continuous Medical Education",
+    "location_prefix": "The leading medical educational platform in",
+    "jordan": "Jordan"
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "twoFactor": "Two-Factor Authentication",
+      "subtitle": "Welcome back to",
+      "subtitle2fa": "Please enter the 5-digit verification code",
+      "email": "Email",
+      "password": "Password",
+      "forgotPassword": "Forgot password?",
+      "submit": "Login",
+      "submitting": "Logging in...",
+      "verifyCode": "Enter the code sent to your email",
+      "confirmLogin": "Confirm Login",
+      "verifying": "Verifying...",
+      "backToLogin": "Back to login",
+      "noAccount": "Don't have an account yet?",
+      "createAccount": "Create a new account",
+      "errInvalid": "Invalid username or password",
+      "errCode": "Invalid verification code"
+    },
+    "register": {
+      "title": "Create New Account",
+      "subtitle": "Join the largest educational and developmental community on",
+      "fullName": "Full Name",
+      "namePlaceholder": "e.g. John Doe",
+      "username": "Username",
+      "submit": "Create Account",
+      "submitting": "Creating account...",
+      "haveAccount": "Already have an account?",
+      "login": "Login",
+      "errCreate": "Error occurred while creating the account"
+    }
+  },
+  "staticPages": {
+    "privacy": {
+      "unavailable": "Privacy policy is currently unavailable.",
+      "title": "Privacy Policy",
+      "lastUpdated": "Last updated:",
+      "officerTitle": "Privacy Officer",
+      "officerDesc": "If you have any questions regarding this privacy policy or how we handle your personal data, please contact us directly.",
+      "contactOfficer": "Contact Privacy Officer"
+    },
+    "terms": {
+      "unavailable": "Terms and conditions are currently unavailable.",
+      "title": "Terms and Conditions of Use",
+      "lastUpdated": "Last updated:",
+      "supportTitle": "Have a question?",
+      "supportDesc": "If you have any questions or inquiries about these terms of use, please do not hesitate to contact our support team.",
+      "contactSupport": "Contact Support"
+    },
+    "about": {
+      "statStudents": "Student & Doctor",
+      "statCourses": "Training Course",
+      "statInstructors": "Specialized Instructor",
+      "statSatisfaction": "Student Satisfaction",
+      "valQualityTitle": "Quality and Scientific Integrity",
+      "valQualityDesc": "We are committed to providing reliable and updated medical and academic content according to the latest international medical standards and studies.",
+      "valDevTitle": "Continuous Development",
+      "valDevDesc": "We constantly strive to update curricula and educational tools to keep pace with rapid developments in medical sciences.",
+      "valCommunityTitle": "Interactive Academic Community",
+      "valCommunityDesc": "We provide a supportive learning environment that encourages discussion and participation among students, doctors, and lecturers.",
+      "badge": "About Triple S Academy",
+      "title": "Pioneers in empowering medical and academic cadres",
+      "subtitle": "A specialized educational academy aiming to develop the skills of doctors and medical students through professional courses, interactive workshops, and high-level scientific content.",
+      "visionTitle": "Our Vision",
+      "visionDesc": "To be the first and most trusted medical educational platform in the Arab world, by providing smart and interactive medical education that meets the highest international standards and makes a real difference in clinical practice.",
+      "missionTitle": "Our Mission",
+      "missionDesc": "Facilitating access to advanced medical education through comprehensive training programs delivered by prominent doctors and consultants, while providing a flexible learning environment that supports students and practitioners at all stages of their careers.",
+      "valuesTitle": "Our Core Values",
+      "valuesDesc": "The principles that guide us in providing the best possible educational service"
+    },
+    "contact": {
+      "successMsg": "Your message has been sent successfully! The support team will contact you shortly.",
+      "errorMsg": "An error occurred while sending the message, please try again later.",
+      "phone": "Phone Number",
+      "email": "Email",
+      "address": "Address",
+      "badge": "We are here to help",
+      "title": "Contact Us",
+      "descFallback": "Do you have an inquiry about courses or subscriptions? The academic support team is ready to answer all your questions.",
+      "formTitle": "Send us a message",
+      "nameLabel": "Full Name *",
+      "namePlaceholder": "Enter your full name",
+      "emailLabel": "Email *",
+      "subjectLabel": "Subject *",
+      "subjectPlaceholder": "e.g., Inquiry about course registration...",
+      "messageLabel": "Message *",
+      "messagePlaceholder": "Write the details of your inquiry here...",
+      "sending": "Sending...",
+      "sendBtn": "Send Message"
+    },
+    "articles": {
+      "badge": "Academic Medical Library",
+      "title": "Blog & Medical News",
+      "subtitle": "Explore the latest scientific articles, research, medical news, and academic reviews prepared by a select group of specialists and doctors.",
+      "noArticlesTitle": "No articles added yet",
+      "noArticlesDesc": "No scientific articles have been published on the blog at the moment. Please check back later for updates.",
+      "aWhileAgo": "A while ago",
+      "featured": "Featured Article",
+      "views": "views",
+      "readArticle": "Read Article"
+    }
+  },
+  "language": {
+    "switch": "العربية"
+  },
+  "coursesPage": {
+    "header": {
+      "badge": "Comprehensive Academic Guide",
+      "title": "Available Training Courses",
+      "subtitle": "Explore a wide range of specialized medical courses carefully designed to qualify you and help you develop your clinical and academic capabilities."
+    },
+    "filters": {
+      "searchPlaceholder": "Search by course or instructor name...",
+      "allCategories": "All Categories",
+      "allLevels": "All Levels",
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "searchButton": "Search",
+      "resetTitle": "Reset Filters"
+    },
+    "empty": {
+      "title": "No courses found",
+      "subtitle": "We didn't find any results matching your search or filter options. Try changing your search terms or resetting.",
+      "viewAll": "View All Courses"
+    }
+  }
+}

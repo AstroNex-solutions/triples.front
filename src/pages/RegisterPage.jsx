@@ -15,8 +15,10 @@ import {
   AlertCircle, 
   Loader2 
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function RegisterPage() {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -38,14 +40,14 @@ export default function RegisterPage() {
       await register({ name, username, email, password, status });
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'حدث خطأ أثناء إنشاء الحساب');
+      setError(err.response?.data?.message || t('auth.register.errCreate'));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-10 " dir="rtl">
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-10">
       {/* Background Glow Elements */}
       <div className="relative w-full max-w-lg">
         <div className="absolute -top-12 -right-12 w-80 h-80 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
@@ -58,10 +60,10 @@ export default function RegisterPage() {
           <div className="text-center space-y-2">
             <img className="w-40 mx-auto mb-4" src="logo.png" alt="logo" />
             <h1 className="text-2xl font-extrabold text-on-surface tracking-tight">
-              إنشاء حساب جديد
+              {t('auth.register.title')}
             </h1>
             <p className="text-xs sm:text-sm text-on-surface-variant">
-              انضم لأكبر تجمع تعليمي وتطويري في منصة <span className="font-bold text-primary">Triple S Academy</span>
+              {t('auth.register.subtitle')} <span className="font-bold text-primary">Triple S Academy</span>
             </p>
           </div>
 
@@ -80,7 +82,7 @@ export default function RegisterPage() {
             {/* Name Input */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-on-surface-variant block">
-                الاسم الكامل
+                {t('auth.register.fullName')}
               </label>
               <div className="relative">
                 <User size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant/60" />
@@ -89,7 +91,7 @@ export default function RegisterPage() {
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="مثال: أحمد صبري"
+                  placeholder={t('auth.register.namePlaceholder')}
                   className="w-full pr-10 pl-4 py-3 bg-surface/80 border border-outline-variant/50 rounded-2xl text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                 />
               </div>
@@ -98,7 +100,7 @@ export default function RegisterPage() {
             {/* Username Input */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-on-surface-variant block">
-                اسم المستخدم
+                {t('auth.register.username')}
               </label>
               <div className="relative">
                 <AtSign size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant/60" />
@@ -117,7 +119,7 @@ export default function RegisterPage() {
             {/* Email Input */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-on-surface-variant block">
-                البريد الإلكتروني
+                {t('auth.login.email')}
               </label>
               <div className="relative">
                 <Mail size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant/60" />
@@ -136,7 +138,7 @@ export default function RegisterPage() {
             {/* Password Input */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-on-surface-variant block">
-                كلمة المرور
+                {t('auth.login.password')}
               </label>
               <div className="relative">
                 <Lock size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant/60" />
@@ -169,12 +171,12 @@ export default function RegisterPage() {
               {loading ? (
                 <>
                   <Loader2 size={18} className="animate-spin" />
-                  <span>جاري إنشاء الحساب...</span>
+                  <span>{t('auth.register.submitting')}</span>
                 </>
               ) : (
                 <>
                   <UserPlus size={18} />
-                  <span>إنشاء الحساب</span>
+                  <span>{t('auth.register.submit')}</span>
                 </>
               )}
             </button>
@@ -182,9 +184,9 @@ export default function RegisterPage() {
 
           {/* Footer Link */}
           <div className="pt-4 border-t border-outline-variant/30 text-center text-xs text-on-surface-variant">
-            لديك حساب بالفعل؟{' '}
+            {t('auth.register.haveAccount')}{' '}
             <Link to="/login" className="text-primary font-bold hover:underline">
-              تسجيل الدخول
+              {t('auth.register.login')}
             </Link>
           </div>
 

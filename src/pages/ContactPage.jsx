@@ -8,7 +8,6 @@ import {
   MessageSquare, 
   CheckCircle2, 
   AlertCircle,
-  Clock,
   Loader2,
   Facebook,
   Twitter,
@@ -16,8 +15,10 @@ import {
   Linkedin,
   Youtube
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function ContactPage() {
+  const { t, i18n } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -56,7 +57,7 @@ export default function ContactPage() {
       setStatus({
         loading: false,
         success: true,
-        message: 'تم إرسال رسالتك بنجاح! سيتواصل معك فريق الدعم في أقرب وقت.'
+        message: t('staticPages.contact.successMsg')
       });
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
     } catch (err) {
@@ -64,7 +65,7 @@ export default function ContactPage() {
       setStatus({
         loading: false,
         success: false,
-        message: err.response?.data?.message || 'حدث خطأ أثناء إرسال الرسالة، يرجى المحاولة لاحقاً.'
+        message: err.response?.data?.message || t('staticPages.contact.errorMsg')
       });
     }
   };
@@ -72,18 +73,18 @@ export default function ContactPage() {
   const displayInfo = [
     {
       icon: Phone,
-      title: 'رقم الهاتف',
+      title: t('staticPages.contact.phone'),
       value: contactInfo?.phone ,
     },
     {
       icon: Mail,
-      title: 'البريد الإلكتروني',
+      title: t('staticPages.contact.email'),
       value: contactInfo?.email,
     },
     {
       icon: MapPin,
-      title: 'العنوان',
-      value: contactInfo?.address_ar || contactInfo?.address ,
+      title: t('staticPages.contact.address'),
+      value: contactInfo?.[`address_${i18n.language}`] || contactInfo?.address_ar || contactInfo?.address ,
     }
   ];
 
@@ -92,7 +93,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen pb-20 pt-6 px-4 sm:px-6 lg:px-12 max-w-container-max mx-auto space-y-12 " dir="rtl">
+    <div className="min-h-screen pb-20 pt-6 px-4 sm:px-6 lg:px-12 max-w-container-max mx-auto space-y-12">
       
       {/* 1. Page Header */}
       <div className="relative rounded-3xl bg-surface-container-low/70 border border-outline-variant/40 p-6 sm:p-10 backdrop-blur-xl overflow-hidden shadow-sm">
@@ -100,13 +101,13 @@ export default function ContactPage() {
         <div className="relative z-10 max-w-2xl space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">
             <MessageSquare size={15} />
-            <span>نحن هنا للمساعدة</span>
+            <span>{t('staticPages.contact.badge')}</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-extrabold text-on-surface tracking-tight">
-            تواصل معنا
+            {t('staticPages.contact.title')}
           </h1>
           <p className="text-on-surface-variant text-sm sm:text-base leading-relaxed">
-            {contactInfo?.description_ar || contactInfo?.description || 'هل لديك استفسار حول الدورات أو الاشتراكات؟ فريق الدعم الأكاديمي جاهز للإجابة على جميع أسئلتك.'}
+            {contactInfo?.[`description_${i18n.language}`] || contactInfo?.description_ar || contactInfo?.description || t('staticPages.contact.descFallback')}
           </p>
         </div>
       </div>
@@ -146,7 +147,7 @@ export default function ContactPage() {
 
         {/* Contact Form Panel */}
         <div className="lg:col-span-2 rounded-3xl bg-surface-container-low/70 border border-outline-variant/40 p-6 sm:p-8 backdrop-blur-xl">
-          <h2 className="text-xl font-extrabold text-on-surface mb-6">أرسل لنا رسالة</h2>
+          <h2 className="text-xl font-extrabold text-on-surface mb-6">{t('staticPages.contact.formTitle')}</h2>
 
           {status.message && (
             <div className={`p-4 rounded-2xl mb-6 flex items-start gap-3 border text-sm ${
@@ -163,21 +164,21 @@ export default function ContactPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Name */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-on-surface-variant">الاسم الكامل *</label>
+                <label className="text-xs font-bold text-on-surface-variant">{t('staticPages.contact.nameLabel')}</label>
                 <input 
                   type="text" 
                   name="name" 
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="أدخل اسمك الثلاثي" 
+                  placeholder={t('staticPages.contact.namePlaceholder')} 
                   className="w-full px-4 py-3 bg-surface/80 border border-outline-variant/50 rounded-2xl text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                 />
               </div>
 
               {/* Email */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-on-surface-variant">البريد الإلكتروني *</label>
+                <label className="text-xs font-bold text-on-surface-variant">{t('staticPages.contact.emailLabel')}</label>
                 <input 
                   type="email" 
                   name="email" 
@@ -193,7 +194,7 @@ export default function ContactPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Phone */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-on-surface-variant">رقم الهاتف</label>
+                <label className="text-xs font-bold text-on-surface-variant">{t('staticPages.contact.phone')}</label>
                 <input 
                   type="tel" 
                   name="phone" 
@@ -206,14 +207,14 @@ export default function ContactPage() {
 
               {/* Subject */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-on-surface-variant">موضوع الرسالة *</label>
+                <label className="text-xs font-bold text-on-surface-variant">{t('staticPages.contact.subjectLabel')}</label>
                 <input 
                   type="text" 
                   name="subject" 
                   required
                   value={formData.subject}
                   onChange={handleChange}
-                  placeholder="مثال: استفسار عن تسجيل دوره..." 
+                  placeholder={t('staticPages.contact.subjectPlaceholder')} 
                   className="w-full px-4 py-3 bg-surface/80 border border-outline-variant/50 rounded-2xl text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                 />
               </div>
@@ -221,14 +222,14 @@ export default function ContactPage() {
 
             {/* Message */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-on-surface-variant">نص الرسالة *</label>
+              <label className="text-xs font-bold text-on-surface-variant">{t('staticPages.contact.messageLabel')}</label>
               <textarea 
                 name="message" 
                 rows="5"
                 required
                 value={formData.message}
                 onChange={handleChange}
-                placeholder="اكتب تفاصيل استفسارك هنا..." 
+                placeholder={t('staticPages.contact.messagePlaceholder')} 
                 className="w-full px-4 py-3 bg-surface/80 border border-outline-variant/50 rounded-2xl text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-none"
               ></textarea>
             </div>
@@ -240,11 +241,11 @@ export default function ContactPage() {
               className="w-full sm:w-auto px-8 py-3.5 bg-primary text-on-primary font-bold text-sm rounded-2xl hover:bg-primary-hover disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-glow cursor-pointer"
             >
               {status.loading ? (
-                <span>جاري الإرسال...</span>
+                <span>{t('staticPages.contact.sending')}</span>
               ) : (
                 <>
                   <Send size={16} />
-                  <span>إرسال الرسالة</span>
+                  <span>{t('staticPages.contact.sendBtn')}</span>
                 </>
               )}
             </button>

@@ -53,9 +53,9 @@ export default function BannersSection({ showMsg }) {
             <Input label="العنوان (AR)" value={form.title_ar} onChange={e => setForm({...form, title_ar: e.target.value})} />
           </div>
           <Textarea label="الوصف" value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
-          <Select label="النوع" value={form.banner_type} onChange={e => setForm({...form, banner_type: e.target.value})}>
+          {/* <Select label="النوع" value={form.banner_type} onChange={e => setForm({...form, banner_type: e.target.value})}>
             <option value="main">رئيسي</option><option value="header">Header</option><option value="sidebar">Sidebar</option>
-          </Select>
+          </Select> */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-on-surface-variant block">صورة البنر *</label>
             <input type="file" accept="image/*" onChange={e => setFile(e.target.files[0])} className="text-sm text-on-surface-variant" />

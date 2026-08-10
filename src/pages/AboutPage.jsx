@@ -10,35 +10,37 @@ import {
   HeartPulse,
   Sparkles 
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function AboutPage() {
+  const { t } = useTranslation();
   const stats = [
-    { id: 1, label: 'طالب وطبيبة', value: '+10,000', icon: Users },
-    { id: 2, label: 'دورة تدريبية', value: '+150', icon: BookOpen },
-    { id: 3, label: 'محاضر متخصص', value: '+45', icon: GraduationCap },
-    { id: 4, label: 'نسبة رضا الطلاب', value: '98%', icon: Award },
+    { id: 1, label: t('staticPages.about.statStudents'), value: '+10,000', icon: Users },
+    { id: 2, label: t('staticPages.about.statCourses'), value: '+150', icon: BookOpen },
+    { id: 3, label: t('staticPages.about.statInstructors'), value: '+45', icon: GraduationCap },
+    { id: 4, label: t('staticPages.about.statSatisfaction'), value: '98%', icon: Award },
   ];
 
   const values = [
     {
       icon: ShieldCheck,
-      title: 'الجودة والأمانة العلمية',
-      description: 'نلتزم تقديم محتوى طبي وأكاديمي موثوق ومحدث وفق أحدث المعايير والدراسات الطبية العالمية.'
+      title: t('staticPages.about.valQualityTitle'),
+      description: t('staticPages.about.valQualityDesc')
     },
     {
       icon: HeartPulse,
-      title: 'التطوير المستمر',
-      description: 'نسعى دائماً لتحديث المناهج والأدوات التعليمية لمواكبة التطورات السريعة في العلوم الطبية.'
+      title: t('staticPages.about.valDevTitle'),
+      description: t('staticPages.about.valDevDesc')
     },
     {
       icon: Users,
-      title: 'مجتمع أكاديمي تفاعلي',
-      description: 'نوفر بيئة تعلّم داعمة تشجع على النقاش والمشاركة بين الطلاب والأطباء والمحاضرين.'
+      title: t('staticPages.about.valCommunityTitle'),
+      description: t('staticPages.about.valCommunityDesc')
     }
   ];
 
   return (
-    <div className="min-h-screen pb-20 pt-6 px-4 sm:px-6 lg:px-12 max-w-container-max mx-auto space-y-12 " dir="rtl">
+    <div className="min-h-screen pb-20 pt-6 px-4 sm:px-6 lg:px-12 max-w-container-max mx-auto space-y-12">
       
       {/* 1. Hero Header */}
       <div className="relative rounded-3xl bg-surface-container-low/70 border border-outline-variant/40 p-8 sm:p-14 backdrop-blur-xl overflow-hidden shadow-sm text-center sm:text-right">
@@ -46,13 +48,13 @@ export default function AboutPage() {
         <div className="relative z-10 max-w-3xl space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">
             <Sparkles size={15} />
-            <span>عن Triple S Academy</span>
+            <span>{t('staticPages.about.badge')}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-on-surface tracking-tight leading-tight">
-            رائدون في تمكين الكوادر الطبية والأكاديمية
+            {t('staticPages.about.title')}
           </h1>
           <p className="text-on-surface-variant text-base sm:text-lg leading-relaxed">
-            أكاديمية تعليمية متخصصة تهدف إلى تطوير مهارات الأطباء وطلاب الكليات الطبية من خلال دورات احترافية، ورش عمل تفاعلية، ومحتوى علمي رفيع المستوى.
+            {t('staticPages.about.subtitle')}
           </p>
         </div>
       </div>
@@ -87,9 +89,9 @@ export default function AboutPage() {
           <div className="w-12 h-12 rounded-2xl bg-secondary-container/80 text-on-secondary-container flex items-center justify-center">
             <Eye size={24} />
           </div>
-          <h2 className="text-xl font-extrabold text-on-surface">رؤيتنا</h2>
+          <h2 className="text-xl font-extrabold text-on-surface">{t('staticPages.about.visionTitle')}</h2>
           <p className="text-sm text-on-surface-variant leading-relaxed">
-            أن نكون المنصة التعليمية الطبية الأولى والموثوقة في الوطن العربي، عبر تقديم تعليم طبي ذكي وتفاعلي يواكب أرقى المعايير العالمية ويصنع فارقاً حقيقياً في الممارسة الإكلينيكية.
+            {t('staticPages.about.visionDesc')}
           </p>
         </div>
 
@@ -98,9 +100,9 @@ export default function AboutPage() {
           <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
             <Target size={24} />
           </div>
-          <h2 className="text-xl font-extrabold text-on-surface">رسالتنا</h2>
+          <h2 className="text-xl font-extrabold text-on-surface">{t('staticPages.about.missionTitle')}</h2>
           <p className="text-sm text-on-surface-variant leading-relaxed">
-            تسهيل الوصول للتعليم الطبي المتقدم من خلال برامج تدريبية شاملة يلقيها أطباء واستشاريون بارزون، مع توفير بيئة تعليمية مرنة تدعم الطالب والممارس في جميع مراحل مسيرته المهنية.
+            {t('staticPages.about.missionDesc')}
           </p>
         </div>
       </div>
@@ -108,8 +110,8 @@ export default function AboutPage() {
       {/* 4. Core Values */}
       <div className="space-y-6">
         <div className="text-center max-w-xl mx-auto space-y-2">
-          <h2 className="text-2xl font-extrabold text-on-surface">قيمنا الأساسية</h2>
-          <p className="text-sm text-on-surface-variant">المبادئ التي تقودنا في تقديم أفضل خدمة تعليمية ممكنة</p>
+          <h2 className="text-2xl font-extrabold text-on-surface">{t('staticPages.about.valuesTitle')}</h2>
+          <p className="text-sm text-on-surface-variant">{t('staticPages.about.valuesDesc')}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

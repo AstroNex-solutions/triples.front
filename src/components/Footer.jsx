@@ -11,12 +11,14 @@ import {
   Youtube,
   QrCode
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function Footer() {
+  const { t } = useTranslation();
   const [logoError, setLogoError] = useState(false);
 
   return (
-    <footer className="w-full bg-primary text-on-primary py-12 relative overflow-hidden" dir="rtl">
+    <footer className="w-full bg-primary text-on-primary py-12 relative overflow-hidden">
       
       {/* Visual Ambient Glow Background */}
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-white/5 rounded-full blur-3xl pointer-events-none" />
@@ -36,33 +38,33 @@ export default function Footer() {
                 />
             </div>
             <p className="text-sm font-label-md leading-relaxed text-on-primary/90">
-              المنصة الرائدة في التعليم الطبي التفاعلي. نساعد الأطباء وطلاب الكليات الطبية على تحقيق التميز الأكاديمي عبر أدوات استذكار ذكية وبنوك أسئلة متكاملة.
+              {t('footer.description')}
             </p>
           </div>
 
           <div className="flex items-center gap-2 text-xs opacity-75">
             <Globe2 size={16} />
-            <span>منصة معتمدة للتعليم الطبي المستمر</span>
+            <span>{t('footer.certified')}</span>
           </div>
         </div>
 
         {/* 2. Quick Links */}
         <div className="flex flex-col gap-3">
           <h4 className="text-base font-bold text-on-primary border-b border-on-primary/15 pb-2">
-            روابط سريعة
+            {t('footer.quickLinks')}
           </h4>
           <nav className="flex flex-col gap-2.5 text-sm">
             <Link to="/" className="opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all duration-200 flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-secondary-fixed/60" />
-              الرئيسية
+              {t('navbar.home')}
             </Link>
             <Link to="/courses" className="opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all duration-200 flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-secondary-fixed/60" />
-              جميع الدورات
+              {t('footer.allCourses')}
             </Link>
             <Link to="/articles" className="opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all duration-200 flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-secondary-fixed/60" />
-              المدونة والأخبار الطبية
+              {t('footer.blogAndNews')}
             </Link>
           </nav>
         </div>
@@ -70,7 +72,7 @@ export default function Footer() {
         {/* 4. Contact & Social Channels */}
         <div className="flex flex-col gap-3">
           <h4 className="text-base font-bold text-on-primary border-b border-on-primary/15 pb-2">
-            التواصل والدعم
+            {t('footer.contactAndSupport')}
           </h4>
           <div className="flex flex-col gap-3 text-sm">
             <a 
@@ -82,17 +84,17 @@ export default function Footer() {
             </a>
             <div className="flex items-center gap-2.5 opacity-85">
               <Headphones size={18} />
-              <span>مركز المساعدة والدعم الأكاديمي</span>
+              <span>{t('footer.helpCenter')}</span>
             </div>
           </div>
 
           <div className="pt-2">
-            <span className="text-xs opacity-70 block mb-2">قنوات التواصل السريع</span>
+            <span className="text-xs opacity-70 block mb-2">{t('footer.quickChannels')}</span>
             <div className="flex gap-2">
               <button 
                 type="button"
-                title="مسح رمز QR"
-                aria-label="مسح رمز QR"
+                title={t('footer.scanQr')}
+                aria-label={t('footer.scanQr')}
                 className="p-2 bg-white/10 hover:bg-white/20 hover:text-secondary-fixed rounded-xl transition-all duration-200"
               >
                 <QrCode size={18} />
@@ -101,16 +103,16 @@ export default function Footer() {
                 href="https://youtube.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                title="القناة التعليمية"
-                aria-label="القناة التعليمية على يوتيوب"
+                title={t('footer.youtubeChannel')}
+                aria-label={t('footer.youtubeChannel')}
                 className="p-2 bg-white/10 hover:bg-white/20 hover:text-secondary-fixed rounded-xl transition-all duration-200 flex items-center justify-center"
               >
                 <Youtube size={18} />
               </a>
               <button 
                 type="button"
-                title="مشاركة المنصة"
-                aria-label="مشاركة المنصة"
+                title={t('footer.sharePlatform')}
+                aria-label={t('footer.sharePlatform')}
                 className="p-2 bg-white/10 hover:bg-white/20 hover:text-secondary-fixed rounded-xl transition-all duration-200"
               >
                 <Share2 size={18} />
@@ -132,12 +134,12 @@ export default function Footer() {
     >
       AstroNex Solutions
     </a>
-    <span>© {new Date().getFullYear()}  All Rights Reserved. Powered by</span>
+    <span>© {new Date().getFullYear()} {t('footer.poweredBy')}</span>
   </p>
   <div className="font-bold flex items-center gap-4">
-    <Link to="/privacy" className="hover:underline hover:opacity-100">سياسة الخصوصية</Link>
+    <Link to="/privacy" className="hover:underline hover:opacity-100">{t('footer.privacy')}</Link>
     <span>•</span>
-    <Link to="/terms" className="hover:underline hover:opacity-100">الشروط والأحكام</Link>
+    <Link to="/terms" className="hover:underline hover:opacity-100">{t('footer.terms')}</Link>
   </div>
 </div>
     </footer>

@@ -2,38 +2,65 @@ import React, { useState, useEffect } from 'react';
 import API from '../../../api/axios';
 import { 
   Loader2, BookOpen, Plus, CheckCircle2, Users, Play, Trash2, ChevronDown, 
-  Video, FileText, ClipboardList, Lock, Edit3, FolderPlus, Upload, Search, X 
+  Video, FileText, ClipboardList, Lock, Edit3, FolderPlus, Upload, Search, X, Paperclip, FileIcon, Download, AlertTriangle
 } from 'lucide-react';
 import { SectionHeader, Card, Badge, statusBadge, Modal, Input, Select, Textarea, SubmitBtn } from '../ui/SharedUI';
+
+const parseAttachments = (atts) => {
+  if (!atts) return [];
+  if (typeof atts === 'string') {
+    try { return JSON.parse(atts); } catch(e) { return []; }
+  }
+  return Array.isArray(atts) ? atts : [];
+};
 
 const ModuleNode = ({ 
   module, allModules, mIdx, level = 0, 
   expandedModuleIds, toggleModule, 
   setShowAddLesson, setShowAddModule, setModuleForm, 
-  setLessonForm, setLessonFile, setShowEditLesson 
+  setLessonForm, setLessonFile, setShowEditLesson,
+  setShowEditModule, setItemToDelete, setLessonAttachmentFiles
 }) => {
   const isModuleOpen = expandedModuleIds.includes(module.id);
   const subModules = allModules.filter(m => m.submodule_id === module.id);
   
+  const levelStyles = [
+    { border: 'border-primary/50', bg: 'bg-primary/5', badgeBg: 'bg-primary/10', badgeText: 'text-primary', badgeBorder: 'border-primary/20' },
+    { border: 'border-indigo-500/50', bg: 'bg-indigo-500/5', badgeBg: 'bg-indigo-500/10', badgeText: 'text-indigo-500', badgeBorder: 'border-indigo-500/20' },
+    { border: 'border-emerald-500/50', bg: 'bg-emerald-500/5', badgeBg: 'bg-emerald-500/10', badgeText: 'text-emerald-500', badgeBorder: 'border-emerald-500/20' },
+    { border: 'border-amber-500/50', bg: 'bg-amber-500/5', badgeBg: 'bg-amber-500/10', badgeText: 'text-amber-500', badgeBorder: 'border-amber-500/20' }
+  ];
+  const style = levelStyles[Math.min(level, levelStyles.length - 1)];
+
   return (
-    <div className={`border border-outline-variant/30 rounded-2xl bg-surface/60 overflow-hidden ${level > 0 ? 'mt-3 border-r-2 border-r-primary/50' : ''}`}>
-      <div className={`p-3 sm:p-4 flex items-center justify-between gap-3 bg-surface-container-low/30`}>
+    <div className={`border border-outline-variant/30 rounded-2xl bg-surface/60 overflow-hidden ${level > 0 ? `mt-3 border-r-4 ${style.border}` : 'border-r-4 border-r-primary'}`}>
+      <div className={`p-3 sm:p-4 flex items-center justify-between gap-3 ${style.bg} transition-colors`}>
         <div className="flex items-center gap-2.5">
-          <span className="text-xs font-bold text-primary px-2 py-0.5 rounded-lg bg-primary/10 border border-primary/20">
+          <span className={`text-xs font-bold px-2 py-0.5 rounded-lg border ${style.badgeBg} ${style.badgeText} ${style.badgeBorder}`}>
             {level === 0 ? `موديول ${mIdx + 1}` : `قسم فرعي`}
           </span>
           <h5 className="text-xs sm:text-sm font-bold text-on-surface">{module.name}</h5>
           <span className="text-[11px] text-on-surface-variant">({module.lessons?.length || 0} دروس، {subModules.length} أقسام)</span>
         </div>
-        <div className="flex flex-wrap items-center justify-end gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-1.5 sm:gap-2">
           <button onClick={() => {
             setShowAddModule(module.course_id); 
             setModuleForm({ name: '', description: '', order: 1, submodule_id: module.id });
           }} className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-500 font-bold text-[11px] flex items-center gap-1 hover:bg-emerald-500/20 transition-all cursor-pointer">
-            <Plus size={12} /><span>قسم فرعي</span>
+            <Plus size={12} /><span className="hidden sm:inline">قسم فرعي</span>
           </button>
           <button onClick={() => setShowAddLesson(module.id)} className="px-2.5 py-1 rounded-lg bg-primary text-on-primary font-bold text-[11px] flex items-center gap-1 hover:bg-primary-hover transition-all cursor-pointer">
-            <Plus size={12} /><span>درس</span>
+            <Plus size={12} /><span className="hidden sm:inline">درس</span>
+          </button>
+          <div className="w-[1px] h-4 bg-outline-variant/30 mx-1"></div>
+          <button onClick={() => {
+            setModuleForm({ name: module.name, description: module.description || '', order: module.order || 1, submodule_id: module.submodule_id });
+            setShowEditModule(module);
+          }} className="p-1.5 rounded-lg bg-surface border border-outline-variant/40 text-on-surface-variant hover:text-primary transition-all cursor-pointer" title="تعديل الوحدة">
+            <Edit3 size={14} />
+          </button>
+          <button onClick={() => setItemToDelete({ type: 'module', id: module.id, name: module.name })} className="p-1.5 rounded-lg bg-surface border border-outline-variant/40 text-on-surface-variant hover:text-rose-400 transition-all cursor-pointer" title="حذف الوحدة">
+            <Trash2 size={14} />
           </button>
           <button onClick={() => toggleModule(module.id)} className="p-1 text-on-surface-variant cursor-pointer">
             <ChevronDown size={16} className={`transition-transform ${isModuleOpen ? 'rotate-180 text-primary' : ''}`} />
@@ -47,12 +74,19 @@ const ModuleNode = ({
           {module.lessons && module.lessons.length > 0 && (
             <div className="space-y-2 mb-3">
               {module.lessons.map((l) => (
-                <div key={l.id} className="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low/40 border border-outline-variant/20 text-xs">
-                  <div className="flex items-center gap-2.5">
+                <div key={l.id} className="flex items-center justify-between p-2.5 rounded-xl border border-outline-variant/20 text-xs bg-surface-container-low/50 hover:bg-surface-container-low transition-colors shadow-sm relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 bottom-0 w-1 bg-outline-variant/20 group-hover:bg-primary/40 transition-colors"></div>
+                  <div className="flex items-center gap-2.5 pr-2">
                     {l.lesson_type === 'video' && <Video size={14} className="text-primary" />}
                     {l.lesson_type === 'article' && <FileText size={14} className="text-emerald-400" />}
                     {l.lesson_type === 'quiz' && <ClipboardList size={14} className="text-amber-400" />}
                     <span className="font-semibold text-on-surface">{l.title}</span>
+                    {parseAttachments(l.attachments).length > 0 && (
+                      <div className="flex items-center gap-1 text-[10px] text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded-md border border-amber-500/20" title={`يحتوي على ${parseAttachments(l.attachments).length} مرفقات`}>
+                        <Paperclip size={10} />
+                        <span>{parseAttachments(l.attachments).length}</span>
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
@@ -65,12 +99,19 @@ const ModuleNode = ({
                     <button
                       onClick={() => {
                         setLessonForm({ title: l.title || '', content: l.content || '', video_url: l.video_url || '', lesson_type: l.lesson_type || 'video', is_free: !!l.is_free, order: l.order || 1 });
-                        setLessonFile(null); setShowEditLesson(l);
+                        setLessonFile(null); setLessonAttachmentFiles([]); setShowEditLesson(l);
                       }}
                       className="p-1.5 rounded-lg bg-surface border border-outline-variant/40 text-on-surface-variant hover:text-primary transition-all cursor-pointer"
                       title="تعديل الدرس"
                     >
                       <Edit3 size={12} />
+                    </button>
+                    <button
+                      onClick={() => setItemToDelete({ type: 'lesson', id: l.id, name: l.title })}
+                      className="p-1.5 rounded-lg bg-surface border border-outline-variant/40 text-on-surface-variant hover:text-rose-400 transition-all cursor-pointer"
+                      title="حذف الدرس"
+                    >
+                      <Trash2 size={12} />
                     </button>
                   </div>
                 </div>
@@ -88,6 +129,8 @@ const ModuleNode = ({
                   setShowAddLesson={setShowAddLesson} setShowAddModule={setShowAddModule}
                   setModuleForm={setModuleForm} setLessonForm={setLessonForm}
                   setLessonFile={setLessonFile} setShowEditLesson={setShowEditLesson}
+                  setShowEditModule={setShowEditModule} setItemToDelete={setItemToDelete}
+                  setLessonAttachmentFiles={setLessonAttachmentFiles}
                 />
               ))}
             </div>
@@ -114,7 +157,10 @@ export default function CoursesSection({ showMsg }) {
   const [showAdd, setShowAdd] = useState(false);
   const [showAddModule, setShowAddModule] = useState(null);
   const [showAddLesson, setShowAddLesson] = useState(null);
+  const [showEditCourse, setShowEditCourse] = useState(null);
+  const [showEditModule, setShowEditModule] = useState(null);
   const [showEditLesson, setShowEditLesson] = useState(null);
+  const [itemToDelete, setItemToDelete] = useState(null); // { type, id, name }
   const [previewCourse, setPreviewCourse] = useState(null);
   const [previewActiveLesson, setPreviewActiveLesson] = useState(null);
  
@@ -123,6 +169,7 @@ export default function CoursesSection({ showMsg }) {
   const [lessonForm, setLessonForm] = useState({ title: '', content: '', video_url: '', lesson_type: 'video', is_free: false, order: 1 });
   const [file, setFile] = useState(null);
   const [lessonFile, setLessonFile] = useState(null);
+  const [lessonAttachmentFiles, setLessonAttachmentFiles] = useState([]);
 
   // Instructor assignment
   const [showAssignInstructor, setShowAssignInstructor] = useState(null); // course object
@@ -171,10 +218,22 @@ export default function CoursesSection({ showMsg }) {
     catch { showMsg('error', 'خطأ في الاعتماد'); }
   };
 
-  const deleteCourse = async (id) => {
-    if (!confirm('حذف هذا الكورس نهائياً؟')) return;
-    try { await API.delete(`/admin/courses/${id}`); showMsg('success', 'تم حذف الكورس'); fetchData(); }
-    catch { showMsg('error', 'خطأ في الحذف'); }
+  const handleConfirmDelete = async () => {
+    if (!itemToDelete) return;
+    setSubmitting(true);
+    try {
+      if (itemToDelete.type === 'course') await API.delete(`/admin/courses/${itemToDelete.id}`);
+      else if (itemToDelete.type === 'module') await API.delete(`/admin/modules/${itemToDelete.id}`);
+      else if (itemToDelete.type === 'lesson') await API.delete(`/admin/lessons/${itemToDelete.id}`);
+      
+      showMsg('success', 'تم الحذف بنجاح');
+      setItemToDelete(null);
+      fetchData();
+    } catch (err) {
+      showMsg('error', err.response?.data?.message || 'خطأ في الحذف');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const createCourse = async (e) => {
@@ -192,6 +251,21 @@ export default function CoursesSection({ showMsg }) {
     finally { setSubmitting(false); }
   };
 
+  const updateCourse = async (e) => {
+    e.preventDefault(); setSubmitting(true);
+    try {
+      const fd = new FormData();
+      Object.entries(form).forEach(([k, v]) => fd.append(k, v));
+      if (file) fd.append('image', file);
+      await API.put(`/admin/courses/${showEditCourse.id}`, fd);
+      showMsg('success', 'تم تحديث الكورس بنجاح');
+      setShowEditCourse(null);
+      setForm({ title: '', subtitle: '', description: '', level: 'beginner', price: '0', category_id: '' });
+      setFile(null); fetchData();
+    } catch (err) { showMsg('error', err.response?.data?.message || 'خطأ في تحديث الكورس'); }
+    finally { setSubmitting(false); }
+  };
+
   const createModule = async (e) => {
     e.preventDefault(); setSubmitting(true);
     try {
@@ -202,22 +276,30 @@ export default function CoursesSection({ showMsg }) {
     finally { setSubmitting(false); }
   };
 
+  const updateModule = async (e) => {
+    e.preventDefault(); setSubmitting(true);
+    try {
+      await API.put(`/admin/modules/${showEditModule.id}`, moduleForm);
+      showMsg('success', 'تم تحديث الوحدة التعليمية');
+      setShowEditModule(null); setModuleForm({ name: '', description: '', order: 1, submodule_id: null }); fetchData();
+    } catch (err) { showMsg('error', err.response?.data?.message || 'خطأ في تحديث الوحدة'); }
+    finally { setSubmitting(false); }
+  };
+
   const createLesson = async (e) => {
     e.preventDefault(); setSubmitting(true);
     try {
-      if (lessonFile || lessonForm.lesson_type === 'video') {
-        const fd = new FormData();
-        Object.entries(lessonForm).forEach(([k, v]) => fd.append(k, v));
-        fd.append('module_id', showAddLesson);
-        if (lessonFile) fd.append('video', lessonFile);
-        await API.post('/admin/lessons', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-      } else {
-        await API.post('/admin/lessons', { ...lessonForm, module_id: showAddLesson });
-      }
+      const fd = new FormData();
+      Object.entries(lessonForm).forEach(([k, v]) => fd.append(k, v));
+      fd.append('module_id', showAddLesson);
+      if (lessonFile) fd.append('video', lessonFile);
+      // Append each attachment file
+      lessonAttachmentFiles.forEach(f => fd.append('attachments', f));
+      await API.post('/admin/lessons', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       showMsg('success', 'تم إضافة الدرس بنجاح');
       setShowAddLesson(null);
       setLessonForm({ title: '', content: '', video_url: '', lesson_type: 'video', is_free: false, order: 1 });
-      setLessonFile(null); fetchData();
+      setLessonFile(null); setLessonAttachmentFiles([]); fetchData();
     } catch (err) { showMsg('error', err.response?.data?.message || 'خطأ في إضافة الدرس'); }
     finally { setSubmitting(false); }
   };
@@ -225,18 +307,16 @@ export default function CoursesSection({ showMsg }) {
   const updateLesson = async (e) => {
     e.preventDefault(); setSubmitting(true);
     try {
-      if (lessonFile || lessonForm.lesson_type === 'video') {
-        const fd = new FormData();
-        Object.entries(lessonForm).forEach(([k, v]) => fd.append(k, v));
-        if (lessonFile) fd.append('video', lessonFile);
-        await API.put(`/admin/lessons/${showEditLesson.id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-      } else {
-        await API.put(`/admin/lessons/${showEditLesson.id}`, lessonForm);
-      }
+      const fd = new FormData();
+      Object.entries(lessonForm).forEach(([k, v]) => fd.append(k, v));
+      if (lessonFile) fd.append('video', lessonFile);
+      // Append each new attachment file
+      lessonAttachmentFiles.forEach(f => fd.append('attachments', f));
+      await API.put(`/admin/lessons/${showEditLesson.id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       showMsg('success', 'تم تحديث الدرس بنجاح');
       setShowEditLesson(null);
       setLessonForm({ title: '', content: '', video_url: '', lesson_type: 'video', is_free: false, order: 1 });
-      setLessonFile(null); fetchData();
+      setLessonFile(null); setLessonAttachmentFiles([]); fetchData();
     } catch (err) { showMsg('error', err.response?.data?.message || 'خطأ في تحديث الدرس'); }
     finally { setSubmitting(false); }
   };
@@ -306,9 +386,9 @@ export default function CoursesSection({ showMsg }) {
             const modulesCount = c.modules?.length || 0;
             const totalLessons = c.modules?.reduce((acc, m) => acc + (m.lessons?.length || 0), 0) || 0;
             return (
-              <Card key={c.id} className="p-0 overflow-hidden border border-outline-variant/40 shadow-sm hover:border-outline-variant/80 transition-all">
+              <Card key={c.id} className={`p-0 overflow-hidden border shadow-sm transition-all ${isCourseOpen ? 'border-r-4 border-r-primary/70 border-outline-variant/60' : 'border-r-4 border-r-primary/20 border-outline-variant/40 hover:border-outline-variant/80'}`}>
                 {/* Course Header */}
-                <div className="p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4 bg-surface-container-low/40">
+                <div className={`p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4 transition-colors ${isCourseOpen ? 'bg-primary/5' : 'bg-surface-container-low/40'}`}>
                   <div className="flex items-center gap-3.5 flex-1 min-w-[240px]">
                     <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center shrink-0">
                       <BookOpen size={22} />
@@ -352,7 +432,13 @@ export default function CoursesSection({ showMsg }) {
                     }} className="p-2 rounded-xl bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-all cursor-pointer" title="مشاهدة محتوى الكورس">
                       <Play size={16} />
                     </button>
-                    <button onClick={() => deleteCourse(c.id)} className="p-2 rounded-xl bg-surface border border-outline-variant/40 text-on-surface-variant hover:text-rose-400 transition-all cursor-pointer" title="حذف">
+                    <button onClick={() => {
+                      setForm({ title: c.title, subtitle: c.subtitle || '', description: c.description || '', level: c.level || 'beginner', price: c.price || '0', category_id: c.category_id || '' });
+                      setFile(null); setShowEditCourse(c);
+                    }} className="p-2 rounded-xl bg-surface border border-outline-variant/40 text-on-surface-variant hover:text-primary transition-all cursor-pointer" title="تعديل الكورس">
+                      <Edit3 size={16} />
+                    </button>
+                    <button onClick={() => setItemToDelete({ type: 'course', id: c.id, name: c.title })} className="p-2 rounded-xl bg-surface border border-outline-variant/40 text-on-surface-variant hover:text-rose-400 transition-all cursor-pointer" title="حذف الكورس">
                       <Trash2 size={16} />
                     </button>
                     <button onClick={() => setExpandedCourseId(expandedCourseId === c.id ? null : c.id)} className="p-2 rounded-xl bg-surface border border-outline-variant/40 text-on-surface-variant hover:text-on-surface transition-all cursor-pointer">
@@ -380,6 +466,9 @@ export default function CoursesSection({ showMsg }) {
                           setLessonForm={setLessonForm}
                           setLessonFile={setLessonFile} 
                           setShowEditLesson={setShowEditLesson}
+                          setShowEditModule={setShowEditModule}
+                          setItemToDelete={setItemToDelete}
+                          setLessonAttachmentFiles={setLessonAttachmentFiles}
                         />
                       ))
                     ) : (
@@ -435,6 +524,39 @@ export default function CoursesSection({ showMsg }) {
         </form>
       </Modal>
 
+      {/* Edit Course Modal */}
+      <Modal open={!!showEditCourse} onClose={() => { setShowEditCourse(null); setForm({ title: '', subtitle: '', description: '', level: 'beginner', price: '0', category_id: '' }); }} title="تعديل الكورس">
+        <form onSubmit={updateCourse} className="space-y-4">
+          <Input label="عنوان الكورس *" required placeholder="مثال: الدبلومة الشاملة في الرعاية الفائقة" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
+          <Input label="العنوان الفرعي" placeholder="نظرة مبسطة وتطبيقية للمفاهيم الأساسية" value={form.subtitle} onChange={e => setForm({ ...form, subtitle: e.target.value })} />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <Select label="المستوى" value={form.level} onChange={e => setForm({ ...form, level: e.target.value })}>
+              <option value="beginner">مبتدئ</option>
+              <option value="intermediate">متوسط</option>
+              <option value="advanced">متقدم</option>
+            </Select>
+            <Input label="السعر ($)" type="number" step="0.01" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} dir="ltr" />
+            <Select label="التصنيف" value={form.category_id} onChange={e => setForm({ ...form, category_id: e.target.value })}>
+              <option value="">اختر التصنيف</option>
+              {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+            </Select>
+          </div>
+          <Textarea label="الوصف التفصيلي" placeholder="شرح كافة المحاور التي سيتعلمها الطالب..." value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-on-surface-variant block">تغيير صورة الغلاف</label>
+            <div className="border-2 border-dashed border-outline-variant/40 rounded-2xl p-4 text-center hover:border-primary/50 transition-colors bg-surface-container-low/30">
+              <input type="file" id="adminCourseImgEdit" accept="image/*" onChange={e => setFile(e.target.files[0])} className="hidden" />
+              <label htmlFor="adminCourseImgEdit" className="cursor-pointer space-y-1 block">
+                <Upload size={24} className="mx-auto text-primary" />
+                <span className="text-xs font-bold text-on-surface block">{file ? file.name : 'اضغط لاختيار صورة جديدة'}</span>
+                <span className="text-[10px] text-on-surface-variant/70 block">PNG, JPG حتى 5MB</span>
+              </label>
+            </div>
+          </div>
+          <SubmitBtn loading={submitting} label="تحديث الكورس" />
+        </form>
+      </Modal>
+
       {/* 2. Add Module Modal */}
       <Modal open={!!showAddModule} onClose={() => setShowAddModule(null)} title="إضافة وحدة تعليمية جديدة">
         <form onSubmit={createModule} className="space-y-4">
@@ -442,6 +564,16 @@ export default function CoursesSection({ showMsg }) {
           <Textarea label="الوصف" placeholder="نبذة مختصرة عن مواضيع هذا الفصل..." value={moduleForm.description} onChange={e => setModuleForm({ ...moduleForm, description: e.target.value })} />
           <Input label="الترتيب في المنهاج" type="number" value={moduleForm.order} onChange={e => setModuleForm({ ...moduleForm, order: e.target.value })} />
           <SubmitBtn loading={submitting} label="إضافة الوحدة" />
+        </form>
+      </Modal>
+
+      {/* Edit Module Modal */}
+      <Modal open={!!showEditModule} onClose={() => setShowEditModule(null)} title="تعديل الوحدة التعليمية">
+        <form onSubmit={updateModule} className="space-y-4">
+          <Input label="اسم الوحدة *" required placeholder="مثال: الفصل الأول - المقدمة والأساسيات" value={moduleForm.name} onChange={e => setModuleForm({ ...moduleForm, name: e.target.value })} />
+          <Textarea label="الوصف" placeholder="نبذة مختصرة عن مواضيع هذا الفصل..." value={moduleForm.description} onChange={e => setModuleForm({ ...moduleForm, description: e.target.value })} />
+          <Input label="الترتيب في المنهاج" type="number" value={moduleForm.order} onChange={e => setModuleForm({ ...moduleForm, order: e.target.value })} />
+          <SubmitBtn loading={submitting} label="تحديث الوحدة" />
         </form>
       </Modal>
 
@@ -489,6 +621,39 @@ export default function CoursesSection({ showMsg }) {
             <input type="checkbox" id="adminLessonFree" checked={lessonForm.is_free} onChange={e => setLessonForm({ ...lessonForm, is_free: e.target.checked })} className="w-4 h-4 rounded text-primary focus:ring-primary cursor-pointer" />
             <label htmlFor="adminLessonFree" className="text-xs font-bold text-on-surface cursor-pointer select-none">تحديد كـ معاينة مجانية (متاح بدون اشتراك)</label>
           </div>
+
+          {/* Attachments */}
+          <div className="space-y-2 border border-outline-variant/30 rounded-2xl p-4 bg-surface-container-low/20">
+            <div className="flex items-center gap-2 mb-2">
+              <Paperclip size={14} className="text-amber-400" />
+              <span className="text-xs font-bold text-on-surface-variant">مرفقات الدرس (PDF، ملفات، إلخ)</span>
+            </div>
+            <input
+              id="addLessonAttachments"
+              type="file"
+              multiple
+              accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.txt"
+              onChange={e => setLessonAttachmentFiles(Array.from(e.target.files))}
+              className="text-xs text-on-surface-variant w-full file:ml-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-500/10 file:text-amber-500 hover:file:bg-amber-500/20 cursor-pointer"
+            />
+            {lessonAttachmentFiles.length > 0 && (
+              <div className="space-y-1.5 mt-2">
+                {lessonAttachmentFiles.map((f, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-amber-500/5 border border-amber-500/20 text-xs">
+                    <div className="flex items-center gap-2">
+                      <FileIcon size={12} className="text-amber-400 shrink-0" />
+                      <span className="text-on-surface font-medium truncate max-w-[200px]">{f.name}</span>
+                      <span className="text-on-surface-variant/60">({(f.size / 1024).toFixed(1)} KB)</span>
+                    </div>
+                    <button type="button" onClick={() => setLessonAttachmentFiles(prev => prev.filter((_, i) => i !== idx))} className="p-1 rounded-lg hover:bg-rose-500/10 text-on-surface-variant hover:text-rose-400 transition-all cursor-pointer">
+                      <X size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           <SubmitBtn loading={submitting} label="إضافة الدرس" />
         </form>
       </Modal>
@@ -537,6 +702,86 @@ export default function CoursesSection({ showMsg }) {
             <input type="checkbox" id="adminEditLessonFree" checked={lessonForm.is_free} onChange={e => setLessonForm({ ...lessonForm, is_free: e.target.checked })} className="w-4 h-4 rounded text-primary focus:ring-primary cursor-pointer" />
             <label htmlFor="adminEditLessonFree" className="text-xs font-bold text-on-surface cursor-pointer select-none">تحديد كـ معاينة مجانية (متاح بدون اشتراك)</label>
           </div>
+
+          {/* Existing Attachments */}
+          {parseAttachments(showEditLesson?.attachments).length > 0 && (
+            <div className="space-y-2 border border-outline-variant/30 rounded-2xl p-4 bg-surface-container-low/20">
+              <div className="flex items-center gap-2 mb-2">
+                <Paperclip size={14} className="text-amber-400" />
+                <span className="text-xs font-bold text-on-surface-variant">المرفقات الحالية ({parseAttachments(showEditLesson.attachments).length})</span>
+              </div>
+              <div className="space-y-1.5">
+                {parseAttachments(showEditLesson.attachments).map((att, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-amber-500/5 border border-amber-500/20 text-xs">
+                    <div className="flex items-center gap-2">
+                      <FileIcon size={12} className="text-amber-400 shrink-0" />
+                      <span className="text-on-surface font-medium truncate max-w-[180px]">{att.name}</span>
+                      {att.size > 0 && <span className="text-on-surface-variant/60">({(att.size / 1024).toFixed(1)} KB)</span>}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      {att.url && (
+                        <a
+                          href={att.url.startsWith('http') ? att.url : `http://localhost:4500${att.url}`}
+                          target="_blank" rel="noreferrer"
+                          className="p-1 rounded-lg hover:bg-primary/10 text-on-surface-variant hover:text-primary transition-all"
+                          title="تحميل"
+                        >
+                          <Download size={12} />
+                        </a>
+                      )}
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            const res = await API.delete(`/admin/lessons/${showEditLesson.id}/attachments/${idx}`);
+                            setShowEditLesson(prev => ({ ...prev, attachments: res.data.attachments }));
+                            showMsg('success', 'تم حذف المرفق');
+                          } catch { showMsg('error', 'خطأ في حذف المرفق'); }
+                        }}
+                        className="p-1 rounded-lg hover:bg-rose-500/10 text-on-surface-variant hover:text-rose-400 transition-all cursor-pointer"
+                        title="حذف المرفق"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Add New Attachments */}
+          <div className="space-y-2 border border-dashed border-outline-variant/30 rounded-2xl p-4 bg-surface-container-low/10">
+            <div className="flex items-center gap-2 mb-2">
+              <Paperclip size={14} className="text-amber-400" />
+              <span className="text-xs font-bold text-on-surface-variant">إضافة مرفقات جديدة</span>
+            </div>
+            <input
+              id="editLessonAttachments"
+              type="file"
+              multiple
+              accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.txt"
+              onChange={e => setLessonAttachmentFiles(Array.from(e.target.files))}
+              className="text-xs text-on-surface-variant w-full file:ml-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-500/10 file:text-amber-500 hover:file:bg-amber-500/20 cursor-pointer"
+            />
+            {lessonAttachmentFiles.length > 0 && (
+              <div className="space-y-1.5 mt-2">
+                {lessonAttachmentFiles.map((f, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-amber-500/5 border border-amber-500/20 text-xs">
+                    <div className="flex items-center gap-2">
+                      <FileIcon size={12} className="text-amber-400 shrink-0" />
+                      <span className="text-on-surface font-medium truncate max-w-[200px]">{f.name}</span>
+                      <span className="text-on-surface-variant/60">({(f.size / 1024).toFixed(1)} KB)</span>
+                    </div>
+                    <button type="button" onClick={() => setLessonAttachmentFiles(prev => prev.filter((_, i) => i !== idx))} className="p-1 rounded-lg hover:bg-rose-500/10 text-on-surface-variant hover:text-rose-400 transition-all cursor-pointer">
+                      <X size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           <SubmitBtn loading={submitting} label="تحديث الدرس" />
         </form>
       </Modal>
@@ -587,6 +832,41 @@ export default function CoursesSection({ showMsg }) {
               )}
             </div>
           )}
+        </div>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal open={!!itemToDelete} onClose={() => !submitting && setItemToDelete(null)} title="تأكيد الحذف">
+        <div className="space-y-5 text-center">
+          <div className="w-16 h-16 rounded-full bg-rose-500/10 text-rose-500 flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(244,63,94,0.1)]">
+            <AlertTriangle size={32} />
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-lg font-extrabold text-on-surface">هل أنت متأكد من الحذف؟</h3>
+            <p className="text-sm text-on-surface-variant max-w-[280px] mx-auto leading-relaxed">
+              سيتم حذف <strong className="text-rose-500 mx-1">{itemToDelete?.name}</strong> نهائياً. 
+              {itemToDelete?.type === 'course' && ' هذا الإجراء سيؤدي إلى حذف الكورس وكل ما يحتويه من وحدات ودروس.'}
+              {itemToDelete?.type === 'module' && ' هذا الإجراء سيؤدي إلى حذف الوحدة وكل محتوياتها من دروس وأقسام.'}
+              {itemToDelete?.type === 'lesson' && ' هذا الإجراء لا يمكن التراجع عنه.'}
+            </p>
+          </div>
+          <div className="flex items-center gap-3 pt-3">
+            <button
+              onClick={() => setItemToDelete(null)}
+              disabled={submitting}
+              className="flex-1 px-4 py-2.5 rounded-xl font-bold text-sm bg-surface border border-outline-variant/40 text-on-surface-variant hover:bg-surface-container transition-all"
+            >
+              إلغاء
+            </button>
+            <button
+              onClick={handleConfirmDelete}
+              disabled={submitting}
+              className="flex-1 px-4 py-2.5 rounded-xl font-bold text-sm bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/20 transition-all flex items-center justify-center gap-2"
+            >
+              {submitting ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+              <span>تأكيد الحذف</span>
+            </button>
+          </div>
         </div>
       </Modal>
 
@@ -781,6 +1061,40 @@ export default function CoursesSection({ showMsg }) {
                       <div className="bg-surface rounded-2xl p-6 shadow-sm border border-outline-variant/30 min-h-[400px]">
                         <h2 className="text-xl font-bold text-primary mb-4">{previewActiveLesson.title}</h2>
                         <div className="prose prose-sm prose-invert max-w-none text-on-surface-variant leading-relaxed" dangerouslySetInnerHTML={{ __html: previewActiveLesson.content?.replace(/\n/g, '<br/>') || 'لا يوجد محتوى.' }} />
+                      </div>
+                    )}
+
+                    {/* Lesson Attachments */}
+                    {parseAttachments(previewActiveLesson.attachments).length > 0 && (
+                      <div className="bg-surface-container-low rounded-2xl p-4 sm:p-6 shadow-sm border border-outline-variant/30">
+                        <h3 className="text-sm font-bold text-on-surface mb-4 flex items-center gap-2">
+                          <Paperclip size={18} className="text-amber-400" />
+                          مرفقات الدرس ({parseAttachments(previewActiveLesson.attachments).length})
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {parseAttachments(previewActiveLesson.attachments).map((att, idx) => (
+                            <a
+                              key={idx}
+                              href={att.url.startsWith('http') ? att.url : `http://localhost:4500${att.url}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="flex items-center justify-between p-3 rounded-xl bg-surface border border-outline-variant/30 hover:border-amber-500/50 hover:bg-amber-500/5 transition-all group"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
+                                  <FileIcon size={16} />
+                                </div>
+                                <div>
+                                  <p className="text-xs font-bold text-on-surface line-clamp-1 group-hover:text-amber-500 transition-colors">{att.name}</p>
+                                  {att.size > 0 && <p className="text-[10px] text-on-surface-variant">{(att.size / 1024).toFixed(1)} KB</p>}
+                                </div>
+                              </div>
+                              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant group-hover:bg-amber-500/20 group-hover:text-amber-500 transition-all">
+                                <Download size={14} />
+                              </div>
+                            </a>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>

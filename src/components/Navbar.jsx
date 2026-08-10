@@ -3,7 +3,9 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
-import { 
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
+import {
   ShoppingBag, 
   LogOut, 
   LayoutDashboard, 
@@ -18,6 +20,7 @@ import {
 export default function Navbar() {
   const { user, logout } = useContext(AuthContext);
   const { cartCount } = useContext(CartContext);
+  const { t } = useTranslation();
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [logoError, setLogoError] = useState(false);
@@ -34,16 +37,15 @@ export default function Navbar() {
   const isActive = (path) => location.pathname === path;
 
   const navLinks = [
-    { name: 'الرئيسية', path: '/', icon: Home },
-    { name: 'الدورات', path: '/courses', icon: BookOpen },
-    { name: 'المدونة', path: '/articles', icon: FileText },
-    { name: 'اتصل بنا', path: '/contact', icon: PhoneCall },
-    { name: 'من نحن', path: '/about', icon: Info },
+    { name: t('navbar.home'), path: '/', icon: Home },
+    { name: t('navbar.courses'), path: '/courses', icon: BookOpen },
+    { name: t('navbar.articles'), path: '/articles', icon: FileText },
+    { name: t('navbar.contact'), path: '/contact', icon: PhoneCall },
+    { name: t('navbar.about'), path: '/about', icon: Info },
   ];
 
   return (
     <header 
-      dir="rtl"
       className={`fixed top-0 w-full z-40 transition-all duration-300 flex flex-col ${
         scrolled 
           ? 'bg-background/90 backdrop-blur-xl shadow-glass border-b border-outline-variant/50' 
@@ -58,10 +60,10 @@ export default function Navbar() {
           className="flex whitespace-nowrap text-[11px] sm:text-xs font-bold tracking-wide"
         >
           {[...Array(2)].map((_, i) => (
-            <div key={i} className="flex items-center gap-16 px-8" dir="rtl">
-              <span className="flex items-center gap-2">🚀 منصة Triple S Academy تحت التطوير المستمر</span>
-              <span className="flex items-center gap-2">✨ نعمل دائماً لنقدم لكم تجربة تعليمية استثنائية</span>
-              <span className="flex items-center gap-2">💡 يسعدنا استقبال تعليقاتكم ومقترحاتكم للتطوير</span>
+            <div key={i} className="flex items-center gap-16 px-8">
+              <span className="flex items-center gap-2">{t('navbar.marquee.msg1')}</span>
+              <span className="flex items-center gap-2">{t('navbar.marquee.msg2')}</span>
+              <span className="flex items-center gap-2">{t('navbar.marquee.msg3')}</span>
             </div>
           ))}
         </motion.div>
@@ -115,10 +117,11 @@ export default function Navbar() {
 
         {/* أزرار الحساب والسلة */}
         <div className="flex items-center gap-2 sm:gap-3">
+          <LanguageSwitcher />
           <Link 
             to="/cart" 
             className="relative p-2.5 text-on-surface-variant hover:text-primary transition-all duration-200 rounded-2xl hover:bg-surface-container-high border border-transparent hover:border-outline-variant/40"
-            title="سلة الاشتراكات"
+            title={t('navbar.cartTitle')}
           >
             <ShoppingBag size={20} />
             {cartCount > 0 && (
@@ -139,12 +142,12 @@ export default function Navbar() {
                 className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-primary text-on-primary text-xs sm:text-sm font-label-md rounded-2xl hover:bg-primary-hover transition-all duration-200 shadow-glow"
               >
                 <LayoutDashboard size={16} />
-                <span className="font-bold">لوحة التحكم</span>
+                <span className="font-bold">{t('navbar.dashboard')}</span>
               </Link>
               <button 
                 onClick={logout} 
                 className="p-2.5 text-error hover:bg-error-container/30 rounded-2xl transition-colors"
-                title="تسجيل الخروج"
+                title={t('navbar.logout')}
               >
                 <LogOut size={18} />
               </button>
@@ -155,14 +158,14 @@ export default function Navbar() {
                 to="/login" 
                 className="text-xs sm:text-sm font-label-md px-3 py-2 text-on-surface-variant hover:text-primary rounded-2xl transition-all"
               >
-                دخول
+                {t('navbar.loginShort')}
               </Link>
               <Link 
                 to="/register" 
                 className="px-3.5 py-2 bg-primary text-on-primary text-xs sm:text-sm font-label-md rounded-2xl hover:bg-primary-hover transition-all flex items-center gap-1.5 shadow-glow"
               >
                 <Sparkles size={14} />
-                <span>تسجيل</span>
+                <span>{t('navbar.registerShort')}</span>
               </Link>
             </div>
           )}

@@ -13,8 +13,10 @@ import {
   KeyRound,
   ShieldCheck
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -48,7 +50,7 @@ export default function LoginPage() {
         }
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'اسم المستخدم أو كلمة المرور غير صحيحة');
+      setError(err.response?.data?.message || t('auth.login.errInvalid'));
     } finally {
       setLoading(false);
     }
@@ -63,14 +65,14 @@ export default function LoginPage() {
       const data = await verifyLogin(email, code);
       navigate('/admin');
     } catch (err) {
-      setError(err.response?.data?.message || 'كود التحقق غير صحيح');
+      setError(err.response?.data?.message || t('auth.login.errCode'));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12" dir="rtl">
+    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
       {/* Container Background Glow */}
       <div className="relative w-full max-w-md">
         <div className="absolute -top-10 -right-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
@@ -83,12 +85,12 @@ export default function LoginPage() {
           <div className="text-center space-y-2">
             <img className="w-40 mx-auto mb-4" src="logo.png" alt="logo" />
             <h1 className="text-2xl font-extrabold text-on-surface tracking-tight">
-              {show2FA ? 'التحقق بخطوتين' : 'تسجيل الدخول'}
+              {show2FA ? t('auth.login.twoFactor') : t('auth.login.title')}
             </h1>
             <p className="text-xs sm:text-sm text-on-surface-variant">
               {show2FA 
-                ? 'يرجى إدخال كود التحقق المكون من 5 أرقام' 
-                : <>أهلاً بك مجدداً في منصة <span className="font-bold text-primary">Triple S Academy</span></>}
+                ? t('auth.login.subtitle2fa') 
+                : <>{t('auth.login.subtitle')} <span className="font-bold text-primary">Triple S Academy</span></>}
             </p>
           </div>
 
@@ -107,7 +109,7 @@ export default function LoginPage() {
               {/* Email Input */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-on-surface-variant block">
-                  البريد الإلكتروني
+                  {t('auth.login.email')}
                 </label>
                 <div className="relative">
                   <Mail size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant/60" />
@@ -127,13 +129,13 @@ export default function LoginPage() {
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
                   <label className="text-xs font-bold text-on-surface-variant block">
-                    كلمة المرور
+                    {t('auth.login.password')}
                   </label>
                   <Link 
                     to="/forgot-password" 
                     className="text-[11px] text-primary hover:underline font-medium"
                   >
-                    نسيت كلمة المرور؟
+                    {t('auth.login.forgotPassword')}
                   </Link>
                 </div>
                 <div className="relative">
@@ -167,12 +169,12 @@ export default function LoginPage() {
                 {loading ? (
                   <>
                     <Loader2 size={18} className="animate-spin" />
-                    <span>جاري تسجيل الدخول...</span>
+                    <span>{t('auth.login.submitting')}</span>
                   </>
                 ) : (
                   <>
                     <LogIn size={18} />
-                    <span>دخول</span>
+                    <span>{t('auth.login.submit')}</span>
                   </>
                 )}
               </button>
@@ -182,7 +184,7 @@ export default function LoginPage() {
               {/* Code Input */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-on-surface-variant block text-center mb-4">
-                  أدخل الكود المرسل لبريدك الإلكتروني ({email})
+                  {t('auth.login.verifyCode')} ({email})
                 </label>
                 <div className="relative max-w-xs mx-auto">
                   <KeyRound size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant/60" />
@@ -207,12 +209,12 @@ export default function LoginPage() {
                 {loading ? (
                   <>
                     <Loader2 size={18} className="animate-spin" />
-                    <span>جاري التحقق...</span>
+                    <span>{t('auth.login.verifying')}</span>
                   </>
                 ) : (
                   <>
                     <ShieldCheck size={18} />
-                    <span>تأكيد الدخول</span>
+                    <span>{t('auth.login.confirmLogin')}</span>
                   </>
                 )}
               </button>
@@ -222,7 +224,7 @@ export default function LoginPage() {
                 onClick={() => setShow2FA(false)}
                 className="w-full text-xs text-on-surface-variant hover:text-on-surface mt-2 transition-colors cursor-pointer"
               >
-                العودة لتسجيل الدخول
+                {t('auth.login.backToLogin')}
               </button>
             </form>
           )}
@@ -230,9 +232,9 @@ export default function LoginPage() {
           {/* Footer Navigation Link */}
           {!show2FA && (
             <div className="pt-4 border-t border-outline-variant/30 text-center text-xs text-on-surface-variant">
-              ليس لديك حساب بعد؟{' '}
+              {t('auth.login.noAccount')}{' '}
               <Link to="/register" className="text-primary font-bold hover:underline">
-                إنشاء حساب جديد
+                {t('auth.login.createAccount')}
               </Link>
             </div>
           )}

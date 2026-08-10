@@ -11,8 +11,10 @@ import {
   Newspaper,
   Clock
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function ArticlesPage() {
+  const { t, i18n } = useTranslation();
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -24,7 +26,7 @@ export default function ArticlesPage() {
   }, []);
 
   return (
-    <div className="min-h-screen pb-20 pt-6 px-4 sm:px-6 lg:px-12 max-w-container-max mx-auto space-y-8" dir="rtl">
+    <div className="min-h-screen pb-20 pt-6 px-4 sm:px-6 lg:px-12 max-w-container-max mx-auto space-y-8">
       
       {/* 1. Page Header & Hero Section */}
       <div className="relative rounded-3xl bg-surface-container-low/70 border border-outline-variant/40 p-6 sm:p-10 backdrop-blur-xl overflow-hidden shadow-sm">
@@ -32,13 +34,13 @@ export default function ArticlesPage() {
         <div className="relative z-10 max-w-2xl space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">
             <Newspaper size={15} />
-            <span>المكتبة الطبية الأكاديمية</span>
+            <span>{t('staticPages.articles.badge')}</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-extrabold text-on-surface tracking-tight">
-            المدونة والأخبار الطبية
+            {t('staticPages.articles.title')}
           </h1>
           <p className="text-on-surface-variant text-sm sm:text-base leading-relaxed">
-            استكشف أحدث المقالات العلمية، الأبحاث، والأخبار الطبية والمراجعات الأكاديمية المعدّة بواسطة نخبة من المتخصصين والأطباء.
+            {t('staticPages.articles.subtitle')}
           </p>
         </div>
       </div>
@@ -69,9 +71,9 @@ export default function ArticlesPage() {
             <BookOpen size={32} />
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-bold text-on-surface">لا توجد مقالات مضافة حالياً</h3>
+            <h3 className="text-lg font-bold text-on-surface">{t('staticPages.articles.noArticlesTitle')}</h3>
             <p className="text-sm text-on-surface-variant max-w-md mx-auto">
-              لم يتم نشر أي مقالات علمية في المدونة في الوقت الحالي. يرجى العودة لاحقاً لمتابعة التحديثات.
+              {t('staticPages.articles.noArticlesDesc')}
             </p>
           </div>
         </div>
@@ -80,8 +82,8 @@ export default function ArticlesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {articles.map((art) => {
             const formattedDate = art.created_at 
-              ? new Date(art.created_at).toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' })
-              : 'منذ فترة';
+              ? new Date(art.created_at).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'ar-EG', { year: 'numeric', month: 'short', day: 'numeric' })
+              : t('staticPages.articles.aWhileAgo');
 
             return (
               <article 
@@ -107,7 +109,7 @@ export default function ArticlesPage() {
                     {/* Badge */}
                     <div className="absolute top-3 right-3 bg-surface/90 backdrop-blur-md text-primary text-[11px] font-bold px-3 py-1 rounded-full border border-outline-variant/40 flex items-center gap-1 shadow-sm">
                       <Sparkles size={12} className="text-secondary-fixed" />
-                      <span>مقالة مميزة</span>
+                      <span>{t('staticPages.articles.featured')}</span>
                     </div>
                   </div>
 
@@ -127,10 +129,10 @@ export default function ArticlesPage() {
 
                   {/* Title & Excerpt */}
                   <h2 className="text-lg font-extrabold text-on-surface group-hover:text-primary transition-colors line-clamp-2 leading-snug mb-2">
-                    {art.title}
+                    {art[`title_${i18n.language}`] || art.title_ar || art.title}
                   </h2>
                   <p className="text-xs sm:text-sm text-on-surface-variant/80 line-clamp-3 leading-relaxed mb-4">
-                    {art.summary || art.content?.replace(/<[^>]*>?/gm, '').substring(0, 130) + '...'}
+                    {art[`summary_${i18n.language}`] || art.summary_ar || art.summary || (art[`content_${i18n.language}`] || art.content_ar || art.content)?.replace(/<[^>]*>?/gm, '').substring(0, 130) + '...'}
                   </p>
                 </div>
 
@@ -138,15 +140,15 @@ export default function ArticlesPage() {
                 <div className="pt-4 border-t border-outline-variant/30 flex items-center justify-between mt-auto">
                   <div className="flex items-center gap-1 text-xs text-on-surface-variant/70">
                     <Eye size={14} />
-                    <span>{art.views_count || 0} مشاهدة</span>
+                    <span>{art.views_count || 0} {t('staticPages.articles.views')}</span>
                   </div>
 
                   <Link 
                     to={`/articles/${art.id}`}
                     className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-primary-hover transition-colors"
                   >
-                    <span>اقرأ المقال</span>
-                    <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-1" />
+                    <span>{t('staticPages.articles.readArticle')}</span>
+                    <ArrowLeft size={14} className={`transition-transform ${i18n.language === 'ar' ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1'}`} />
                   </Link>
                 </div>
               </article>

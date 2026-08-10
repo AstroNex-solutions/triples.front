@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Stethoscope, ShieldCheck } from 'lucide-react';
+import { Sparkles, Stethoscope } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function SplashScreen({ onFinish }) {
+  const { t } = useTranslation();
   const [progress, setProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [imgError, setImgError] = useState(false);
@@ -45,7 +47,6 @@ export default function SplashScreen({ onFinish }) {
             transition: { duration: 0.7, ease: [0.4, 0, 0.2, 1] } 
           }}
           className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background text-on-background font-sans overflow-hidden select-none"
-          dir="rtl"
         >
           {/* 1. خلفية زجاجية معتمدة على توهج الألوان الخاصة بك (Primary & Secondary Glow) */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -109,7 +110,7 @@ export default function SplashScreen({ onFinish }) {
                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-label-sm font-semibold mb-xs shadow-sm"
               >
                 <Stethoscope size={14} className="text-secondary" />
-                <span>التعليم الطبي المستمر</span>
+                <span>{t('splash.subtitle')}</span>
                 <Sparkles size={13} className="text-tertiary" />
               </motion.div>
 
@@ -128,10 +129,10 @@ export default function SplashScreen({ onFinish }) {
                 transition={{ delay: 0.6, duration: 0.6 }}
                 className="flex items-center justify-center gap-xs flex-wrap text-body-md font-semibold text-on-surface-variant"
               >
-                <span>المنصة التعليمية الطبية الأولى في</span>
+                <span>{t('splash.location_prefix')}</span>
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-surface-container-high rounded-full border border-outline-variant text-on-surface text-label-md shadow-sm">
                   <img src="/jo.png" alt="JO" className="h-4 w-auto object-contain" />
-                  <span>الأردن</span>
+                  <span>{t('splash.jordan')}</span>
                 </span>
               </motion.div>
               
@@ -141,7 +142,7 @@ export default function SplashScreen({ onFinish }) {
                 transition={{ delay: 0.75, duration: 0.6 }}
                 className="text-label-md text-on-surface-variant font-medium max-w-xs mx-auto leading-relaxed mt-xs"
               >
-                ريادة وأكاديمية تميز لتأهيل الكوادر الطبية والمستقبلية بمستويات عالمية.
+                {t('splash.description')}
               </motion.p>
             </div>
 

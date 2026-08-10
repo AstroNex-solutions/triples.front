@@ -25,6 +25,90 @@ import {
   Layers
 } from 'lucide-react';
 
+const PublicModuleNode = ({ module, allModules, idx, level = 0, openModuleIds, toggleModule, setPreviewVideo }) => {
+  const isOpen = openModuleIds.includes(module.id);
+  const subModules = allModules.filter(m => m.submodule_id === module.id);
+  
+  return (
+    <div 
+      className={`border border-outline-variant/40 rounded-2xl overflow-hidden transition-all bg-surface/50 hover:bg-surface/80 ${level > 0 ? 'mt-3 border-r-2 border-r-primary/50' : ''}`}
+    >
+      <button 
+        onClick={() => toggleModule(module.id)}
+        className={`w-full p-4 flex items-center justify-between text-right cursor-pointer ${level > 0 ? 'bg-surface-container-low/30' : ''}`}
+      >
+        <div className="space-y-0.5">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-primary">{level === 0 ? `موديول ${idx + 1}` : 'قسم فرعي'}</span>
+            <span className="text-xs text-on-surface-variant">• ({module.lessons?.length || 0} دروس)</span>
+          </div>
+          <h3 className="text-sm sm:text-base font-bold text-on-surface">{module.name}</h3>
+        </div>
+        <ChevronDown size={18} className={`text-on-surface-variant transition-transform duration-300 ${isOpen ? 'rotate-180 text-primary' : ''}`} />
+      </button>
+
+      {isOpen && (
+        <div className="px-4 pb-4 pt-1 border-t border-outline-variant/30 space-y-2 bg-surface-container-low/30">
+          {module.description && (
+            <p className="text-xs text-on-surface-variant/80 mb-3">{module.description}</p>
+          )}
+
+          {module.lessons && module.lessons.map((lesson) => (
+            <div 
+              key={lesson.id}
+              className="flex items-center justify-between p-3 rounded-xl bg-surface border border-outline-variant/30 hover:border-primary/40 transition-all text-xs sm:text-sm"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                  <Play size={14} />
+                </div>
+                <span className="font-semibold text-on-surface">{lesson.title}</span>
+                {lesson.is_free && (
+                  <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    معاينة مجانية
+                  </span>
+                )}
+              </div>
+
+              {lesson.is_free ? (
+                <button 
+                  onClick={() => setPreviewVideo({ title: lesson.title, url: lesson.video_url })}
+                  className="text-xs font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <span>مشاهدة</span>
+                  <ArrowRight size={14} className="rotate-180" />
+                </button>
+              ) : (
+                <div className="flex items-center gap-1 text-on-surface-variant/60 text-xs">
+                  <Lock size={12} />
+                  <span>مغلق</span>
+                </div>
+              )}
+            </div>
+          ))}
+
+          {subModules.length > 0 && (
+            <div className="pl-4 pr-1 mt-3 space-y-3 border-r border-outline-variant/20">
+              {subModules.map((sm, smIdx) => (
+                <PublicModuleNode 
+                  key={sm.id} 
+                  module={sm} 
+                  allModules={allModules} 
+                  idx={smIdx} 
+                  level={level + 1}
+                  openModuleIds={openModuleIds} 
+                  toggleModule={toggleModule} 
+                  setPreviewVideo={setPreviewVideo}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function CourseDetailPage() {
   const { slug } = useParams();
   const [course, setCourse] = useState(null);
@@ -300,72 +384,18 @@ export default function CourseDetailPage() {
             </div>
 
             <div className="space-y-3">
-              {course.modules && course.modules.map((mod, idx) => {
-                const isOpen = openModuleIds.includes(mod.id);
-
-                return (
-                  <div 
-                    key={mod.id || idx}
-                    className="border border-outline-variant/40 rounded-2xl overflow-hidden transition-all bg-surface/50 hover:bg-surface/80"
-                  >
-                    <button 
-                      onClick={() => toggleModule(mod.id)}
-                      className="w-full p-4 flex items-center justify-between text-right cursor-pointer"
-                    >
-                      <div className="space-y-0.5">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-primary">موديول {idx + 1}</span>
-                          <span className="text-xs text-on-surface-variant">• ({mod.lessons?.length || 0} دروس)</span>
-                        </div>
-                        <h3 className="text-sm sm:text-base font-bold text-on-surface">{mod.name}</h3>
-                      </div>
-                      <ChevronDown size={18} className={`text-on-surface-variant transition-transform duration-300 ${isOpen ? 'rotate-180 text-primary' : ''}`} />
-                    </button>
-
-                    {isOpen && (
-                      <div className="px-4 pb-4 pt-1 border-t border-outline-variant/30 space-y-2 bg-surface-container-low/30">
-                        {mod.description && (
-                          <p className="text-xs text-on-surface-variant/80 mb-3">{mod.description}</p>
-                        )}
-
-                        {mod.lessons && mod.lessons.map((lesson) => (
-                          <div 
-                            key={lesson.id}
-                            className="flex items-center justify-between p-3 rounded-xl bg-surface border border-outline-variant/30 hover:border-primary/40 transition-all text-xs sm:text-sm"
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                                <Play size={14} />
-                              </div>
-                              <span className="font-semibold text-on-surface">{lesson.title}</span>
-                              {lesson.is_free && (
-                                <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                  معاينة مجانية
-                                </span>
-                              )}
-                            </div>
-
-                            {lesson.is_free ? (
-                              <button 
-                                onClick={() => setPreviewVideo({ title: lesson.title, url: lesson.video_url })}
-                                className="text-xs font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
-                              >
-                                <span>مشاهدة</span>
-                                <ArrowRight size={14} className="rotate-180" />
-                              </button>
-                            ) : (
-                              <div className="flex items-center gap-1 text-on-surface-variant/60 text-xs">
-                                <Lock size={12} />
-                                <span>مغلق</span>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+              {course.modules && course.modules.filter(m => !m.submodule_id).map((mod, idx) => (
+                <PublicModuleNode 
+                  key={mod.id || idx}
+                  module={mod}
+                  allModules={course.modules}
+                  idx={idx}
+                  level={0}
+                  openModuleIds={openModuleIds}
+                  toggleModule={toggleModule}
+                  setPreviewVideo={setPreviewVideo}
+                />
+              ))}
             </div>
           </div>
         </div>
@@ -388,7 +418,7 @@ export default function CourseDetailPage() {
             <div className="space-y-3">
               {isEnrolled ? (
                 <Link 
-                  to={`/learn/${course.id}/play`}
+                  to={`/learn/${course.id}`}
                   className="w-full py-4 bg-primary text-on-primary font-bold text-sm rounded-2xl hover:bg-primary-hover transition-all flex items-center justify-center gap-2 shadow-glow cursor-pointer"
                 >
                   <Play size={18} className="fill-current" />

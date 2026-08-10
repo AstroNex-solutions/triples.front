@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Mail, Loader2 } from 'lucide-react';
 import API from '../api/axios';
+import { useTranslation } from 'react-i18next';
 
 export default function TermsPage() {
+  const { t, i18n } = useTranslation();
   const [terms, setTerms] = useState(null);
   const [contactEmail, setContactEmail] = useState('legal@example.com');
   const [loading, setLoading] = useState(true);
@@ -29,11 +31,11 @@ export default function TermsPage() {
   }
 
   if (!terms) {
-    return <div className="min-h-screen flex items-center justify-center bg-background"><p className="text-on-surface">الشروط والأحكام غير متوفرة حالياً.</p></div>;
+    return <div className="min-h-screen flex items-center justify-center bg-background"><p className="text-on-surface">{t('staticPages.terms.unavailable')}</p></div>;
   }
 
   return (
-    <div className="min-h-screen bg-background text-on-background font-arabic py-xl px-sm sm:px-md dir-rtl">
+    <div className="min-h-screen bg-background text-on-background font-arabic py-xl px-sm sm:px-md">
       <div className="max-w-container-max mx-auto space-y-lg">
         {/* Hero Section */}
         <header className="bg-surface border border-outline-variant rounded-2xl p-lg sm:p-xl shadow-soft text-center space-y-xs relative overflow-hidden">
@@ -42,10 +44,10 @@ export default function TermsPage() {
             <ShieldCheck className="w-8 h-8 text-primary" />
           </div>
           <h1 className="text-headline-lg sm:text-display-lg text-on-surface">
-            {terms.title_ar || terms.title || 'شروط وأحكام الاستخدام'}
+            {terms[`title_${i18n.language}`] || terms.title_ar || terms.title || t('staticPages.terms.title')}
           </h1>
           <div className="inline-block mt-xs px-sm py-xs bg-surface-container rounded-full text-label-md text-on-surface-variant border border-outline-variant">
-            آخر تحديث: {new Date(terms.updatedAt || Date.now()).toLocaleDateString('ar-EG')}
+            {t('staticPages.terms.lastUpdated')} {new Date(terms.updatedAt || Date.now()).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'ar-EG')}
           </div>
         </header>
 
@@ -56,7 +58,7 @@ export default function TermsPage() {
             <section className="bg-surface border border-outline-variant rounded-xl p-md sm:p-lg shadow-soft">
               <div 
                 className="prose prose-sm sm:prose-base dark:prose-invert max-w-none prose-headings:text-on-surface prose-p:text-on-surface-variant leading-loose"
-                dangerouslySetInnerHTML={{ __html: terms.content_ar || terms.content || '' }}
+                dangerouslySetInnerHTML={{ __html: terms[`content_${i18n.language}`] || terms.content_ar || terms.content || '' }}
               />
             </section>
           </div>
@@ -64,16 +66,16 @@ export default function TermsPage() {
           {/* Sticky Sidebar Notice */}
           <aside className="lg:col-span-1 lg:sticky lg:top-8 space-y-md">
             <div className="bg-surface-container-low border border-outline-variant rounded-xl p-md shadow-soft space-y-sm">
-              <h3 className="text-headline-md text-on-surface">لديك استفسار؟</h3>
+              <h3 className="text-headline-md text-on-surface">{t('staticPages.terms.supportTitle')}</h3>
               <p className="text-body-md text-on-surface-variant">
-                إذا كانت لديك أي أسئلة أو استفسارات حول شروط الاستخدام هذه، لا تتردد في التواصل مع فريق الدعم لدينا.
+                {t('staticPages.terms.supportDesc')}
               </p>
               <a
                 href={`mailto:${contactEmail}`}
                 className="inline-flex items-center justify-center gap-xs w-full py-xs px-sm bg-primary hover:bg-primary-hover text-on-primary rounded-lg font-semibold text-label-md transition-all shadow-glow hover:shadow-none"
               >
                 <Mail className="w-4 h-4" />
-                تواصل مع الدعم
+                {t('staticPages.terms.contactSupport')}
               </a>
             </div>
           </aside>

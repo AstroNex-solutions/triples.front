@@ -146,7 +146,7 @@ export default function UsersSection({ showMsg }) {
           {totalPages > 1 && (
             <div className="p-3 sm:p-4 border-t border-outline-variant/30 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-on-surface-variant">
               <span>
-                عرض {((currentPage - 1) * itemsPerPage) + 1} إلى {Math.min(currentPage * itemsPerPage, users.length)} من إجمالي {users.length} مستخدم
+                عرض {((currentPage - 1) * itemsPerPage) + 1} إلى {Math.min(currentPage * itemsPerPage, totalUsers)} من إجمالي {totalUsers} مستخدم
               </span>
               <div className="flex items-center gap-1.5" dir="rtl">
                 <button
@@ -156,19 +156,33 @@ export default function UsersSection({ showMsg }) {
                 >
                   <ChevronRight size={16} />
                 </button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-                  <button
-                    key={p}
-                    onClick={() => handlePageChange(p)}
-                    className={`w-7 h-7 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
-                      p === currentPage
-                        ? 'bg-primary text-on-primary border-primary'
-                        : 'border-outline-variant/40 hover:bg-surface-variant text-on-surface-variant'
-                    }`}
-                  >
-                    {p}
-                  </button>
-                ))}
+                {(() => {
+                  const pages = [];
+                  if (totalPages <= 7) {
+                    for (let i = 1; i <= totalPages; i++) pages.push(i);
+                  } else {
+                    pages.push(1);
+                    if (currentPage > 3) pages.push('...');
+                    for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) pages.push(i);
+                    if (currentPage < totalPages - 2) pages.push('...');
+                    pages.push(totalPages);
+                  }
+                  return pages.map((p, idx) =>
+                    p === '...'
+                      ? <span key={`ellipsis-${idx}`} className="w-7 h-7 flex items-center justify-center text-on-surface-variant/50 text-xs select-none">…</span>
+                      : <button
+                          key={p}
+                          onClick={() => handlePageChange(p)}
+                          className={`w-7 h-7 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                            p === currentPage
+                              ? 'bg-primary text-on-primary border-primary'
+                              : 'border-outline-variant/40 hover:bg-surface-variant text-on-surface-variant'
+                          }`}
+                        >
+                          {p}
+                        </button>
+                  );
+                })()}
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
