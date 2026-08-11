@@ -56,17 +56,17 @@ export default function AssessmentPage() {
     
     // خلفيات وحيادية
     bodyBg: 'bg-[#F8FAFC]', // رمادي مائل للأزرق باهت جداً مريح للعين
-    cardBg: 'bg-white',
-    textDark: 'text-slate-900',
-    textMain: 'text-slate-700',
-    textLight: 'text-slate-500',
-    border: 'border-slate-200',
+    cardBg: 'bg-surface',
+    textDark: 'text-on-surface',
+    textMain: 'text-on-surface-variant',
+    textLight: 'text-on-surface-variant',
+    border: 'border-outline-variant',
   };
 
   // كلاسات جاهزة للاستخدام بناءً على الهوية
   const classes = {
     btnPrimary: `inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-[#111827] text-white rounded-xl font-bold hover:bg-[#000000] transition-all duration-200 shadow-sm hover:shadow-gray-300 active:scale-[0.98]`,
-    btnSecondary: `inline-flex items-center gap-2 px-5 py-2.5 bg-slate-100 text-slate-800 hover:bg-slate-200 rounded-xl font-semibold transition-all border border-slate-200`,
+    btnSecondary: `inline-flex items-center gap-2 px-5 py-2.5 bg-surface-variant text-on-surface hover:bg-surface-variant rounded-xl font-semibold transition-all border border-outline-variant`,
     card: `${brand.cardBg} rounded-3xl border ${brand.border} shadow-sm p-6 sm:p-8`,
     iconBox: `w-14 h-14 rounded-2xl flex items-center justify-center border`,
   };
@@ -206,7 +206,7 @@ export default function AssessmentPage() {
             <img src="/logo.png" alt="SSS" className='absolute w-10 h-10 opacity-80'/>
         </div>
         <p className={`mt-6 text-xl font-bold text-[${brand.primary}] animate-pulse`}>جاري تحضير الاختبار...</p>
-        <p className="text-slate-500 mt-2">Triple S Academy</p>
+        <p className="text-on-surface-variant mt-2">Triple S Academy</p>
       </div>
     );
   }
@@ -215,7 +215,7 @@ export default function AssessmentPage() {
   if (!assessment) {
     return (
       <div className={`flex items-center justify-center min-h-screen ${brand.bodyBg} px-4 font-['Tajawal']`} dir="rtl">
-        <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-10 text-center space-y-6 border border-slate-100">
+        <div className="max-w-md w-full bg-surface rounded-3xl shadow-xl p-10 text-center space-y-6 border border-outline-variant">
           <div className="w-24 h-24 bg-red-50 rounded-full mx-auto flex items-center justify-center text-[${brand.jordanRed}] border-4 border-red-100 shadow-inner">
             <AlertCircle size={56} strokeWidth={1.5} />
           </div>
@@ -235,8 +235,8 @@ export default function AssessmentPage() {
   const renderFlashcardMode = () => {
     if (questions.length === 0) return (
         <div className={`${classes.card} text-center py-16 mt-10`}>
-            <HelpCircle size={48} className="mx-auto text-slate-300 mb-4"/>
-            <p className="text-slate-500 text-lg">لا توجد بطاقات متاحة في هذا القسم حالياً.</p>
+            <HelpCircle size={48} className="mx-auto text-on-surface-variant mb-4"/>
+            <p className="text-on-surface-variant text-lg">لا توجد بطاقات متاحة في هذا القسم حالياً.</p>
         </div>
     );
     const currentQ = questions[currentCardIdx];
@@ -255,7 +255,7 @@ export default function AssessmentPage() {
     
     return (
       <div className="max-w-4xl mx-auto space-y-4 mt-4 pb-6 font-['Tajawal']">
-        <div className="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+        <div className="flex justify-between items-center bg-surface p-3 rounded-xl border border-outline-variant shadow-sm">
           <div className="flex items-center gap-2">
              <div className={`p-2 rounded-lg bg-[${brand.primaryLight}] text-[${brand.primary}]`}>
                 <BookOpen size={18}/>
@@ -273,7 +273,7 @@ export default function AssessmentPage() {
             
             {/* وجه البطاقة (السؤال) */}
             <div 
-              className={`absolute inset-0 w-full h-full bg-white border-2 ${brand.border} rounded-2xl p-6 flex flex-col items-center justify-center text-center [backface-visibility:hidden] group-hover:border-[${brand.primaryBorder}] transition-colors`}
+              className={`absolute inset-0 w-full h-full bg-surface border-2 ${brand.border} rounded-2xl p-6 flex flex-col items-center justify-center text-center [backface-visibility:hidden] group-hover:border-[${brand.primaryBorder}] transition-colors`}
               onClick={(e) => isMCQ && e.stopPropagation()} // منع القلب التلقائي في حالة الخيارات
             >
               <HelpCircle size={40} className={`text-[${brand.primary}] mb-3 opacity-20`} />
@@ -289,7 +289,7 @@ export default function AssessmentPage() {
                           setUserAnswers(prev => ({ ...prev, [currentQ.id]: opt }));
                           setIsFlipped(true); // اقلب البطاقة لإظهار النتيجة
                        }}
-                       className={`p-3 bg-slate-50 hover:bg-[${brand.primaryLight}] text-sm font-bold text-[${brand.textDark}] rounded-xl border border-slate-200 hover:border-[${brand.primary}] transition-all text-center flex items-center justify-center`}
+                       className={`p-3 bg-surface-variant hover:bg-[${brand.primaryLight}] text-sm font-bold text-[${brand.textDark}] rounded-xl border border-outline-variant hover:border-[${brand.primary}] transition-all text-center flex items-center justify-center`}
                     >
                       {opt}
                     </button>
@@ -313,7 +313,7 @@ export default function AssessmentPage() {
                         <>
                            <CheckCircle2 size={48} className="text-green-500 mb-2" />
                            <h4 className="text-xl font-bold text-green-700 mb-3">إجابة صحيحة!</h4>
-                           <div className="p-3 bg-white rounded-xl border border-green-200 text-green-700 font-black shadow-sm text-sm w-full max-w-sm">
+                           <div className="p-3 bg-surface rounded-xl border border-green-200 text-green-700 font-black shadow-sm text-sm w-full max-w-sm">
                              {currentQ.correct_answer}
                            </div>
                         </>
@@ -321,8 +321,8 @@ export default function AssessmentPage() {
                         <>
                            <AlertCircle size={48} className="text-red-500 mb-2" />
                            <h4 className="text-xl font-bold text-red-700 mb-2">إجابة خاطئة!</h4>
-                           <p className="text-slate-600 text-xs mb-2">الإجابة الصحيحة هي:</p>
-                           <div className="p-3 bg-white rounded-xl border border-green-200 text-green-700 font-black shadow-sm text-sm w-full max-w-sm">
+                           <p className="text-on-surface-variant text-xs mb-2">الإجابة الصحيحة هي:</p>
+                           <div className="p-3 bg-surface rounded-xl border border-green-200 text-green-700 font-black shadow-sm text-sm w-full max-w-sm">
                              {currentQ.correct_answer}
                            </div>
                         </>
@@ -347,7 +347,7 @@ export default function AssessmentPage() {
                 <>
                   <CheckCircle2 size={40} className={`text-[${brand.primary}] mb-2 opacity-30 hidden sm:block`} />
                   <div className="space-y-3 w-full max-w-xl overflow-y-auto max-h-[120px] pr-2 custom-scrollbar mb-8">
-                      <div className="bg-white p-4 rounded-xl border border-purple-100 shadow-sm">
+                      <div className="bg-surface p-4 rounded-xl border border-purple-100 shadow-sm">
                             <p className={`text-base font-bold text-[${brand.textDark}] leading-relaxed`}>الإجابة الصحيحة غير متوفرة لهذا النوع، هل كنت تعرفها؟</p>
                       </div>
                   </div>
@@ -373,7 +373,7 @@ export default function AssessmentPage() {
         </div>
 
         {/* أزرار التنقل السريع */}
-        <div className="flex items-center justify-between mt-4 bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+        <div className="flex items-center justify-between mt-4 bg-surface p-3 rounded-xl border border-outline-variant shadow-sm">
           <button 
             onClick={(e) => { e.stopPropagation(); setCurrentCardIdx(Math.max(0, currentCardIdx - 1)); setIsFlipped(false); }}
             disabled={currentCardIdx === 0}
@@ -410,9 +410,9 @@ export default function AssessmentPage() {
         const isAnswered = userAnswers[q.id] !== undefined && userAnswers[q.id] !== '';
 
         return (
-          <div key={q.id} id={`question-${q.id}`} className={`bg-white rounded-xl border transition-all duration-300 p-4 shadow-sm hover:shadow-md ${isAnswered ? `border-[${brand.primaryBorder}] shadow-purple-50` : 'border-slate-100'}`}>
-            <div className="flex items-start gap-3 mb-3 border-b border-slate-50 pb-3">
-              <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center font-black ${isAnswered ? `bg-[${brand.primary}] text-white` : 'bg-slate-100 text-slate-500'} border ${isAnswered ? `border-[${brand.primaryHover}]`: 'border-slate-200'}`}>
+          <div key={q.id} id={`question-${q.id}`} className={`bg-surface rounded-xl border transition-all duration-300 p-4 shadow-sm hover:shadow-md ${isAnswered ? `border-[${brand.primaryBorder}] shadow-purple-50` : 'border-outline-variant'}`}>
+            <div className="flex items-start gap-3 mb-3 border-b border-outline-variant pb-3">
+              <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center font-black ${isAnswered ? `bg-[${brand.primary}] text-white` : 'bg-surface-variant text-on-surface-variant'} border ${isAnswered ? `border-[${brand.primaryHover}]`: 'border-outline-variant'}`}>
                 <span className='text-lg'>{idx + 1}</span>
               </div>
               <h3 className={`text-lg font-bold ${brand.textDark} pt-1.5 leading-snug`}>
@@ -424,7 +424,7 @@ export default function AssessmentPage() {
               <div className="sm:pr-14 mt-2">
                 <textarea 
                   rows={q.question_type === 'essay' ? 4 : 2}
-                  className={`w-full bg-slate-50 border ${brand.border} rounded-xl p-3 text-[${brand.textDark}] focus:border-[${brand.primary}] focus:ring-2 focus:ring-[${brand.primaryLight}] outline-none transition-all resize-none text-sm leading-relaxed placeholder:text-slate-400`}
+                  className={`w-full bg-surface-variant border ${brand.border} rounded-xl p-3 text-[${brand.textDark}] focus:border-[${brand.primary}] focus:ring-2 focus:ring-[${brand.primaryLight}] outline-none transition-all resize-none text-sm leading-relaxed placeholder:text-on-surface-variant`}
                   placeholder="اكتب إجابتك هنا..."
                   value={userAnswers[q.id] || ''}
                   onChange={(e) => handleTextAnswer(q.id, e.target.value)}
@@ -440,7 +440,7 @@ export default function AssessmentPage() {
                       className={`relative flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer overflow-hidden group ${
                         isSelected 
                           ? `border-[${brand.selection}] bg-purple-50 shadow-inner` 
-                          : `border-slate-200 bg-white hover:border-[${brand.primaryBorder}] hover:bg-[${brand.primaryLight}]/50`
+                          : `border-outline-variant bg-surface hover:border-[${brand.primaryBorder}] hover:bg-[${brand.primaryLight}]/50`
                       }`}
                     >
                       <input 
@@ -453,8 +453,8 @@ export default function AssessmentPage() {
                       />
                       
                       {/* مظهر خيار الراديو المخصص */}
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors bg-white ${
-                        isSelected ? `border-[${brand.selection}]` : 'border-slate-300 group-hover:border-purple-300'
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors bg-surface ${
+                        isSelected ? `border-[${brand.selection}]` : 'border-outline-variant0 group-hover:border-purple-300'
                       }`}>
                         {isSelected && <div className={`w-2.5 h-2.5 rounded-full bg-[${brand.selection}]`} />}
                       </div>
@@ -484,7 +484,7 @@ export default function AssessmentPage() {
     <div className={`min-h-screen ${brand.bodyBg} font-['Tajawal']`} dir="rtl">
       
       {/* 👑 ترويسة الهوية الاحترافية (Header) */}
-      <header className={`bg-white/95 backdrop-blur-sm border-b ${brand.border} shadow-sm sticky top-0 z-50`}>
+      <header className={`bg-surface/95 backdrop-blur-sm border-b ${brand.border} shadow-sm sticky top-0 z-50`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           {/* الشعار والاسم */}
           <div className="flex items-center gap-2">
@@ -532,7 +532,7 @@ export default function AssessmentPage() {
       {/* --- شاشة البداية والتعليمات (Start Screen) --- */}
       {!hasStarted && !result && (
         <div className="flex items-center justify-center p-4 mt-6 font-['Tajawal'] overflow-hidden">
-          <div className="w-full max-w-3xl bg-white rounded-3xl shadow-xl shadow-purple-100/30 relative border border-slate-100">
+          <div className="w-full max-w-3xl bg-surface rounded-3xl shadow-xl shadow-purple-100/30 relative border border-outline-variant">
             
             <div className={`absolute top-0 left-0 right-0 h-2 bg-[${brand.primary}] rounded-t-full`}></div>
 
@@ -548,32 +548,32 @@ export default function AssessmentPage() {
               {assessment.description && <p className={`${brand.textMain} text-sm mb-6 max-w-xl mx-auto leading-relaxed`}>{assessment.description}</p>}
               
               {/* شبكة المعلومات */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 py-6 border-y border-slate-100 mb-8 bg-slate-50/50 rounded-2xl px-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 py-6 border-y border-outline-variant mb-8 bg-surface-variant/50 rounded-2xl px-4">
                 {!isFlashcard && (
                   <>
-                    <div className="flex flex-col items-center gap-1 p-3 rounded-xl bg-white border border-slate-100 shadow-sm">
+                    <div className="flex flex-col items-center gap-1 p-3 rounded-xl bg-surface border border-outline-variant shadow-sm">
                       <div className={`p-2 rounded-lg bg-blue-50 text-blue-600`}><Clock size={20} /></div>
-                      <span className="text-xs font-semibold text-slate-500">المدة</span>
+                      <span className="text-xs font-semibold text-on-surface-variant">المدة</span>
                       <span className={`text-base font-extrabold ${brand.textDark}`}>{assessment.duration_minutes ? `${assessment.duration_minutes} دقيقة` : 'مفتوح'}</span>
                     </div>
                     
-                    <div className="flex flex-col items-center gap-1 p-3 rounded-xl bg-white border border-slate-100 shadow-sm">
+                    <div className="flex flex-col items-center gap-1 p-3 rounded-xl bg-surface border border-outline-variant shadow-sm">
                       <div className={`p-2 rounded-lg bg-amber-50 text-amber-600`}><LayoutList size={20} /></div>
-                      <span className="text-xs font-semibold text-slate-500">الأسئلة</span>
+                      <span className="text-xs font-semibold text-on-surface-variant">الأسئلة</span>
                       <span className={`text-base font-extrabold ${brand.textDark}`}>{questions.length} سؤال</span>
                     </div>
                     
-                    <div className="flex flex-col items-center gap-1 p-3 rounded-xl bg-white border border-slate-100 shadow-sm">
+                    <div className="flex flex-col items-center gap-1 p-3 rounded-xl bg-surface border border-outline-variant shadow-sm">
                       <div className={`p-2 rounded-lg bg-green-50 text-[${brand.jordanGreen}]`}><Award size={20} /></div>
-                      <span className="text-xs font-semibold text-slate-500">الدرجة</span>
+                      <span className="text-xs font-semibold text-on-surface-variant">الدرجة</span>
                       <span className={`text-base font-extrabold ${brand.textDark}`}>{assessment.total_marks || 100}</span>
                     </div>
                   </>
                 )}
                 {isFlashcard && (
-                  <div className="flex flex-col items-center gap-1 p-3 rounded-xl bg-white border border-slate-100 shadow-sm sm:col-span-3">
+                  <div className="flex flex-col items-center gap-1 p-3 rounded-xl bg-surface border border-outline-variant shadow-sm sm:col-span-3">
                     <div className={`p-2 rounded-lg bg-[${brand.primaryLight}] text-[${brand.primary}]`}><BookOpen size={24} /></div>
-                    <span className="text-xs font-semibold text-slate-500">عدد البطاقات</span>
+                    <span className="text-xs font-semibold text-on-surface-variant">عدد البطاقات</span>
                     <span className={`text-xl font-extrabold ${brand.textDark}`}>{questions.length}</span>
                   </div>
                 )}
@@ -594,17 +594,17 @@ export default function AssessmentPage() {
       {hasStarted && !result && (
         <>
           {/* شريط التقدم والوقت المثبت العلوي (تحت الـ Header مباشرة) */}
-          <div className="sticky top-14 z-40 bg-white/95 backdrop-blur-sm border-b ${brand.border} shadow-sm font-['Tajawal']">
+          <div className="sticky top-14 z-40 bg-surface/95 backdrop-blur-sm border-b ${brand.border} shadow-sm font-['Tajawal']">
               {/* شريط التقدم اللطيف */}
-              <div className="h-2 w-full bg-slate-100 overflow-hidden">
+              <div className="h-2 w-full bg-surface-variant overflow-hidden">
                 <div className={`h-full bg-[${brand.primary}] transition-all duration-500 ease-out rounded-l-full relative`} style={{ width: `${progressPercentage}%` }}>
-                    <div className='absolute inset-0 bg-white/30 animate-pulse'></div>
+                    <div className='absolute inset-0 bg-surface/30 animate-pulse'></div>
                 </div>
               </div>
               
               <div className="max-w-7xl mx-auto px-4 sm:px-6 h-12 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className={`bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 border border-slate-200`}>
+                  <div className={`bg-surface-variant text-on-surface-variant px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 border border-outline-variant`}>
                     <Target size={14} className='text-[${brand.primary}]' />
                     <span>
                         {isFlashcard 
@@ -619,9 +619,9 @@ export default function AssessmentPage() {
                   <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 font-bold transition-all duration-300 ${
                     timeLeft < 120
                       ? `bg-red-50 border-[${brand.jordanRed}] text-[${brand.jordanRed}] animate-pulse` 
-                      : `bg-white ${brand.border} ${brand.textDark}`
+                      : `bg-surface ${brand.border} ${brand.textDark}`
                   }`}>
-                    <Clock size={16} className={timeLeft < 120 ? `text-[${brand.jordanRed}]` : 'text-slate-500'} />
+                    <Clock size={16} className={timeLeft < 120 ? `text-[${brand.jordanRed}]` : 'text-on-surface-variant'} />
                     <span dir="ltr" className="text-sm mt-0.5 tabular-nums">{formatTime(timeLeft)}</span>
                   </div>
                 )}
@@ -635,7 +635,7 @@ export default function AssessmentPage() {
 
           {/* شريط الإنهاء السفلي المثبت (فقط للاختبارات والتكليفات) */}
           {hasStarted && !result && questions.length > 0 && !isFlashcard && (
-            <div className="fixed bottom-0 left-0 right-0 p-3 bg-white/95 backdrop-blur-sm border-t ${brand.border} shadow-[0_-5px_20px_-10px_rgba(0,0,0,0.1)] z-40 flex justify-center font-['Tajawal']">
+            <div className="fixed bottom-0 left-0 right-0 p-3 bg-surface/95 backdrop-blur-sm border-t ${brand.border} shadow-[0_-5px_20px_-10px_rgba(0,0,0,0.1)] z-40 flex justify-center font-['Tajawal']">
               <button 
                 onClick={() => handleSubmitQuiz(false)} 
                 className={`${classes.btnPrimary} w-full max-w-sm text-sm py-2.5 rounded-xl group shadow-sm`}
@@ -651,7 +651,7 @@ export default function AssessmentPage() {
       {/* --- شاشة النتيجة الاحترافية --- */}
       {result && (
         <div className="flex items-center justify-center p-4 mt-6 md:mt-10 font-['Tajawal'] pb-10 overflow-hidden">
-          <div className={`w-full max-w-2xl bg-white rounded-[2rem] shadow-xl p-8 sm:p-10 text-center relative border ${brand.border}`}>
+          <div className={`w-full max-w-2xl bg-surface rounded-[2rem] shadow-xl p-8 sm:p-10 text-center relative border ${brand.border}`}>
             
             {/* خط هوية علوي بلون الحالة */}
             <div className={`absolute top-0 left-0 right-0 h-2 rounded-t-[2rem] ${
@@ -691,21 +691,21 @@ export default function AssessmentPage() {
               
               {/* كرت الدرجة (فقط للاختبارات) */}
               {!isAssignment && (
-                <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6 mt-6 inline-block w-full max-w-md mx-auto shadow-sm relative">
+                <div className="bg-surface-variant border border-outline-variant rounded-2xl p-6 mt-6 inline-block w-full max-w-md mx-auto shadow-sm relative">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 relative z-10">
-                    <div className="text-center sm:text-right sm:border-l border-slate-200 sm:pl-6">
-                      <p className="text-slate-500 font-bold mb-1 text-xs">الدرجة المستحقة</p>
-                      <p className={`text-4xl font-black ${brand.textDark}`}>{result.score}<span className="text-xl text-slate-400 font-bold"> / {result.totalMarks}</span></p>
+                    <div className="text-center sm:text-right sm:border-l border-outline-variant sm:pl-6">
+                      <p className="text-on-surface-variant font-bold mb-1 text-xs">الدرجة المستحقة</p>
+                      <p className={`text-4xl font-black ${brand.textDark}`}>{result.score}<span className="text-xl text-on-surface-variant font-bold"> / {result.totalMarks}</span></p>
                     </div>
                     <div className="text-center sm:text-right">
-                      <p className="text-slate-500 font-bold mb-1 text-xs">النسبة المئوية</p>
+                      <p className="text-on-surface-variant font-bold mb-1 text-xs">النسبة المئوية</p>
                       <p className={`text-4xl font-black ${result.passed ? 'text-green-600' : 'text-red-600'}`} dir="ltr">{result.percentage}%</p>
                     </div>
                   </div>
                 </div>
               )}
               
-              <div className="pt-8 border-t border-slate-100 mt-8">
+              <div className="pt-8 border-t border-outline-variant mt-8">
                 <Link to="/dashboard" className={`${classes.btnPrimary} text-sm px-8 py-3 rounded-xl shadow-md inline-flex justify-center w-full sm:w-auto`}>
                   <ArrowRight size={18} /> العودة إلى لوحة التحكم
                 </Link>
@@ -725,7 +725,7 @@ export default function AssessmentPage() {
           ></div>
           
           {/* Modal Content */}
-          <div className="relative bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl animate-fade-in-up border border-slate-100">
+          <div className="relative bg-surface rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl animate-fade-in-up border border-outline-variant">
             <div className="flex flex-col items-center text-center">
                <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
                   modalConfig.type === 'error' ? 'bg-red-50 text-red-500' :
@@ -737,14 +737,14 @@ export default function AssessmentPage() {
                    <CheckCircle2 size={32} />}
                </div>
                
-               <h3 className="text-xl font-bold text-slate-800 mb-2">{modalConfig.title}</h3>
-               <p className="text-slate-600 text-sm leading-relaxed mb-8">{modalConfig.message}</p>
+               <h3 className="text-xl font-bold text-on-surface mb-2">{modalConfig.title}</h3>
+               <p className="text-on-surface-variant text-sm leading-relaxed mb-8">{modalConfig.message}</p>
                
                <div className="flex gap-3 w-full">
                   {modalConfig.type === 'confirm' && modalConfig.onCancel && (
                      <button 
                         onClick={modalConfig.onCancel}
-                        className="flex-1 py-3 px-4 rounded-xl font-bold text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
+                        className="flex-1 py-3 px-4 rounded-xl font-bold text-sm bg-surface-variant hover:bg-surface-variant text-on-surface-variant transition-colors"
                      >
                         {modalConfig.cancelText}
                      </button>

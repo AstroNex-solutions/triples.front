@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import API from '../../../api/axios';
 import { Loader2, Trash2, Edit, ClipboardList } from 'lucide-react';
 import { SectionHeader, Card, statusBadge, Modal, Select, Input, Textarea, SubmitBtn, Badge } from '../ui/SharedUI';
 import QuestionsManager from '../ui/QuestionsManager';
 
 export default function SelfAssessmentProductsSection({ showMsg }) {
+  const { t, i18n } = useTranslation();
   const [products, setProducts] = useState([]);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,7 +18,7 @@ export default function SelfAssessmentProductsSection({ showMsg }) {
   const fetchData = () => {
     setLoading(true);
     Promise.all([API.get('/admin/self-assessment-products'), API.get('/admin/courses')])
-      .then(([p, c]) => { setProducts(p.data.products); setCourses(c.data.courses); })
+      .then(([p, c]) => { setProducts(p.data.products || []); setCourses(c.data.courses || []); })
       .catch(console.error).finally(() => setLoading(false));
   };
   useEffect(() => { fetchData(); }, []);
@@ -31,20 +33,20 @@ export default function SelfAssessmentProductsSection({ showMsg }) {
     try {
       if (form.id) {
         await API.put(`/admin/self-assessment-products/${form.id}`, form);
-        showMsg('success', 'تم التحديث بنجاح');
+        showMsg('success', t('admin.common.save'));
       } else {
         await API.post('/admin/self-assessment-products', form);
-        showMsg('success', 'تم الإنشاء بنجاح');
+        showMsg('success', t('admin.sections.selfAssessments.addAssessment'));
       }
       resetForm(); fetchData();
-    } catch { showMsg('error', 'خطأ في حفظ المنتج'); }
+    } catch { showMsg('error', 'Error'); }
     finally { setSubmitting(false); }
   };
 
   const deleteProduct = async (id) => {
-    if (!confirm('حذف هذا المنتج؟')) return;
-    try { await API.delete(`/admin/self-assessment-products/${id}`); showMsg('success', 'تم الحذف'); fetchData(); }
-    catch { showMsg('error', 'خطأ في الحذف'); }
+    if (!confirm('Delete? / هل أنت متأكد؟')) return;
+    try { await API.delete(`/admin/self-assessment-products/${id}`); showMsg('success', t('admin.common.delete')); fetchData(); }
+    catch { showMsg('error', 'Error'); }
   };
 
   const editProduct = (p) => {
@@ -54,52 +56,71 @@ export default function SelfAssessmentProductsSection({ showMsg }) {
 
   return (
     <>
-      <SectionHeader title="منتجات التقييم الذاتي" count={products.length} onAdd={() => { resetForm(); setShowAdd(true); }} addLabel="منتج جديد" />
+      <SectionHeader title={t('admin.sections.selfAssessments.title')} count={products.length} onAdd={() => { resetForm(); setShowAdd(true); }} addLabel={t('admin.sections.selfAssessments.addAssessment')} />
       {loading ? <div className="py-12 flex justify-center"><Loader2 size={24} className="animate-spin text-primary" /></div> : (
         <Card>
           <div className="overflow-x-auto">
-            <table className="w-full text-right text-xs sm:text-sm border-separate border-spacing-y-1">
-              <thead><tr className="text-on-surface-variant/70"><th className="p-3">العنوان</th><th className="p-3">الكورس</th><th className="p-3">المدة</th><th className="p-3">السعر</th><th className="p-3">الحالة</th><th className="p-3 text-center">إجراءات</th></tr></thead>
-              <tbody>{products.map(p => (
-                <tr key={p.id} className="bg-surface/50 hover:bg-surface/80 transition-all">
-                  <td className="p-3 font-bold text-on-surface">{p.title}</td>
-                  <td className="p-3 text-on-surface-variant">{p.Course?.title || '—'}</td>
-                  <td className="p-3 text-on-surface-variant">{p.duration_minutes} دقيقة</td>
-                  <td className="p-3 font-bold text-on-surface">{p.is_free ? <Badge text="مجاني" variant="success" /> : `$${p.price}`}</td>
-                  <td className="p-3">{statusBadge(p.status)}</td>
-                  <td className="p-3 text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <button onClick={() => setManageQuestions(p)} title="إدارة الأسئلة" className="p-1.5 rounded-lg text-emerald-500 hover:bg-emerald-500/10"><ClipboardList size={14} /></button>
-                      <button onClick={() => editProduct(p)} className="p-1.5 rounded-lg text-primary hover:bg-primary/10"><Edit size={14} /></button>
-                      <button onClick={() => deleteProduct(p.id)} className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-500/10"><Trash2 size={14} /></button>
-                    </div>
-                  </td>
+            <table className="w-full text-start text-xs sm:text-sm border-separate border-spacing-y-1">
+              <thead>
+                <tr className="text-on-surface-variant/70">
+                  <th className="p-3 text-start">{t('admin.sections.selfAssessments.assessmentTitle')}</th>
+                  <th className="p-3 text-start">{t('admin.sections.reviews.course')}</th>
+                  <th className="p-3 text-start">{t('admin.sections.selfAssessments.duration')}</th>
+                  <th className="p-3 text-start">{t('admin.sections.questionBanks.price')}</th>
+                  <th className="p-3 text-start">{t('admin.common.status')}</th>
+                  <th className="p-3 text-center">{t('admin.common.actions')}</th>
                 </tr>
-              ))}</tbody>
+              </thead>
+              <tbody>{products.map(p => {
+                const pTitle = p[`title_${i18n.language}`] || p.title;
+                const cTitle = p.Course?.[`title_${i18n.language}`] || p.Course?.title;
+                return (
+                  <tr key={p.id} className="bg-surface/50 hover:bg-surface/80 transition-all">
+                    <td className="p-3 font-bold text-on-surface">{pTitle}</td>
+                    <td className="p-3 text-on-surface-variant">{cTitle || '—'}</td>
+                    <td className="p-3 text-on-surface-variant">{p.duration_minutes} min / دقيقة</td>
+                    <td className="p-3 font-bold text-on-surface">{p.is_free ? <Badge text="Free / مجاني" variant="success" /> : `$${p.price}`}</td>
+                    <td className="p-3">{statusBadge(p.status)}</td>
+                    <td className="p-3 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <button onClick={() => setManageQuestions(p)} title="Manage Questions" className="p-1.5 rounded-lg text-emerald-500 hover:bg-emerald-500/10 cursor-pointer"><ClipboardList size={14} /></button>
+                        <button onClick={() => editProduct(p)} title="Edit" className="p-1.5 rounded-lg text-primary hover:bg-primary/10 cursor-pointer"><Edit size={14} /></button>
+                        <button onClick={() => deleteProduct(p.id)} title="Delete" className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-500/10 cursor-pointer"><Trash2 size={14} /></button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}</tbody>
             </table>
           </div>
         </Card>
       )}
-      <Modal open={showAdd} onClose={resetForm} title={form.id ? "تعديل المنتج" : "إنشاء منتج جديد"}>
+      <Modal open={showAdd} onClose={resetForm} title={form.id ? t('admin.common.edit') : t('admin.sections.selfAssessments.addAssessment')}>
         <form onSubmit={saveProduct} className="space-y-4">
-          <Select label="الكورس المرتبط *" required value={form.course_id} onChange={e => setForm({...form, course_id: e.target.value})}>
-            <option value="">اختر الكورس</option>
-            {courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
+          <Select label="Course / الكورس المرتبط *" required value={form.course_id} onChange={e => setForm({...form, course_id: e.target.value})}>
+            <option value="">Select Course / اختر الكورس</option>
+            {courses.map(c => (
+              <option key={c.id} value={c.id}>
+                {c[`title_${i18n.language}`] || c.title}
+              </option>
+            ))}
           </Select>
-          <Input label="عنوان المنتج *" required value={form.title} onChange={e => setForm({...form, title: e.target.value})} />
-          <Textarea label="الوصف" value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
+          <Input label={`${t('admin.sections.selfAssessments.assessmentTitle')} *`} required value={form.title} onChange={e => setForm({...form, title: e.target.value})} />
+          <Textarea label="Description / الوصف" value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
           <div className="grid grid-cols-2 gap-3">
-            <Input label="المدة (بالدقائق)" type="number" min="1" value={form.duration_minutes} onChange={e => setForm({...form, duration_minutes: e.target.value})} />
-            <Input label="السعر ($)" type="number" step="0.01" min="0" value={form.price} onChange={e => setForm({...form, price: e.target.value})} disabled={form.is_free} />
+            <Input label="Duration (min) / المدة بالدقائق" type="number" min="1" value={form.duration_minutes} onChange={e => setForm({...form, duration_minutes: e.target.value})} />
+            <Input label="Price ($) / السعر" type="number" step="0.01" min="0" value={form.price} onChange={e => setForm({...form, price: e.target.value})} disabled={form.is_free} />
             <div className="flex items-center gap-2 mt-6">
-              <input type="checkbox" id="sa_free" checked={form.is_free} onChange={e => setForm({...form, is_free: e.target.checked, price: e.target.checked ? 0 : form.price})} className="w-4 h-4" />
-              <label htmlFor="sa_free" className="text-sm font-bold text-on-surface cursor-pointer">مجاني</label>
+              <input type="checkbox" id="sa_free" checked={form.is_free} onChange={e => setForm({...form, is_free: e.target.checked, price: e.target.checked ? 0 : form.price})} className="w-4 h-4 cursor-pointer" />
+              <label htmlFor="sa_free" className="text-sm font-bold text-on-surface cursor-pointer">Free / مجاني</label>
             </div>
-            <Select label="الحالة" value={form.status} onChange={e => setForm({...form, status: e.target.value})}>
-              <option value="published">منشور</option><option value="draft">مسودة</option><option value="archived">مؤرشف</option>
+            <Select label={t('admin.common.status')} value={form.status} onChange={e => setForm({...form, status: e.target.value})}>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+              <option value="archived">Archived</option>
             </Select>
           </div>
-          <SubmitBtn loading={submitting} label={form.id ? "تحديث" : "حفظ"} />
+          <SubmitBtn loading={submitting} label={form.id ? t('admin.common.save') : t('admin.sections.selfAssessments.addAssessment')} />
         </form>
       </Modal>
       {manageQuestions && (

@@ -20,6 +20,21 @@
     "loginShort": "Login",
     "registerShort": "Register"
   },
+  "theme": {
+    "switchToDark": "Switch to Dark Mode",
+    "switchToLight": "Switch to Light Mode"
+  },
+  "courseCard": {
+    "medicalSciences": "Medical Sciences",
+    "specialAccreditation": "Special Accreditation ✨",
+    "accreditedAndUpdated": "Certified & Updated Medical Course",
+    "defaultDescription": "Comprehensive medical curriculum covering certified theoretical and practical aspects.",
+    "students": "trainees",
+    "practicalApplications": "Practical Applications",
+    "free": "Free",
+    "addToCart": "Add to Cart",
+    "details": "Course Details"
+  },
   "home": {
     "banner": {
       "badge": "The Premier Medical Academy",
@@ -233,6 +248,325 @@
       "title": "No courses found",
       "subtitle": "We didn't find any results matching your search or filter options. Try changing your search terms or resetting.",
       "viewAll": "View All Courses"
+    }
+  },
+  "student": {
+    "dashboard": {
+      "title": "Student Dashboard",
+      "platform": "Student Platform",
+      "logout": "Logout",
+      "groups": {
+        "home": "Home",
+        "learning": "Learning & Progress",
+        "assessments": "Assessments & Exams",
+        "purchases": "My Purchases",
+        "community": "Community & Support"
+      },
+      "items": {
+        "overview": "Overview",
+        "account": "Account Settings",
+        "courses": "My Courses",
+        "schedule": "Study Schedule",
+        "assessments": "Exams & Results",
+        "self_assessments": "Self-Assessments",
+        "question_banks": "Question Bank",
+        "orders": "Purchase History",
+        "library": "Articles & Library",
+        "support": "Technical Support"
+      }
+    },
+    "overview": {
+      "welcome": "Welcome back! 👋",
+      "subtitle": "Track your progress and continue your journey toward success.",
+      "enrolledCourses": "Enrolled Courses",
+      "completedCourses": "Completed Courses",
+      "pendingAssessments": "Available Exams",
+      "ordersCount": "Purchases"
+    },
+    "account": {
+      "title": "Profile Settings",
+      "fullName": "Full Name",
+      "phone": "Phone Number",
+      "newPassword": "New Password (optional)",
+      "newPasswordPlaceholder": "Leave empty if you don't want to change it",
+      "interests": "Educational Interests",
+      "interestsPlaceholder": "e.g. Medicine, Pharmacy...",
+      "profileImage": "Profile Picture",
+      "updateBtn": "Update Profile",
+      "updateSuccess": "Profile updated successfully",
+      "updateError": "Failed to update profile"
+    },
+    "courses": {
+      "title": "My Enrolled Courses",
+      "explore": "Explore Courses",
+      "completed": "Completed 🎉",
+      "progress": "Progress",
+      "continueLearning": "Continue Learning",
+      "emptyTitle": "You haven't enrolled in any courses yet.",
+      "emptyLink": "Browse Available Courses"
+    },
+    "schedule": {
+      "title": "Study Schedule",
+      "addNew": "Add New Schedule",
+      "selectCourse": "Select Course",
+      "course": "Course",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "dailyHours": "Daily Study Hours",
+      "daysOff": "Weekly Days Off",
+      "saveSchedule": "Save Schedule",
+      "empty": "No study schedules recorded.",
+      "addSuccess": "Study schedule added successfully",
+      "addError": "Error adding schedule",
+      "deleteSuccess": "Deleted successfully",
+      "days": {
+        "Saturday": "Saturday",
+        "Sunday": "Sunday",
+        "Monday": "Monday",
+        "Tuesday": "Tuesday",
+        "Wednesday": "Wednesday",
+        "Thursday": "Thursday",
+        "Friday": "Friday"
+      }
+    },
+    "assessments": {
+      "availableTitle": "Available Assessments",
+      "emptyAvailable": "No assessments available for your current courses.",
+      "quiz": "Quiz",
+      "exam": "Final Exam",
+      "assignment": "Assignment",
+      "flashcard": "Flashcards",
+      "noTime": "No time limit",
+      "minutes": "min",
+      "browseFlashcards": "Browse Cards",
+      "startAssignment": "Start Assignment",
+      "startQuiz": "Start Exam",
+      "previousResults": "Previous Assessment Results",
+      "table": {
+        "assessment": "Assessment",
+        "date": "Date",
+        "score": "Score",
+        "status": "Status",
+        "underReview": "Under Review",
+        "reviewOnly": "Review Only",
+        "passed": "Passed",
+        "failed": "Failed",
+        "empty": "You haven't submitted any assessments yet"
+      }
+    },
+    "selfAssessments": {
+      "title": "Self-Assessments",
+      "empty": "No self-assessments available right now.",
+      "free": "Free",
+      "minutes": "min",
+      "start": "Start Assessment"
+    },
+    "questionBanks": {
+      "title": "Question Bank",
+      "empty": "No question banks available right now.",
+      "free": "Free",
+      "browse": "Browse Questions"
+    },
+    "orders": {
+      "title": "Purchase History & Invoices",
+      "table": {
+        "orderNumber": "Order #",
+        "content": "Content",
+        "total": "Total Amount",
+        "status": "Status",
+        "date": "Date",
+        "completed": "Completed",
+        "empty": "No past purchases"
+      }
+    },
+    "library": {
+      "title": "Additional Resources",
+      "blogTitle": "Medical Blog",
+      "blogDesc": "Read the latest medical articles and tips to boost your knowledge.",
+      "libraryTitle": "Digital Library (Books)",
+      "libraryDesc": "Browse and download key medical references and textbooks for free."
+    },
+    "support": {
+      "title": "Support & Feedback",
+      "description": "Faced an issue with payment? Or have a question about the curriculum? Send us a message and we will respond ASAP.",
+      "subject": "Subject *",
+      "subjectPlaceholder": "e.g. Issue opening a lesson...",
+      "message": "Message Details *",
+      "messagePlaceholder": "Type your query or issue here...",
+      "submit": "Submit Ticket",
+      "success": "Your message was sent successfully. We will get back to you soon.",
+      "error": "Failed to send message"
+    },
+    "questionBankPage": {
+      "loading": "Loading Question Bank...",
+      "notFoundTitle": "Question Bank Not Found",
+      "notFoundDesc": "Sorry, the requested question bank could not be found.",
+      "backToDashboard": "Back to Dashboard",
+      "questionsCount": "questions",
+      "question": "Question",
+      "explanation": "Scientific Explanation:",
+      "hideAnswer": "Hide Answer",
+      "showAnswer": "Show Explanatory Answer"
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Admin Dashboard",
+      "home": "Home",
+      "logout": "Logout",
+      "groups": {
+        "home": "Home",
+        "usersAndLearning": "Users & Learning",
+        "storeAndCommerce": "Store & Commerce",
+        "contentAndCommunication": "Content & Communication"
+      },
+      "items": {
+        "dashboard": "Dashboard Stats",
+        "sessions": "Active Sessions",
+        "users": "Users",
+        "courses": "Courses",
+        "enrollments": "Enrollments",
+        "assessments": "Assessments",
+        "categories": "Categories & Tags",
+        "coupons": "Coupons",
+        "orders": "Orders",
+        "questionBankProducts": "Question Banks",
+        "selfAssessmentProducts": "Self-Assessments",
+        "reviews": "Reviews",
+        "banners": "Banners",
+        "articles": "Articles",
+        "partners": "Partners",
+        "faqs": "FAQs",
+        "pages": "Static Pages",
+        "books": "Library Books",
+        "messages": "Contact Messages"
+      }
+    },
+    "common": {
+      "add": "Add",
+      "save": "Save",
+      "edit": "Edit",
+      "delete": "Delete",
+      "actions": "Actions",
+      "search": "Search...",
+      "filter": "Filter",
+      "close": "Close",
+      "status": "Status",
+      "date": "Date",
+      "loading": "Loading..."
+    },
+    "sections": {
+      "dashboardTitle": "Dashboard Statistics",
+      "totalUsers": "Total Users",
+      "students": "Students",
+      "instructors": "Instructors",
+      "courses": "Courses",
+      "enrollments": "Enrollments",
+      "completedOrders": "Completed Orders",
+      "totalRevenue": "Total Revenue",
+      "pendingCourses": "Pending Approval Courses",
+      "articlesLabel": "Articles",
+      "booksLabel": "Books",
+      "newMessages": "New Messages",
+      "users": {
+        "title": "Users Management",
+        "name": "Name",
+        "email": "Email",
+        "phone": "Phone",
+        "role": "Role",
+        "status": "Status",
+        "actions": "Actions",
+        "addUser": "Add New User",
+        "editUser": "Edit User"
+      },
+      "sessions": {
+        "title": "Active Sessions",
+        "user": "User",
+        "ip": "IP Address",
+        "device": "Device",
+        "lastActivity": "Last Activity",
+        "revoke": "Revoke Session"
+      },
+      "categories": {
+        "title": "Categories & Tags",
+        "name": "Category Name",
+        "slug": "Slug",
+        "addCategory": "Add New Category"
+      },
+      "orders": {
+        "title": "Orders Management",
+        "orderNumber": "Order #",
+        "student": "Student",
+        "total": "Total",
+        "status": "Status",
+        "date": "Date"
+      },
+      "reviews": {
+        "title": "Reviews & Ratings",
+        "course": "Course",
+        "student": "Student",
+        "rating": "Rating",
+        "comment": "Comment"
+      },
+      "banners": {
+        "title": "Advertising Banners",
+        "image": "Image",
+        "link": "Link",
+        "type": "Type",
+        "addBanner": "Add New Banner"
+      },
+      "messages": {
+        "title": "Contact & Support Messages",
+        "sender": "Sender",
+        "subject": "Subject",
+        "message": "Message",
+        "reply": "Reply"
+      },
+      "articles": {
+        "title": "Articles Management",
+        "articleTitle": "Article Title",
+        "author": "Author",
+        "views": "Views",
+        "addArticle": "Add New Article"
+      },
+      "books": {
+        "title": "Library Books Management",
+        "bookTitle": "Book Title",
+        "category": "Category",
+        "download": "Download",
+        "addBook": "Add New Book"
+      },
+      "questionBanks": {
+        "title": "Question Banks Management",
+        "bankTitle": "Bank Title",
+        "price": "Price",
+        "questionsCount": "Questions Count",
+        "addBank": "Add New Bank"
+      },
+      "selfAssessments": {
+        "title": "Self-Assessments Management",
+        "assessmentTitle": "Assessment Title",
+        "duration": "Duration",
+        "addAssessment": "Add New Assessment"
+      },
+      "partners": {
+        "title": "Partners Management",
+        "partnerName": "Partner Name",
+        "logo": "Logo",
+        "addPartner": "Add New Partner"
+      },
+      "faqs": {
+        "title": "FAQs Management",
+        "question": "Question",
+        "answer": "Answer",
+        "addFaq": "Add New FAQ"
+      },
+      "pages": {
+        "title": "Static Pages Management",
+        "pageTitle": "Page Title",
+        "slug": "Slug",
+        "addPage": "Add New Page"
+      }
     }
   }
 }

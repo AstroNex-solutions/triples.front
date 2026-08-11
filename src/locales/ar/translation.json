@@ -20,6 +20,21 @@
     "loginShort": "دخول",
     "registerShort": "تسجيل"
   },
+  "theme": {
+    "switchToDark": "التحويل للوضع الليلي",
+    "switchToLight": "التحويل للوضع النهاري"
+  },
+  "courseCard": {
+    "medicalSciences": "علوم طبية",
+    "specialAccreditation": "اعتماد خاص ✨",
+    "accreditedAndUpdated": "دورة طبية معتمدة ومحدثة",
+    "defaultDescription": "منهاج طبي شامل يغطي الجوانب النظرية والتطبيقية المعتمدة.",
+    "students": "متدرب",
+    "practicalApplications": "تطبيقات عملية",
+    "free": "مجاناً",
+    "addToCart": "إضافة إلى سلة الشراء",
+    "details": "تفاصيل الدورة"
+  },
   "home": {
     "banner": {
       "badge": "الأكاديمية الطبية الأولى",
@@ -297,6 +312,325 @@
       "title": "لم يتم العثور على أي دورات",
       "subtitle": "لم نجد أي نتائج مطابقة لخيارات البحث أو الفلترة المحددة. جرب تغيير كلمات البحث أو إعادة الضبط.",
       "viewAll": "عرض جميع الدورات"
+    }
+  },
+  "student": {
+    "dashboard": {
+      "title": "لوحة الطالب",
+      "platform": "منصة الطالب",
+      "logout": "تسجيل الخروج",
+      "groups": {
+        "home": "الرئيسية",
+        "learning": "التعليم والتقدم",
+        "assessments": "التقييمات والاختبارات",
+        "purchases": "مشترياتي",
+        "community": "المجتمع والدعم"
+      },
+      "items": {
+        "overview": "لوحة القيادة",
+        "account": "إعدادات الحساب",
+        "courses": "دوراتي",
+        "schedule": "جدول المذاكرة",
+        "assessments": "الاختبارات والنتائج",
+        "self_assessments": "التقييمات الذاتية",
+        "question_banks": "بنك الأسئلة",
+        "orders": "سجل المشتريات",
+        "library": "المقالات والمكتبة",
+        "support": "الدعم الفني"
+      }
+    },
+    "overview": {
+      "welcome": "مرحباً بعودتك! 👋",
+      "subtitle": "تابع تقدمك واستكمل رحلتك التعليمية نحو النجاح.",
+      "enrolledCourses": "كورساتي المسجلة",
+      "completedCourses": "الكورسات المكتملة",
+      "pendingAssessments": "اختبارات متاحة",
+      "ordersCount": "المشتريات"
+    },
+    "account": {
+      "title": "الملف الشخصي",
+      "fullName": "الاسم الكامل",
+      "phone": "رقم الهاتف",
+      "newPassword": "كلمة المرور الجديدة (اختياري)",
+      "newPasswordPlaceholder": "اتركه فارغاً إذا لم ترد تغييره",
+      "interests": "الاهتمامات التعليمية",
+      "interestsPlaceholder": "مثال: الطب البشري، الصيدلة...",
+      "profileImage": "الصورة الشخصية",
+      "updateBtn": "تحديث البيانات",
+      "updateSuccess": "تم تحديث البيانات بنجاح",
+      "updateError": "حدث خطأ في التحديث"
+    },
+    "courses": {
+      "title": "دوراتي المسجلة",
+      "explore": "استكشاف الدورات",
+      "completed": "مكتمل 🎉",
+      "progress": "التقدم",
+      "continueLearning": "متابعة التعلم",
+      "emptyTitle": "لم تقم بالتسجيل في أي كورس بعد.",
+      "emptyLink": "تصفح الكورسات المتاحة"
+    },
+    "schedule": {
+      "title": "جدول المذاكرة",
+      "addNew": "إضافة موعد جديد",
+      "selectCourse": "اختر الكورس",
+      "course": "الكورس",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "dailyHours": "ساعات المذاكرة اليومية",
+      "daysOff": "أيام الإجازة الأسبوعية",
+      "saveSchedule": "حفظ الجدول",
+      "empty": "لا توجد مواعيد مذاكرة مسجلة.",
+      "addSuccess": "تمت إضافة موعد المذاكرة بنجاح",
+      "addError": "خطأ في إضافة الموعد",
+      "deleteSuccess": "تم الحذف",
+      "days": {
+        "Saturday": "السبت",
+        "Sunday": "الأحد",
+        "Monday": "الإثنين",
+        "Tuesday": "الثلاثاء",
+        "Wednesday": "الأربعاء",
+        "Thursday": "الخميس",
+        "Friday": "الجمعة"
+      }
+    },
+    "assessments": {
+      "availableTitle": "الاختبارات المتاحة",
+      "emptyAvailable": "لا توجد اختبارات متاحة لكورساتك الحالية.",
+      "quiz": "اختبار قصير",
+      "exam": "امتحان نهائي",
+      "assignment": "تكليف / واجب",
+      "flashcard": "بطاقات تعليمية",
+      "noTime": "بدون وقت",
+      "minutes": "دقيقة",
+      "browseFlashcards": "تصفح البطاقات",
+      "startAssignment": "بدء التكليف",
+      "startQuiz": "بدء الاختبار",
+      "previousResults": "نتائج التقييمات السابقة",
+      "table": {
+        "assessment": "التقييم",
+        "date": "التاريخ",
+        "score": "الدرجة",
+        "status": "الحالة",
+        "underReview": "قيد المراجعة",
+        "reviewOnly": "مراجعة فقط",
+        "passed": "ناجح",
+        "failed": "راسب",
+        "empty": "لم تقم بتسليم أي اختبارات حتى الآن"
+      }
+    },
+    "selfAssessments": {
+      "title": "التقييمات الذاتية",
+      "empty": "لا توجد تقييمات ذاتية متاحة حالياً.",
+      "free": "مجاني",
+      "minutes": "دقيقة",
+      "start": "بدء التقييم"
+    },
+    "questionBanks": {
+      "title": "بنك الأسئلة",
+      "empty": "لا توجد بنوك أسئلة متاحة حالياً.",
+      "free": "مجاني",
+      "browse": "تصفح الأسئلة"
+    },
+    "orders": {
+      "title": "سجل المشتريات والفواتير",
+      "table": {
+        "orderNumber": "رقم الطلب",
+        "content": "المحتوى",
+        "total": "المبلغ الإجمالي",
+        "status": "الحالة",
+        "date": "التاريخ",
+        "completed": "مكتمل",
+        "empty": "لا توجد مشتريات سابقة"
+      }
+    },
+    "library": {
+      "title": "المصادر الإضافية",
+      "blogTitle": "المدونة الطبية",
+      "blogDesc": "اقرأ أحدث المقالات والنصائح التعليمية لزيادة معرفتك.",
+      "libraryTitle": "المكتبة الرقمية (الكتب)",
+      "libraryDesc": "تصفح وحمل أهم المراجع والكتب الطبية المتوفرة مجاناً."
+    },
+    "support": {
+      "title": "الدعم الفني والشكاوى",
+      "description": "هل واجهت مشكلة في الدفع؟ أو لديك استفسار بخصوص المنهج؟ أرسل لنا رسالة وسنقوم بالرد في أسرع وقت.",
+      "subject": "الموضوع *",
+      "subjectPlaceholder": "مثال: مشكلة في فتح الدرس...",
+      "message": "الرسالة بالتفصيل *",
+      "messagePlaceholder": "اكتب استفسارك أو مشكلتك هنا...",
+      "submit": "إرسال الطلب",
+      "success": "تم إرسال رسالتك بنجاح وسنتواصل معك قريباً",
+      "error": "خطأ في الإرسال"
+    },
+    "questionBankPage": {
+      "loading": "جاري تحميل بنك الأسئلة...",
+      "notFoundTitle": "بنك الأسئلة غير موجود",
+      "notFoundDesc": "عفواً، لم يتم العثور على بنك الأسئلة المطلوب.",
+      "backToDashboard": "العودة للوحة التحكم",
+      "questionsCount": "أسئلة",
+      "question": "سؤال",
+      "explanation": "الشرح والتوضيح العلمي:",
+      "hideAnswer": "إخفاء الإجابة",
+      "showAnswer": "عرض الإجابة الشارحة"
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "لوحة التحكم",
+      "home": "الرئيسية",
+      "logout": "تسجيل الخروج",
+      "groups": {
+        "home": "الرئيسية",
+        "usersAndLearning": "المستخدمون والتعلم",
+        "storeAndCommerce": "المتجر والتجارة",
+        "contentAndCommunication": "المحتوى والتواصل"
+      },
+      "items": {
+        "dashboard": "الإحصائيات",
+        "sessions": "الجلسات النشطة",
+        "users": "المستخدمين",
+        "courses": "الكورسات",
+        "enrollments": "الاشتراكات",
+        "assessments": "الاختبارات",
+        "categories": "الأقسام والوسوم",
+        "coupons": "الكوبونات",
+        "orders": "الطلبات",
+        "questionBankProducts": "بنوك الأسئلة",
+        "selfAssessmentProducts": "التقييمات الذاتية",
+        "reviews": "التقييمات",
+        "banners": "البنرات الإعلانية",
+        "articles": "المقالات",
+        "partners": "الشركاء",
+        "faqs": "الأسئلة الشائعة",
+        "pages": "الصفحات الثابتة",
+        "books": "المكتبة",
+        "messages": "رسائل التواصل"
+      }
+    },
+    "common": {
+      "add": "إضافة",
+      "save": "حفظ",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "actions": "الإجراءات",
+      "search": "بحث...",
+      "filter": "تصفية",
+      "close": "إغلاق",
+      "status": "الحالة",
+      "date": "التاريخ",
+      "loading": "جاري التحميل..."
+    },
+    "sections": {
+      "dashboardTitle": "لوحة الإحصائيات",
+      "totalUsers": "إجمالي المستخدمين",
+      "students": "الطلاب",
+      "instructors": "المحاضرين",
+      "courses": "الكورسات",
+      "enrollments": "الاشتراكات",
+      "completedOrders": "الطلبات المكتملة",
+      "totalRevenue": "إجمالي الإيرادات",
+      "pendingCourses": "كورسات بانتظار الاعتماد",
+      "articlesLabel": "المقالات",
+      "booksLabel": "الكتب",
+      "newMessages": "رسائل جديدة",
+      "users": {
+        "title": "إدارة المستخدمين",
+        "name": "الاسم",
+        "email": "البريد الإلكتروني",
+        "phone": "الهاتف",
+        "role": "الصلاحية",
+        "status": "الحالة",
+        "actions": "الإجراءات",
+        "addUser": "إضافة مستخدم جديد",
+        "editUser": "تعديل مستخدم"
+      },
+      "sessions": {
+        "title": "الجلسات النشطة",
+        "user": "المستخدم",
+        "ip": "عنوان IP",
+        "device": "الجهاز",
+        "lastActivity": "آخر نشاط",
+        "revoke": "إنهاء الجلسة"
+      },
+      "categories": {
+        "title": "الأقسام والوسوم",
+        "name": "اسم القسم",
+        "slug": "الاسم اللطيف (Slug)",
+        "addCategory": "إضافة قسم جديد"
+      },
+      "orders": {
+        "title": "إدارة الطلبات",
+        "orderNumber": "رقم الطلب",
+        "student": "الطالب",
+        "total": "المبلغ",
+        "status": "الحالة",
+        "date": "التاريخ"
+      },
+      "reviews": {
+        "title": "التقييمات والمراجعات",
+        "course": "الكورس",
+        "student": "الطالب",
+        "rating": "التقييم",
+        "comment": "التعليق"
+      },
+      "banners": {
+        "title": "البنرات الإعلانية",
+        "image": "الصورة",
+        "link": "الرابط",
+        "type": "النوع",
+        "addBanner": "إضافة بنر جديد"
+      },
+      "messages": {
+        "title": "رسائل التواصل والدعم",
+        "sender": "المرسل",
+        "subject": "الموضوع",
+        "message": "الرسالة",
+        "reply": "الرد"
+      },
+      "articles": {
+        "title": "إدارة المقالات",
+        "articleTitle": "عنوان المقال",
+        "author": "الكاتب",
+        "views": "المشاهدات",
+        "addArticle": "إضافة مقال جديد"
+      },
+      "books": {
+        "title": "إدارة المكتبة والكتب",
+        "bookTitle": "اسم الكتاب",
+        "category": "القسم",
+        "download": "تحميل",
+        "addBook": "إضافة كتاب جديد"
+      },
+      "questionBanks": {
+        "title": "إدارة بنوك الأسئلة",
+        "bankTitle": "اسم البنك",
+        "price": "السعر",
+        "questionsCount": "عدد الأسئلة",
+        "addBank": "إضافة بنك جديد"
+      },
+      "selfAssessments": {
+        "title": "إدارة التقييمات الذاتية",
+        "assessmentTitle": "اسم التقييم",
+        "duration": "المدة",
+        "addAssessment": "إضافة تقييم جديد"
+      },
+      "partners": {
+        "title": "إدارة الشركاء",
+        "partnerName": "اسم الشريك",
+        "logo": "الشعار",
+        "addPartner": "إضافة شريك جديد"
+      },
+      "faqs": {
+        "title": "الأسئلة الشائعة",
+        "question": "السؤال",
+        "answer": "الإجابة",
+        "addFaq": "إضافة سؤال جديد"
+      },
+      "pages": {
+        "title": "الصفحات الثابتة",
+        "pageTitle": "عنوان الصفحة",
+        "slug": "الرابط (Slug)",
+        "addPage": "إضافة صفحة جديدة"
+      }
     }
   }
 }

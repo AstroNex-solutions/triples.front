@@ -1,7 +1,8 @@
 import React from 'react';
 import { Loader2, CheckCircle2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 export const getImageSrc = (imgSrc) => {
   if (!imgSrc) return '';
@@ -39,7 +40,7 @@ export function StatCard({ label, value, icon: Icon, color = 'primary' }) {
 export function SectionHeader({ title, count, children }) {
   return (
     <div className="flex items-center justify-between mb-4">
-      <h3 className="text-lg font-extrabold text-on-surface">{title} {count !== undefined && <span className="text-xs text-on-surface-variant font-medium mr-2">({count})</span>}</h3>
+      <h3 className="text-lg font-extrabold text-on-surface">{title} {count !== undefined && <span className="text-xs text-on-surface-variant font-medium mx-2">({count})</span>}</h3>
       {children && <div className="flex items-center gap-2">{children}</div>}
     </div>
   );
@@ -48,7 +49,7 @@ export function SectionHeader({ title, count, children }) {
 export function Input({ label, ...props }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-bold text-on-surface-variant block">{label}</label>
+      {label && <label className="text-xs font-bold text-on-surface-variant block">{label}</label>}
       <input {...props} className="w-full px-4 py-2.5 bg-surface/80 border border-outline-variant/50 rounded-2xl text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" />
     </div>
   );
@@ -57,16 +58,18 @@ export function Input({ label, ...props }) {
 export function Textarea({ label, ...props }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-bold text-on-surface-variant block">{label}</label>
+      {label && <label className="text-xs font-bold text-on-surface-variant block">{label}</label>}
       <textarea {...props} className="w-full px-4 py-2.5 bg-surface/80 border border-outline-variant/50 rounded-2xl text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" rows={3} />
     </div>
   );
 }
 
-export function SubmitBtn({ loading, label = 'حفظ' }) {
+export function SubmitBtn({ loading, label }) {
+  const { t } = useTranslation();
+  const btnLabel = label || t('student.account.updateBtn');
   return (
     <button type="submit" disabled={loading} className="py-2.5 px-6 bg-primary text-on-primary font-bold text-sm rounded-2xl hover:bg-primary-hover disabled:opacity-60 transition-all flex items-center gap-2 shadow-glow cursor-pointer">
-      {loading ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />} {label}
+      {loading ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />} {btnLabel}
     </button>
   );
 }
@@ -84,14 +87,12 @@ export function Badge({ text, variant = 'default' }) {
 
 export function Avatar({ name = '', size = 'md', image = null }) {
   const sizes = { sm: 'w-7 h-7 text-xs', md: 'w-9 h-9 text-xs', lg: 'w-11 h-11 text-sm' };
-  
-  // Use provided image or a default avatar image URL
   const imgSource = image ? getImageSrc(image) : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name || 'User') + '&background=random';
   
   return (
     <img
       src={imgSource}
-      alt={name || 'صورة'}
+      alt={name || 'User'}
       className={`${sizes[size]} rounded-full object-cover border border-outline-variant/30 bg-surface-container`}
       onError={(e) => { e.target.src = 'https://ui-avatars.com/api/?name=U&background=random'; }}
     />

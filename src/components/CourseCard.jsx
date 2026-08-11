@@ -1,9 +1,9 @@
 import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   Star, 
   Users, 
-  Clock, 
   ShoppingCart, 
   Stethoscope, 
   ShieldCheck, 
@@ -14,11 +14,11 @@ import {
 import { CartContext } from '../context/CartContext';
 
 export default function CourseCard({ course }) {
+  const { t, i18n } = useTranslation();
   const { addToCart } = useContext(CartContext);
   const [loading, setLoading] = useState(false);
   const [added, setAdded] = useState(false);
 
-  // صورة افتراضية ذات طابع طبي أكاديمي
   const defaultImg = 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80';
   const imgUrl = course.image 
     ? (course.image.startsWith('http') ? course.image : course.image) 
@@ -39,16 +39,19 @@ export default function CourseCard({ course }) {
     }
   };
 
+  const categoryName = course.category?.[`name_${i18n.language}`] || course.category?.name || t('courseCard.medicalSciences');
+  const courseTitle = course[`title_${i18n.language}`] || course.title;
+  const courseDesc = course[`subtitle_${i18n.language}`] || course.subtitle || course[`short_description_${i18n.language}`] || course.short_description || t('courseCard.defaultDescription');
+
   return (
     <div 
-      dir="rtl" 
       className="group relative rounded-3xl bg-surface-container-low/70 border border-outline-variant/40 hover:border-emerald-500/40 backdrop-blur-xl overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-emerald-500/10 flex flex-col h-full"
     >
       {/* 1. Course Thumbnail Container */}
       <div className="relative h-48 w-full overflow-hidden bg-slate-900">
         <img 
-          src={import.meta.env.VITE_API_URL+imgUrl} 
-          alt={course.title} 
+          src={import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL + imgUrl : imgUrl} 
+          alt={courseTitle} 
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100" 
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/20" />
@@ -58,13 +61,13 @@ export default function CourseCard({ course }) {
           {/* Category Badge */}
           <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-slate-900/80 backdrop-blur-md text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
             <Stethoscope size={13} className="text-emerald-400" />
-            <span>{course.category?.name || 'علوم طبية'}</span>
+            <span>{categoryName}</span>
           </span>
 
           {/* Featured Badge */}
           {course.is_featured && (
             <span className="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-amber-500/20 backdrop-blur-md text-amber-300 border border-amber-500/40 flex items-center gap-1 shadow-sm">
-              <span>اعتماد خاص ✨</span>
+              <span>{t('courseCard.specialAccreditation')}</span>
             </span>
           )}
         </div>
@@ -80,21 +83,21 @@ export default function CourseCard({ course }) {
       <div className="p-5 flex flex-col flex-1 justify-between space-y-4">
         <div className="space-y-2">
           {/* Medical Sub-Badge / Accreditation info */}
-          <div className="flex items-center gap-2 text-[11px] text-emerald-400/90 font-medium">
+          <div className="flex items-center gap-2 text-[11px] text-emerald-500 font-medium">
             <ShieldCheck size={14} className="shrink-0" />
-            <span>دورة طبية معتمدة ومحدثة</span>
+            <span>{t('courseCard.accreditedAndUpdated')}</span>
           </div>
 
           {/* Title */}
-          <h3 className="text-base font-extrabold text-on-surface line-clamp-2 leading-snug group-hover:text-emerald-400 transition-colors">
+          <h3 className="text-base font-extrabold text-on-surface line-clamp-2 leading-snug group-hover:text-emerald-500 transition-colors">
             <Link to={`/courses/${course.slug}`}>
-              {course.title}
+              {courseTitle}
             </Link>
           </h3>
 
           {/* Subtitle or Short Description */}
           <p className="text-xs text-on-surface-variant line-clamp-2 leading-relaxed">
-            {course.subtitle || course.short_description || 'منهاج طبي شامل يغطي الجوانب النظرية والتطبيقية المعتمدة.'}
+            {courseDesc}
           </p>
         </div>
 
@@ -102,11 +105,11 @@ export default function CourseCard({ course }) {
         <div className="flex items-center justify-between text-xs text-on-surface-variant/80 border-t border-outline-variant/30 pt-3">
           <div className="flex items-center gap-1.5">
             <Users size={14} className="text-primary" />
-            <span>{course.total_enrollments || 0} متدرب</span>
+            <span>{course.total_enrollments || 0} {t('courseCard.students')}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <Activity size={14} className="text-emerald-400" />
-            <span>تطبيقات عملية</span>
+            <Activity size={14} className="text-emerald-500" />
+            <span>{t('courseCard.practicalApplications')}</span>
           </div>
         </div>
 
@@ -115,7 +118,7 @@ export default function CourseCard({ course }) {
           {/* Price Tag */}
           <div>
             {course.is_free ? (
-              <span className="text-base font-black text-emerald-400">مجاناً</span>
+              <span className="text-base font-black text-emerald-500">{t('courseCard.free')}</span>
             ) : (
               <div className="flex items-baseline gap-1.5">
                 <span className="text-lg font-black text-on-surface" dir="ltr">${course.discount_price || course.price}</span>
@@ -135,15 +138,15 @@ export default function CourseCard({ course }) {
               disabled={loading}
               className={`p-2.5 rounded-xl border transition-all flex items-center justify-center ${
                 added 
-                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' 
-                  : 'bg-surface border-outline-variant/60 text-on-surface-variant hover:text-emerald-400 hover:border-emerald-500/40 hover:bg-emerald-500/10'
+                  ? 'bg-emerald-500/20 text-emerald-500 border-emerald-500/40' 
+                  : 'bg-surface border-outline-variant/60 text-on-surface-variant hover:text-emerald-500 hover:border-emerald-500/40 hover:bg-emerald-500/10'
               }`}
-              title="إضافة إلى سلة الشراء"
+              title={t('courseCard.addToCart')}
             >
               {loading ? (
-                <Loader2 size={16} className="animate-spin text-emerald-400" />
+                <Loader2 size={16} className="animate-spin text-emerald-500" />
               ) : added ? (
-                <Check size={16} className="text-emerald-400" />
+                <Check size={16} className="text-emerald-500" />
               ) : (
                 <ShoppingCart size={16} />
               )}
@@ -151,9 +154,9 @@ export default function CourseCard({ course }) {
 
             <Link 
               to={`/courses/${course.slug}`} 
-              className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-500/15 transition-all flex items-center justify-center shrink-0"
+              className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-500/15 transition-all flex items-center justify-center shrink-0"
             >
-              تفاصيل الدورة
+              {t('courseCard.details')}
             </Link>
           </div>
         </div>

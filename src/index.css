@@ -1,3 +1,62 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --color-background: 248 250 252;
+  --color-on-background: 15 23 42;
+  --color-surface: 255 255 255;
+  --color-surface-variant: 241 245 249;
+  --color-on-surface: 15 23 42;
+  --color-on-surface-variant: 71 85 105;
+  --color-surface-container-lowest: 255 255 255;
+  --color-surface-container-low: 248 250 252;
+  --color-surface-container: 241 245 249;
+  --color-surface-container-high: 226 232 240;
+  --color-surface-container-highest: 203 213 225;
+  --color-primary-container: 224 231 255;
+  --color-on-primary-container: 49 46 129;
+  --color-secondary-container: 224 242 254;
+  --color-on-secondary-container: 12 74 110;
+  --color-error-container: 254 226 226;
+  --color-outline: 148 163 184;
+  --color-outline-variant: 226 232 240;
+}
+
+.dark {
+  --color-background: 11 15 25;
+  --color-on-background: 248 250 252;
+  --color-surface: 22 30 46;
+  --color-surface-variant: 30 41 59;
+  --color-on-surface: 248 250 252;
+  --color-on-surface-variant: 148 163 184;
+  --color-surface-container-lowest: 11 15 25;
+  --color-surface-container-low: 17 24 39;
+  --color-surface-container: 30 41 59;
+  --color-surface-container-high: 51 65 85;
+  --color-surface-container-highest: 71 85 105;
+  --color-primary-container: 59 7 100;
+  --color-on-primary-container: 243 232 255;
+  --color-secondary-container: 12 74 110;
+  --color-on-secondary-container: 224 242 254;
+  --color-error-container: 127 29 29;
+  --color-outline: 100 116 139;
+  --color-outline-variant: 51 65 85;
+}
+
+@layer base {
+  body {
+    background-color: rgb(var(--color-background));
+    color: rgb(var(--color-on-background));
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

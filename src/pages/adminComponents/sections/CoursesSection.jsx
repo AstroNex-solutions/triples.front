@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import API from '../../../api/axios';
 import { 
   Loader2, BookOpen, Plus, CheckCircle2, Users, Play, Trash2, ChevronDown, 
@@ -146,6 +147,7 @@ const ModuleNode = ({
 };
 
 export default function CoursesSection({ showMsg }) {
+  const { t, i18n } = useTranslation();
   const [courses, setCourses] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -351,12 +353,12 @@ export default function CoursesSection({ showMsg }) {
   };
 
   return (
-    <div className="space-y-6" dir="rtl">
+    <div className="space-y-6" dir={i18n.language === 'en' ? 'ltr' : 'rtl'}>
       <SectionHeader
-        title="إدارة الكورسات"
+        title={t('admin.sections.courses')}
         count={courses.length}
         onAdd={() => setShowAdd(true)}
-        addLabel="كورس جديد"
+        addLabel="New Course / كورس جديد"
       />
 
       {loading ? (

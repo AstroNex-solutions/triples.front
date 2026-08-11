@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../context/AuthContext';
 import {
   Users, BookOpen, Tag, GraduationCap, FileText, ClipboardList, Ticket, Package,
@@ -11,6 +12,7 @@ import { Avatar } from './adminComponents/ui/SharedUI';
 import DashboardSection from './adminComponents/sections/DashboardSection';
 import UsersSection from './adminComponents/sections/UsersSection';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import ThemeToggle from '../components/ThemeToggle';
 import SessionsSection from './adminComponents/sections/SessionsSection';
 import CategoriesSection from './adminComponents/sections/CategoriesSection';
 import CoursesSection from './adminComponents/sections/CoursesSection';
@@ -29,55 +31,56 @@ import PartnersSection from './adminComponents/sections/PartnersSection';
 import FaqsSection from './adminComponents/sections/FaqsSection';
 import PagesSection from './adminComponents/sections/PagesSection';
 
-const MENU_GROUPS = [
-  {
-    title: 'الرئيسية',
-    items: [
-      { key: 'dashboard', label: 'الإحصائيات', icon: LayoutDashboard },
-      { key: 'sessions', label: 'الجلسات النشطة', icon: Globe },
-    ]
-  },
-  {
-    title: 'المستخدمون والتعلم',
-    items: [
-      { key: 'users', label: 'المستخدمين', icon: Users },
-      { key: 'courses', label: 'الكورسات', icon: BookOpen },
-      { key: 'enrollments', label: 'الاشتراكات', icon: GraduationCap },
-      { key: 'assessments', label: 'الاختبارات', icon: ClipboardList },
-    ]
-  },
-  {
-    title: 'المتجر والتجارة',
-    items: [
-      { key: 'categories', label: 'الأقسام والوسوم', icon: Tag },
-      { key: 'coupons', label: 'الكوبونات', icon: Ticket },
-      { key: 'orders', label: 'الطلبات', icon: Package },
-      { key: 'question-bank-products', label: 'بنوك الأسئلة', icon: Database },
-      { key: 'self-assessment-products', label: 'التقييمات الذاتية', icon: Target },
-      { key: 'reviews', label: 'التقييمات', icon: Star },
-    ]
-  },
-  {
-    title: 'المحتوى والتواصل',
-    items: [
-      { key: 'banners', label: 'البنرات الإعلانية', icon: Image },
-      { key: 'articles', label: 'المقالات', icon: FileText },
-      { key: 'partners', label: 'الشركاء', icon: Handshake },
-      { key: 'faqs', label: 'الأسئلة الشائعة', icon: HelpCircle },
-      { key: 'pages', label: 'الصفحات الثابتة', icon: FileText },
-      { key: 'books', label: 'المكتبة', icon: BookMarked },
-      { key: 'messages', label: 'رسائل التواصل', icon: Mail },
-    ]
-  }
-];
-
 export default function AdminDashboard() {
+  const { t, i18n } = useTranslation();
   const [activeSection, setActiveSection] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [globalMsg, setGlobalMsg] = useState({ type: '', text: '' });
   
   const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  const menuGroups = [
+    {
+      title: t('admin.dashboard.groups.home'),
+      items: [
+        { key: 'dashboard', label: t('admin.dashboard.items.dashboard'), icon: LayoutDashboard },
+        { key: 'sessions', label: t('admin.dashboard.items.sessions'), icon: Globe },
+      ]
+    },
+    {
+      title: t('admin.dashboard.groups.usersAndLearning'),
+      items: [
+        { key: 'users', label: t('admin.dashboard.items.users'), icon: Users },
+        { key: 'courses', label: t('admin.dashboard.items.courses'), icon: BookOpen },
+        { key: 'enrollments', label: t('admin.dashboard.items.enrollments'), icon: GraduationCap },
+        { key: 'assessments', label: t('admin.dashboard.items.assessments'), icon: ClipboardList },
+      ]
+    },
+    {
+      title: t('admin.dashboard.groups.storeAndCommerce'),
+      items: [
+        { key: 'categories', label: t('admin.dashboard.items.categories'), icon: Tag },
+        { key: 'coupons', label: t('admin.dashboard.items.coupons'), icon: Ticket },
+        { key: 'orders', label: t('admin.dashboard.items.orders'), icon: Package },
+        { key: 'question-bank-products', label: t('admin.dashboard.items.questionBankProducts'), icon: Database },
+        { key: 'self-assessment-products', label: t('admin.dashboard.items.selfAssessmentProducts'), icon: Target },
+        { key: 'reviews', label: t('admin.dashboard.items.reviews'), icon: Star },
+      ]
+    },
+    {
+      title: t('admin.dashboard.groups.contentAndCommunication'),
+      items: [
+        { key: 'banners', label: t('admin.dashboard.items.banners'), icon: Image },
+        { key: 'articles', label: t('admin.dashboard.items.articles'), icon: FileText },
+        { key: 'partners', label: t('admin.dashboard.items.partners'), icon: Handshake },
+        { key: 'faqs', label: t('admin.dashboard.items.faqs'), icon: HelpCircle },
+        { key: 'pages', label: t('admin.dashboard.items.pages'), icon: FileText },
+        { key: 'books', label: t('admin.dashboard.items.books'), icon: BookMarked },
+        { key: 'messages', label: t('admin.dashboard.items.messages'), icon: Mail },
+      ]
+    }
+  ];
 
   const handleLogout = async () => {
     await logout();
@@ -89,10 +92,12 @@ export default function AdminDashboard() {
     setTimeout(() => setGlobalMsg({ type: '', text: '' }), 4000);
   };
 
+  const activeItemLabel = menuGroups.flatMap(g => g.items).find(i => i.key === activeSection)?.label;
+
   return (
-    <div className="flex bg-background font-sans ">
+    <div className="flex bg-background text-on-background font-sans min-h-screen transition-colors duration-300" dir={i18n.language === 'en' ? 'ltr' : 'rtl'}>
       {/* Sidebar Navigation */}
-      <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} shrink-0 bg-surface-container-low/60 border-l border-outline-variant/30 backdrop-blur-2xl transition-all duration-300 sticky top-0 h-screen flex flex-col z-30`}>
+      <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} shrink-0 bg-surface-container-low/80 border-r border-outline-variant/30 backdrop-blur-2xl transition-all duration-300 sticky top-0 h-screen flex flex-col z-30`}>
         {/* Sidebar Header */}
         <div className="h-16 px-4 flex items-center justify-between border-b border-outline-variant/20">
           {sidebarOpen && (
@@ -100,23 +105,27 @@ export default function AdminDashboard() {
               <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center text-on-primary font-extrabold text-sm shadow-sm">
                 A
               </div>
-              <span className="text-sm font-black text-on-surface tracking-wide">لوحة التحكم</span>
+              <span className="text-sm font-black text-on-surface tracking-wide">{t('admin.dashboard.title')}</span>
             </div>
           )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-xl hover:bg-surface-variant/40 text-on-surface-variant transition-colors cursor-pointer mr-auto"
+            className="p-2 rounded-xl hover:bg-surface-variant/40 text-on-surface-variant transition-colors cursor-pointer"
           >
-            {sidebarOpen ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+            {sidebarOpen ? (
+              i18n.language === 'en' ? <ChevronLeft size={18} /> : <ChevronRight size={18} />
+            ) : (
+              i18n.language === 'en' ? <ChevronRight size={18} /> : <ChevronLeft size={18} />
+            )}
           </button>
         </div>
 
         {/* Sidebar Links */}
-        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          {MENU_GROUPS.map((group, idx) => (
-            <div key={idx} className="space-y-1">
+        <div className="flex-1 overflow-y-auto px-2 py-2 space-y-2.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          {menuGroups.map((group, idx) => (
+            <div key={idx} className="space-y-0.5">
               {sidebarOpen && (
-                <p className="px-3 text-[10px] font-black uppercase tracking-wider text-on-surface-variant/50 mb-2">
+                <p className="px-2 text-[9px] font-black uppercase tracking-wider text-on-surface-variant/50 mb-1">
                   {group.title}
                 </p>
               )}
@@ -128,13 +137,13 @@ export default function AdminDashboard() {
                     key={item.key}
                     onClick={() => setActiveSection(item.key)}
                     title={!sidebarOpen ? item.label : undefined}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                    className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
                       isActive
                         ? 'bg-primary text-on-primary shadow-sm font-bold'
                         : 'text-on-surface-variant hover:bg-surface-variant/30 hover:text-on-surface'
                     }`}
                   >
-                    <Icon size={18} className="shrink-0" />
+                    <Icon size={16} className="shrink-0" />
                     {sidebarOpen && <span className="truncate">{item.label}</span>}
                   </button>
                 );
@@ -144,14 +153,14 @@ export default function AdminDashboard() {
         </div>
         
         {/* Logout Button */}
-        <div className="p-4 border-t border-outline-variant/20">
+        <div className="p-2 border-t border-outline-variant/20">
           <button
             onClick={handleLogout}
-            title={!sidebarOpen ? 'تسجيل الخروج' : undefined}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-rose-500 hover:bg-rose-500/10 transition-all cursor-pointer"
+            title={!sidebarOpen ? t('admin.dashboard.logout') : undefined}
+            className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-rose-500 hover:bg-rose-500/10 transition-all cursor-pointer"
           >
-            <LogOut size={18} className="shrink-0" />
-            {sidebarOpen && <span>تسجيل الخروج</span>}
+            <LogOut size={16} className="shrink-0" />
+            {sidebarOpen && <span>{t('admin.dashboard.logout')}</span>}
           </button>
         </div>
       </aside>
@@ -159,15 +168,16 @@ export default function AdminDashboard() {
       {/* Main Layout Content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
         {/* Top Navbar */}
-        <header className="h-16 border-b border-outline-variant/20 bg-surface/30 backdrop-blur-xl px-6 flex items-center justify-between sticky top-0 z-20">
+        <header className="h-16 border-b border-outline-variant/20 bg-surface/40 backdrop-blur-xl px-6 flex items-center justify-between sticky top-0 z-20">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-on-surface-variant">الرئيسية</span>
+            <span className="text-xs font-medium text-on-surface-variant">{t('admin.dashboard.home')}</span>
             <span className="text-xs text-on-surface-variant/40">/</span>
             <span className="text-xs font-bold text-on-surface">
-              {MENU_GROUPS.flatMap(g => g.items).find(i => i.key === activeSection)?.label}
+              {activeItemLabel}
             </span>
           </div>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <LanguageSwitcher />
             <Avatar name="Admin User" size="sm" />
           </div>
@@ -177,7 +187,7 @@ export default function AdminDashboard() {
         <div className="p-6 sm:p-8 space-y-6 max-w-7xl w-full mx-auto">
           {/* Notification Alert */}
           {globalMsg.text && (
-            <div className={`p-4 rounded-xl text-xs font-bold flex items-center gap-3 border animate-slide-down ${
+            <div className={`p-4 rounded-xl text-xs font-bold flex items-center gap-3 border ${
               globalMsg.type === 'success'
                 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500'
                 : 'bg-rose-500/10 border-rose-500/30 text-rose-500'

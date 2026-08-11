@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import API from '../../../api/axios';
 import { 
   Loader2, ShieldAlert, X, ChevronRight, ChevronLeft
@@ -6,11 +7,11 @@ import {
 import { SectionHeader, Card, Badge } from '../ui/SharedUI';
 
 export default function SessionsSection({ showMsg }) {
+  const { t, i18n } = useTranslation();
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [revokingId, setRevokingId] = useState(null); // لمتابعة الجلسة الجاري إنهاؤها
+  const [revokingId, setRevokingId] = useState(null);
 
-  // حالات التقسيم (Pagination)
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
@@ -30,23 +31,21 @@ export default function SessionsSection({ showMsg }) {
     try {
       setRevokingId(id);
       await API.post(`/admin/sessions/${id}/revoke`);
-      showMsg('success', 'تم إنهاء الجلسة بنجاح');
+      showMsg('success', t('admin.sections.sessions.revoke'));
       fetch();
     } catch {
-      showMsg('error', 'حدث خطأ أثناء إنهاء الجلسة');
+      showMsg('error', 'Error');
     } finally {
       setRevokingId(null);
     }
   };
 
-  // حساب الجلسات للصفحة الحالية
   const totalPages = Math.ceil(sessions.length / itemsPerPage) || 1;
   const paginatedSessions = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
     return sessions.slice(start, start + itemsPerPage);
   }, [sessions, currentPage, itemsPerPage]);
 
-  // التبديل بين الصفحات
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
@@ -56,7 +55,7 @@ export default function SessionsSection({ showMsg }) {
   return (
     <>
       <SectionHeader 
-        title="الجلسات النشطة" 
+        title={t('admin.sections.sessions.title')} 
         count={sessions.filter(s => s.is_active).length} 
       />
 
@@ -67,19 +66,19 @@ export default function SessionsSection({ showMsg }) {
       ) : sessions.length === 0 ? (
         <Card className="p-8 text-center text-on-surface-variant flex flex-col items-center gap-2">
           <ShieldAlert size={32} className="opacity-50 mb-1" />
-          <p>لا توجد جلسات مسجلة حالياً</p>
+          <p>No active sessions found / لا توجد جلسات مسجلة حالياً</p>
         </Card>
       ) : (
         <Card className="overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-right text-xs sm:text-sm border-collapse">
+            <table className="w-full text-start text-xs sm:text-sm border-collapse">
               <thead>
                 <tr className="border-b border-outline-variant/30 text-on-surface-variant/70 bg-surface-variant/20">
-                  <th className="p-3.5 font-semibold">المستخدم</th>
-                  <th className="p-3.5 font-semibold">عنوان IP</th>
-                  <th className="p-3.5 font-semibold">الحالة</th>
-                  <th className="p-3.5 font-semibold">تاريخ الإنشاء</th>
-                  <th className="p-3.5 font-semibold text-center">إجراء</th>
+                  <th className="p-3.5 font-semibold text-start">{t('admin.sections.sessions.user')}</th>
+                  <th className="p-3.5 font-semibold text-start">{t('admin.sections.sessions.ip')}</th>
+                  <th className="p-3.5 font-semibold text-start">{t('admin.common.status')}</th>
+                  <th className="p-3.5 font-semibold text-start">{t('admin.sections.sessions.lastActivity')}</th>
+                  <th className="p-3.5 font-semibold text-center">{t('admin.common.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/20">
@@ -96,13 +95,13 @@ export default function SessionsSection({ showMsg }) {
                     </td>
                     <td className="p-3.5">
                       {s.is_active ? (
-                        <Badge text="نشطة" variant="success" />
+                        <Badge text="Active / نشطة" variant="success" />
                       ) : (
-                        <Badge text="منتهية" variant="default" />
+                        <Badge text="Ended / منتهية" variant="default" />
                       )}
                     </td>
-                    <td className="p-3.5 text-on-surface-variant text-xs">
-                      {new Date(s.createdAt).toLocaleString('ar-EG', {
+                    <td className="p-3.5 text-on-surface-variant text-xs" dir="ltr">
+                      {new Date(s.createdAt).toLocaleString(i18n.language === 'en' ? 'en-US' : 'ar-EG', {
                         dateStyle: 'medium',
                         timeStyle: 'short',
                       })}
@@ -112,7 +111,7 @@ export default function SessionsSection({ showMsg }) {
                         <button
                           onClick={() => revoke(s.id)}
                           disabled={revokingId === s.id}
-                          title="إنهاء الجلسة"
+                          title={t('admin.sections.sessions.revoke')}
                           className="p-1.5 rounded-lg bg-surface hover:bg-rose-500/10 border border-outline-variant/40 text-on-surface-variant hover:text-rose-500 transition-all cursor-pointer disabled:opacity-50"
                         >
                           {revokingId === s.id ? (
@@ -129,20 +128,20 @@ export default function SessionsSection({ showMsg }) {
             </table>
           </div>
 
-          {/* شريط الـ Pagination */}
+          {/* Pagination */}
           {totalPages > 1 && (
             <div className="p-3 sm:p-4 border-t border-outline-variant/30 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-on-surface-variant">
               <span>
-                عرض {((currentPage - 1) * itemsPerPage) + 1} إلى {Math.min(currentPage * itemsPerPage, sessions.length)} من إجمالي {sessions.length} جلسة
+                Page {currentPage} of {totalPages} ({sessions.length} total)
               </span>
 
-              <div className="flex items-center gap-1.5" dir="rtl">
+              <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
                   className="p-1.5 rounded-lg border border-outline-variant/40 hover:bg-surface-variant disabled:opacity-40 disabled:hover:bg-transparent transition-all cursor-pointer disabled:cursor-not-allowed"
                 >
-                  <ChevronRight size={16} />
+                  <ChevronLeft size={16} className={i18n.language === 'ar' ? 'rotate-180' : ''} />
                 </button>
 
                 <div className="flex items-center gap-1 px-2 font-medium">
@@ -156,7 +155,7 @@ export default function SessionsSection({ showMsg }) {
                   disabled={currentPage === totalPages}
                   className="p-1.5 rounded-lg border border-outline-variant/40 hover:bg-surface-variant disabled:opacity-40 disabled:hover:bg-transparent transition-all cursor-pointer disabled:cursor-not-allowed"
                 >
-                  <ChevronLeft size={16} />
+                  <ChevronRight size={16} className={i18n.language === 'ar' ? 'rotate-180' : ''} />
                 </button>
               </div>
             </div>

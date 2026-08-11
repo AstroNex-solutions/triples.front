@@ -21,7 +21,7 @@ export default function Footer() {
     <footer className="w-full bg-primary text-on-primary py-12 relative overflow-hidden">
       
       {/* Visual Ambient Glow Background */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-white/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-96 h-96 bg-surface/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-10 w-80 h-80 bg-secondary-container/10 rounded-full blur-2xl pointer-events-none" />
 
       <div className="max-w-container-max mx-auto px-4 sm:px-6 lg:px-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
@@ -95,7 +95,7 @@ export default function Footer() {
                 type="button"
                 title={t('footer.scanQr')}
                 aria-label={t('footer.scanQr')}
-                className="p-2 bg-white/10 hover:bg-white/20 hover:text-secondary-fixed rounded-xl transition-all duration-200"
+                className="p-2 bg-surface/10 hover:bg-surface/20 hover:text-secondary-fixed rounded-xl transition-all duration-200"
               >
                 <QrCode size={18} />
               </button>
@@ -105,7 +105,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 title={t('footer.youtubeChannel')}
                 aria-label={t('footer.youtubeChannel')}
-                className="p-2 bg-white/10 hover:bg-white/20 hover:text-secondary-fixed rounded-xl transition-all duration-200 flex items-center justify-center"
+                className="p-2 bg-surface/10 hover:bg-surface/20 hover:text-secondary-fixed rounded-xl transition-all duration-200 flex items-center justify-center"
               >
                 <Youtube size={18} />
               </a>
@@ -113,7 +113,7 @@ export default function Footer() {
                 type="button"
                 title={t('footer.sharePlatform')}
                 aria-label={t('footer.sharePlatform')}
-                className="p-2 bg-white/10 hover:bg-white/20 hover:text-secondary-fixed rounded-xl transition-all duration-200"
+                className="p-2 bg-surface/10 hover:bg-surface/20 hover:text-secondary-fixed rounded-xl transition-all duration-200"
               >
                 <Share2 size={18} />
               </button>

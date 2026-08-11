@@ -6,8 +6,8 @@ import API from '../api/axios';
 import CourseCard from '../components/CourseCard';
 import { 
   PlayCircle, ShieldCheck, Star, Play, BookOpen, 
-  Brain, Sparkles, ChevronDown, Activity, Dna, Award, CheckCircle2,
-  Quote, Building, HeartHandshake, Users
+  Brain, Sparkles, ChevronDown, Activity, Dna,
+  Quote
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -44,7 +44,6 @@ export default function HomePage() {
     fetchData();
   }, []);
 
-
   const toggleFaq = (index) => {
     setActiveFaq(activeFaq === index ? null : index);
   };
@@ -67,20 +66,20 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex flex-col w-full bg-background text-on-background font-sans overflow-hidden">
+    <div className="flex flex-col w-full bg-background text-on-background font-sans overflow-hidden transition-colors duration-300">
       
       {/* 1. Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center pt-20 pb-20 overflow-hidden bg-gradient-to-b from-primary-container/30 via-surface to-background">
+      <section className="relative min-h-[90vh] flex items-center pt-20 pb-20 overflow-hidden bg-gradient-to-b from-primary-container/20 via-surface to-background">
         
-        {/* خلفية تفاعلية بوضوح أعلى */}
+        {/* خلفية تفاعلية */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(#4f46e5_1.2px,transparent_1.2px)] [background-size:20px_20px] opacity-[0.08]"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(#6D02A5_1.2px,transparent_1.2px)] [background-size:20px_20px] opacity-[0.08] dark:opacity-[0.15]"></div>
           
           {/* دوائر ضوئية خفيفة */}
           <div className="absolute -top-20 -right-20 w-[500px] h-[500px] bg-primary/15 rounded-full blur-[100px]"></div>
           <div className="absolute bottom-0 -left-20 w-[400px] h-[400px] bg-secondary/15 rounded-full blur-[100px]"></div>
 
-          {/* أيقونات الخلفية أصبحت أكثر وضوحاً وبألوان طبية جذابة */}
+          {/* أيقونات الخلفية */}
           <motion.div 
             animate={{ y: [0, -15, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
@@ -138,7 +137,7 @@ export default function HomePage() {
             <motion.div variants={fadeUp} className="mt-10 flex items-center gap-4 bg-surface/80 p-3.5 rounded-2xl border border-outline-variant shadow-sm backdrop-blur-md">
               <div className="flex -space-x-3 space-x-reverse">
                 {[1, 2, 3, 4].map((i) => (
-                  <img key={i} src={`https://i.pravatar.cc/100?img=${i + 12}`} alt="Student" className="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover" />
+                  <img key={i} src={`https://i.pravatar.cc/100?img=${i + 12}`} alt="Student" className="w-10 h-10 rounded-full border-2 border-surface shadow-sm object-cover" />
                 ))}
               </div>
               <div className="text-sm">
@@ -152,7 +151,7 @@ export default function HomePage() {
             </motion.div>
           </motion.div>
 
-          {/* قسم الصورة الرئيسية مع تحسين الوضوح والأيقونات */}
+          {/* قسم الصورة الرئيسية */}
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -164,12 +163,12 @@ export default function HomePage() {
 
             <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-surface bg-surface">
               <img
-                alt="Medical Education"
+                alt={t('home.banner.title')}
                 className="w-full h-[460px] object-cover rounded-2xl"
                 src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=90"
               />
 
-              {/* بطاقة عائمة 1: اعتماد دولي (واضحة وبألوان بارزة) */}
+              {/* بطاقة عائمة 1: اعتماد دولي */}
               <motion.div 
                 animate={{ y: [0, -8, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
@@ -204,7 +203,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. Features Section (توضيح الأيقونات كلياً) */}
+      {/* 2. Features Section */}
       <section className="py-20 bg-surface relative">
         <div className="max-w-7xl mx-auto px-4 lg:px-8">
           <div className="text-center mb-16 max-w-2xl mx-auto">
@@ -244,7 +243,6 @@ export default function HomePage() {
                 transition={{ duration: 0.3, delay: i * 0.1 }}
                 className="bg-background p-8 rounded-3xl border border-outline-variant/80 hover:border-primary/30 hover:bg-surface hover:shadow-xl transition-all duration-300 group"
               >
-                {/* الأيقونة داخل مربع بلون واضح ومظلل */}
                 <div className={`w-14 h-14 ${feature.iconBg} rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                   {feature.icon}
                 </div>
@@ -292,9 +290,9 @@ export default function HomePage() {
           )}
         </div>
       </section>
+
       {/* 4. Student Reviews Section */}
       <section className="py-20 bg-background relative overflow-hidden">
-        {/* Abstract Background Shapes */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2"></div>
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-secondary/5 rounded-full blur-3xl -z-10 -translate-x-1/2 translate-y-1/2"></div>
         
@@ -319,25 +317,25 @@ export default function HomePage() {
                   
                   <div className="flex gap-1 mb-4">
                     {[...Array(5)].map((_, idx) => (
-                      <Star key={idx} className={`w-4 h-4 ${idx < review.rating ? 'fill-amber-400 text-amber-400' : 'text-outline-variant'}`} />
+                      <Star key={idx} className={`w-4 h-4 ${idx < (review.rating || 5) ? 'fill-amber-400 text-amber-400' : 'text-outline-variant'}`} />
                     ))}
                   </div>
                   
                   <p className="text-on-surface-variant text-sm leading-relaxed mb-8 relative z-10 font-medium">
-                    "{review.content}"
+                    "{review[`content_${i18n.language}`] || review.content_ar || review.content}"
                   </p>
                   
                   <div className="flex items-center gap-4 mt-auto">
                     {review.image ? (
-                      <img src={review.image.startsWith('http') ? review.image : `http://localhost:5000/uploads/${review.image}`} alt={review.student_name} className="w-12 h-12 rounded-full border-2 border-primary/20 object-cover" />
+                      <img src={review.image.startsWith('http') ? review.image : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/uploads/${review.image}`} alt={review.student_name} className="w-12 h-12 rounded-full border-2 border-primary/20 object-cover" />
                     ) : (
                       <div className="w-12 h-12 rounded-full border-2 border-primary/20 bg-primary/10 flex items-center justify-center text-primary font-bold">
-                        {review.student_name.charAt(0)}
+                        {review.student_name?.charAt(0) || 'S'}
                       </div>
                     )}
                     <div>
-                      <h4 className="font-bold text-on-surface text-sm">{review.student_name}</h4>
-                      <span className="text-xs text-primary font-medium">{review.student_role}</span>
+                      <h4 className="font-bold text-on-surface text-sm">{review[`student_name_${i18n.language}`] || review.student_name}</h4>
+                      <span className="text-xs text-primary font-medium">{review[`student_role_${i18n.language}`] || review.student_role}</span>
                     </div>
                   </div>
                 </motion.div>
@@ -366,13 +364,17 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Partners Marquee/Grid */}
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-70">
+          {/* Partners Grid */}
+          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-80">
             {partners.length > 0 ? (
               partners.map((partner) => (
                 <motion.div key={partner.id} whileHover={{ scale: 1.1, opacity: 1 }} className="flex flex-col items-center gap-2 cursor-pointer transition-opacity">
-                  <img src={import.meta.env.VITE_API_URL + partner.logo} alt={partner.name} className="h-12 object-contain grayscale hover:grayscale-0 transition-all" />
-                  <span className="text-xs font-bold text-on-surface-variant">{partner.name}</span>
+                  <img 
+                    src={partner.logo?.startsWith('http') ? partner.logo : (import.meta.env.VITE_API_URL || '') + partner.logo} 
+                    alt={partner.name} 
+                    className="h-12 object-contain grayscale hover:grayscale-0 dark:brightness-200 dark:contrast-125 dark:hover:brightness-100 transition-all" 
+                  />
+                  <span className="text-xs font-bold text-on-surface-variant">{partner[`name_${i18n.language}`] || partner.name}</span>
                 </motion.div>
               ))
             ) : (

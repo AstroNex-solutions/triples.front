@@ -30,6 +30,8 @@ import InstructorDashboard from './pages/InstructorDashboard';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 
+import { useThemeStore } from './store/themeStore';
+
 // Layout يحتوي على Navbar و Footer - يستخدم لكل الصفحات العادية
 function MainLayout({ showSplash }) {
   return (
@@ -46,6 +48,11 @@ function MainLayout({ showSplash }) {
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
   const { i18n } = useTranslation();
+  const initTheme = useThemeStore((state) => state.initTheme);
+
+  useEffect(() => {
+    initTheme();
+  }, [initTheme]);
 
   useEffect(() => {
     document.documentElement.dir = i18n.language === 'en' ? 'ltr' : 'rtl';
@@ -106,7 +113,7 @@ export default function App() {
             <Route path="/learn/:courseId/lesson/:lessonId" element={<CoursePlayerPage />} />
           </Route>
 
-          </Route>
+        </Route>
 
       </Routes>
     </>

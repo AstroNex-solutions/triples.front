@@ -62,7 +62,7 @@ export default function Toast({ toast, onClose }) {
               <h4 className="text-xs font-extrabold text-white">
                 {isSuccess ? 'نجحت العملية' : isError ? 'تنبيه' : 'إشعار'}
               </h4>
-              <p className="text-xs font-medium text-slate-300 leading-relaxed">
+              <p className="text-xs font-medium text-on-surface-variant leading-relaxed">
                 {toast.message}
               </p>
             </div>
@@ -70,7 +70,7 @@ export default function Toast({ toast, onClose }) {
 
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors relative z-10 cursor-pointer"
+            className="p-1 rounded-lg text-on-surface-variant hover:text-white hover:bg-surface/10 transition-colors relative z-10 cursor-pointer"
           >
             <X size={18} />
           </button>

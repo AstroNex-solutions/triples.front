@@ -1,5 +1,6 @@
 import React from 'react';
 import { PlusCircle, X, Loader2, CheckCircle2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function Card({ children, className = '' }) {
   return (
@@ -31,13 +32,15 @@ export function StatCard({ label, value, icon: Icon, color = 'primary' }) {
   );
 }
 
-export function SectionHeader({ title, count, onAdd, addLabel = 'إضافة' }) {
+export function SectionHeader({ title, count, onAdd, addLabel }) {
+  const { t } = useTranslation();
+  const labelText = addLabel || t('admin.common.add');
   return (
     <div className="flex items-center justify-between mb-4">
-      <h3 className="text-lg font-extrabold text-on-surface">{title} {count !== undefined && <span className="text-xs text-on-surface-variant font-medium mr-2">({count})</span>}</h3>
+      <h3 className="text-lg font-extrabold text-on-surface">{title} {count !== undefined && <span className="text-xs text-on-surface-variant font-medium mx-2">({count})</span>}</h3>
       {onAdd && (
         <button onClick={onAdd} className="py-2 px-4 bg-primary text-on-primary font-bold text-xs rounded-2xl hover:bg-primary-hover transition-all flex items-center gap-1.5 shadow-glow cursor-pointer">
-          <PlusCircle size={16} /> {addLabel}
+          <PlusCircle size={16} /> {labelText}
         </button>
       )}
     </div>
@@ -62,7 +65,7 @@ export function Modal({ open, onClose, title, children }) {
 export function Input({ label, ...props }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-bold text-on-surface-variant block">{label}</label>
+      {label && <label className="text-xs font-bold text-on-surface-variant block">{label}</label>}
       <input {...props} className="w-full px-4 py-2.5 bg-surface/80 border border-outline-variant/50 rounded-2xl text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" />
     </div>
   );
@@ -71,7 +74,7 @@ export function Input({ label, ...props }) {
 export function Select({ label, children, ...props }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-bold text-on-surface-variant block">{label}</label>
+      {label && <label className="text-xs font-bold text-on-surface-variant block">{label}</label>}
       <select {...props} className="w-full px-4 py-2.5 bg-surface/80 border border-outline-variant/50 rounded-2xl text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
         {children}
       </select>
@@ -82,16 +85,18 @@ export function Select({ label, children, ...props }) {
 export function Textarea({ label, ...props }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-bold text-on-surface-variant block">{label}</label>
+      {label && <label className="text-xs font-bold text-on-surface-variant block">{label}</label>}
       <textarea {...props} className="w-full px-4 py-2.5 bg-surface/80 border border-outline-variant/50 rounded-2xl text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" rows={3} />
     </div>
   );
 }
 
-export function SubmitBtn({ loading, label = 'حفظ', ...props }) {
+export function SubmitBtn({ loading, label, ...props }) {
+  const { t } = useTranslation();
+  const btnLabel = label || t('admin.common.save');
   return (
     <button type="submit" disabled={loading || props.disabled} {...props} className={`py-2.5 px-6 bg-primary text-on-primary font-bold text-sm rounded-2xl hover:bg-primary-hover disabled:opacity-60 transition-all flex items-center gap-2 shadow-glow cursor-pointer ${props.className || ''}`}>
-      {loading ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />} {label}
+      {loading ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />} {btnLabel}
     </button>
   );
 }
@@ -107,7 +112,7 @@ export function Badge({ text, variant = 'default' }) {
   return <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold border ${styles[variant]}`}>{text}</span>;
 }
 
-export const statusBadge = (status) => {
+export function StatusBadge({ status }) {
   const map = {
     Admin: 'danger', Instructor: 'warning', Student: 'info', Organization: 'default',
     published: 'success', draft: 'warning', pending_review: 'info', archived: 'default',
@@ -115,14 +120,16 @@ export const statusBadge = (status) => {
     refunded: 'danger', new: 'info', read: 'default', replied: 'success', closed: 'danger'
   };
   return <Badge text={status} variant={map[status] || 'default'} />;
-};
+}
+
+export const statusBadge = (status) => <StatusBadge status={status} />;
 
 export function Avatar({ name = '', size = 'md' }) {
   const initials = name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
   const sizes = { sm: 'w-7 h-7 text-xs', md: 'w-9 h-9 text-xs', lg: 'w-11 h-11 text-sm' };
   return (
     <div className={`${sizes[size]} rounded-full bg-primary/10 text-primary font-black border border-primary/20 flex items-center justify-center shrink-0`}>
-      {initials || 'U'}
+      {initials || 'A'}
     </div>
   );
 }

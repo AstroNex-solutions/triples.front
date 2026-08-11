@@ -85,19 +85,19 @@ export default function SelfAssessmentPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 font-['Tajawal']" dir="rtl">
+    <div className="min-h-screen bg-surface-variant font-['Tajawal']" dir="rtl">
       
       {/* 👑 Header with Back Button */}
-      <header className="bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm sticky top-0 z-50">
+      <header className="bg-surface/95 backdrop-blur-sm border-b border-outline-variant shadow-sm sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Link to="/dashboard" className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-sm hover:scale-105 transition-transform">
               <CheckCircle size={16} />
             </Link>
-            <span className="text-base font-bold text-slate-800 hidden sm:block">التقييم الذاتي</span>
+            <span className="text-base font-bold text-on-surface hidden sm:block">التقييم الذاتي</span>
           </div>
           
-          <button onClick={() => navigate(-1)} className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 py-1.5 px-3 rounded-lg text-xs font-bold transition-colors">
+          <button onClick={() => navigate(-1)} className="flex items-center gap-2 bg-surface-variant hover:bg-surface-variant text-on-surface-variant py-1.5 px-3 rounded-lg text-xs font-bold transition-colors">
             <ArrowRight size={14} /> رجوع للخلف
           </button>
         </div>
@@ -106,23 +106,23 @@ export default function SelfAssessmentPage() {
       <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 space-y-4">
         
         {/* Title Section */}
-        <div className="relative overflow-hidden rounded-2xl bg-white border border-slate-100 p-6 text-center shadow-sm">
+        <div className="relative overflow-hidden rounded-2xl bg-surface border border-outline-variant p-6 text-center shadow-sm">
           <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2"></div>
           
           <div className="relative z-10">
             <span className="inline-block bg-emerald-500/10 text-emerald-600 px-3 py-1 rounded-full font-bold text-xs mb-2">تقييم المهارات</span>
-            <h1 className="text-2xl font-black text-slate-800 mb-2">{product.title}</h1>
-            <p className="text-slate-500 text-sm max-w-xl mx-auto leading-relaxed">{product.description}</p>
+            <h1 className="text-2xl font-black text-on-surface mb-2">{product.title}</h1>
+            <p className="text-on-surface-variant text-sm max-w-xl mx-auto leading-relaxed">{product.description}</p>
             
             <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-xl border border-slate-100 shadow-sm">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-surface-variant rounded-xl border border-outline-variant shadow-sm">
                 <Clock className="text-emerald-500" size={16} />
-                <span className="font-bold text-xs text-slate-600">المدة المتوقعة: {product.duration_minutes || 60} دقيقة</span>
+                <span className="font-bold text-xs text-on-surface-variant">المدة المتوقعة: {product.duration_minutes || 60} دقيقة</span>
               </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-xl border border-slate-100 shadow-sm">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-surface-variant rounded-xl border border-outline-variant shadow-sm">
                 <CheckCircle2 className="text-emerald-500" size={16} />
-                <span className="font-bold text-xs text-slate-600">العدد الكلي: {questions.length} أسئلة</span>
+                <span className="font-bold text-xs text-on-surface-variant">العدد الكلي: {questions.length} أسئلة</span>
               </div>
             </div>
           </div>
@@ -173,12 +173,12 @@ export default function SelfAssessmentPage() {
           {questions.map((q, idx) => {
             const options = parseOptions(q.options);
             return (
-              <div key={q.id} className="rounded-xl bg-white border border-slate-100 p-4 shadow-sm transition-all hover:shadow-md">
-                <div className="flex items-start gap-3 mb-3 border-b border-slate-50 pb-3">
+              <div key={q.id} className="rounded-xl bg-surface border border-outline-variant p-4 shadow-sm transition-all hover:shadow-md">
+                <div className="flex items-start gap-3 mb-3 border-b border-outline-variant pb-3">
                   <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 text-emerald-600 font-black text-lg">
                     {idx + 1}
                   </div>
-                  <h3 className="text-base font-bold text-slate-800 pt-1.5 leading-snug">
+                  <h3 className="text-base font-bold text-on-surface pt-1.5 leading-snug">
                     {q.question_text}
                   </h3>
                 </div>
@@ -192,11 +192,11 @@ export default function SelfAssessmentPage() {
                         className={`flex items-center gap-2 p-3 rounded-xl border transition-all cursor-pointer ${
                           isSelected 
                             ? 'bg-emerald-50 border-emerald-200 text-emerald-700 shadow-sm' 
-                            : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                            : 'bg-surface-variant border-outline-variant text-on-surface-variant hover:bg-surface-variant'
                         }`}
                       >
                         <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
-                          isSelected ? 'border-emerald-500' : 'border-slate-300'
+                          isSelected ? 'border-emerald-500' : 'border-outline-variant0'
                         }`}>
                           {isSelected && <div className="w-2 h-2 rounded-full bg-emerald-500" />}
                         </div>
@@ -221,7 +221,7 @@ export default function SelfAssessmentPage() {
 
       {/* Submit Button */}
       {!result && questions.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 p-3 bg-white/95 backdrop-blur-sm border-t border-slate-200 shadow-[0_-5px_20px_-10px_rgba(0,0,0,0.1)] z-40 flex justify-center">
+        <div className="fixed bottom-0 left-0 right-0 p-3 bg-surface/95 backdrop-blur-sm border-t border-outline-variant shadow-[0_-5px_20px_-10px_rgba(0,0,0,0.1)] z-40 flex justify-center">
           <button 
             onClick={handleSubmitQuiz} 
             className="flex items-center justify-center gap-2 w-full max-w-sm py-2.5 bg-emerald-500 text-white rounded-xl font-bold text-sm hover:-translate-y-0.5 transition-all group shadow-sm"

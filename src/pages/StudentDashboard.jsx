@@ -7,6 +7,7 @@ import {
   ChevronRight, ChevronLeft, FileText, Globe, LogOut
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import ThemeToggle from '../components/ThemeToggle';
 
 import { Avatar } from './student/SharedUI';
 import OverviewSection from './student/OverviewSection';
@@ -20,57 +21,51 @@ import OrdersSection from './student/OrdersSection';
 import LibrarySection from './student/LibrarySection';
 import SupportSection from './student/SupportSection';
 
-// ═══════════════════════════════════════════
-//  SIDEBAR MENU GROUPS
-// ═══════════════════════════════════════════
-const MENU_GROUPS = [
-  {
-    title: 'الرئيسية',
-    items: [
-      { key: 'overview', label: 'لوحة القيادة', icon: Award },
-      { key: 'account', label: 'إعدادات الحساب', icon: Settings },
-    ]
-  },
-  {
-    title: 'التعليم والتقدم',
-    items: [
-      { key: 'courses', label: 'دوراتي', icon: BookOpen },
-      { key: 'schedule', label: 'جدول المذاكرة', icon: Calendar },
-    ]
-  },
-  {
-    title: 'التقييمات والاختبارات',
-    items: [
-      { key: 'assessments', label: 'الاختبارات والنتائج', icon: CheckCircle2 },
-      { key: 'self_assessments', label: 'التقييمات الذاتية', icon: Award },
-      { key: 'question_banks', label: 'بنك الأسئلة', icon: FileText },
-    ]
-  },
-  {
-    title: 'مشترياتي',
-    items: [
-      { key: 'orders', label: 'سجل المشتريات', icon: ShoppingBag },
-    ]
-  },
-  {
-    title: 'المجتمع والدعم',
-    items: [
-      { key: 'library', label: 'المقالات والمكتبة', icon: BookMarked },
-      { key: 'support', label: 'الدعم الفني', icon: MessageSquare },
-    ]
-  }
-];
-
-// ═══════════════════════════════════════════
-//  MAIN STUDENT DASHBOARD
-// ═══════════════════════════════════════════
 export default function StudentDashboard() {
   const { user, logout } = useContext(AuthContext);
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeSection, setActiveSection] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [globalMsg, setGlobalMsg] = useState({ type: '', text: '' });
   const navigate = useNavigate();
+
+  const menuGroups = [
+    {
+      title: t('student.dashboard.groups.home'),
+      items: [
+        { key: 'overview', label: t('student.dashboard.items.overview'), icon: Award },
+        { key: 'account', label: t('student.dashboard.items.account'), icon: Settings },
+      ]
+    },
+    {
+      title: t('student.dashboard.groups.learning'),
+      items: [
+        { key: 'courses', label: t('student.dashboard.items.courses'), icon: BookOpen },
+        { key: 'schedule', label: t('student.dashboard.items.schedule'), icon: Calendar },
+      ]
+    },
+    {
+      title: t('student.dashboard.groups.assessments'),
+      items: [
+        { key: 'assessments', label: t('student.dashboard.items.assessments'), icon: CheckCircle2 },
+        { key: 'self_assessments', label: t('student.dashboard.items.self_assessments'), icon: Award },
+        { key: 'question_banks', label: t('student.dashboard.items.question_banks'), icon: FileText },
+      ]
+    },
+    {
+      title: t('student.dashboard.groups.purchases'),
+      items: [
+        { key: 'orders', label: t('student.dashboard.items.orders'), icon: ShoppingBag },
+      ]
+    },
+    {
+      title: t('student.dashboard.groups.community'),
+      items: [
+        { key: 'library', label: t('student.dashboard.items.library'), icon: BookMarked },
+        { key: 'support', label: t('student.dashboard.items.support'), icon: MessageSquare },
+      ]
+    }
+  ];
 
   const showMsg = (type, text) => {
     setGlobalMsg({ type, text });
@@ -89,33 +84,46 @@ export default function StudentDashboard() {
     navigate('/login');
   };
 
+  const activeItemLabel = menuGroups.flatMap(g => g.items).find(i => i.key === activeSection)?.label;
+
   return (
-    <div className="flex min-h-screen bg-background font-sans" dir={i18n.language === 'en' ? 'ltr' : 'rtl'}>
+    <div className="flex min-h-screen bg-background text-on-background font-sans transition-colors duration-300" dir={i18n.language === 'en' ? 'ltr' : 'rtl'}>
       {/* Sidebar */}
-      <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} shrink-0 bg-surface-container-low/60 border-l border-outline-variant/30 backdrop-blur-2xl transition-all duration-300 sticky top-0 h-screen flex flex-col z-30`}>
+      <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} shrink-0 bg-surface-container-low/80 border-r border-outline-variant/30 backdrop-blur-2xl transition-all duration-300 sticky top-0 h-screen flex flex-col z-30`}>
         <div className="h-16 px-4 flex items-center justify-between border-b border-outline-variant/20">
           {sidebarOpen && (
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center text-on-primary font-extrabold text-sm shadow-sm">
                 <Shield size={16} />
               </div>
-              <span className="text-sm font-black text-on-surface tracking-wide">لوحة الطالب</span>
+              <span className="text-sm font-black text-on-surface tracking-wide">{t('student.dashboard.title')}</span>
             </div>
           )}
-          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 rounded-xl hover:bg-surface-variant/40 text-on-surface-variant transition-colors cursor-pointer mr-auto">
-            {sidebarOpen ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          <button 
+            onClick={() => setSidebarOpen(!sidebarOpen)} 
+            className="p-2 rounded-xl hover:bg-surface-variant/40 text-on-surface-variant transition-colors cursor-pointer"
+          >
+            {sidebarOpen ? (
+              i18n.language === 'en' ? <ChevronLeft size={18} /> : <ChevronRight size={18} />
+            ) : (
+              i18n.language === 'en' ? <ChevronRight size={18} /> : <ChevronLeft size={18} />
+            )}
           </button>
         </div>
         <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6 custom-scrollbar">
-          {MENU_GROUPS.map((group, idx) => (
+          {menuGroups.map((group, idx) => (
             <div key={idx} className="space-y-1">
               {sidebarOpen && <p className="px-3 text-[10px] font-black uppercase tracking-wider text-on-surface-variant/50 mb-2">{group.title}</p>}
               {group.items.map(item => {
                 const Icon = item.icon;
                 const isActive = activeSection === item.key;
                 return (
-                  <button key={item.key} onClick={() => setActiveSection(item.key)} title={!sidebarOpen ? item.label : undefined}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${isActive ? 'bg-primary text-on-primary shadow-sm font-bold' : 'text-on-surface-variant hover:bg-surface-variant/30 hover:text-on-surface'}`}>
+                  <button 
+                    key={item.key} 
+                    onClick={() => setActiveSection(item.key)} 
+                    title={!sidebarOpen ? item.label : undefined}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${isActive ? 'bg-primary text-on-primary shadow-sm font-bold' : 'text-on-surface-variant hover:bg-surface-variant/30 hover:text-on-surface'}`}
+                  >
                     <Icon size={18} className="shrink-0" />
                     {sidebarOpen && <span className="truncate">{item.label}</span>}
                   </button>
@@ -129,22 +137,23 @@ export default function StudentDashboard() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
         {/* Top Nav */}
-        <header className="h-16 border-b border-outline-variant/20 bg-surface/30 backdrop-blur-xl px-6 flex items-center justify-between sticky top-0 z-20">
+        <header className="h-16 border-b border-outline-variant/20 bg-surface/40 backdrop-blur-xl px-6 flex items-center justify-between sticky top-0 z-20">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-on-surface-variant">منصة الطالب</span>
+            <span className="text-xs font-medium text-on-surface-variant">{t('student.dashboard.platform')}</span>
             <span className="text-xs text-on-surface-variant/40">/</span>
             <span className="text-xs font-bold text-on-surface">
-              {MENU_GROUPS.flatMap(g => g.items).find(i => i.key === activeSection)?.label}
+              {activeItemLabel}
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={toggleLanguage} className="p-2 rounded-xl bg-surface/50 border border-outline-variant/30 text-on-surface-variant hover:bg-surface hover:text-primary transition-all shadow-sm">
+            <ThemeToggle />
+            <button onClick={toggleLanguage} className="p-2 rounded-xl bg-surface/50 border border-outline-variant/30 text-on-surface-variant hover:bg-surface hover:text-primary transition-all shadow-sm cursor-pointer" title="تغيير اللغة / Change Language">
               <Globe size={18} />
             </button>
             <div className="h-6 w-px bg-outline-variant/30 mx-1"></div>
             <span className="text-xs font-bold text-on-surface hidden sm:inline">{user?.name}</span>
-            <Avatar name={user?.name || 'Student'} size="sm" image={import.meta.env.VITE_API_URL+user?.image_profile} />
-            <button onClick={handleLogout} className="p-2 rounded-xl text-rose-500 hover:bg-rose-500/10 transition-all ml-1">
+            <Avatar name={user?.name || 'Student'} size="sm" image={user?.image_profile} />
+            <button onClick={handleLogout} className="p-2 rounded-xl text-rose-500 hover:bg-rose-500/10 transition-all cursor-pointer" title={t('student.dashboard.logout')}>
               <LogOut size={18} />
             </button>
           </div>
