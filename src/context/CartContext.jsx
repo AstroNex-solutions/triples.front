@@ -28,9 +28,17 @@ export const CartProvider = ({ children }) => {
     fetchCart();
   }, [user]);
 
-  const addToCart = async (course_id) => {
-    if (!user) throw new Error('يرجى تسجيل الدخول أولاً لإضافة الدورة إلى السلة');
-    const res = await API.post('/store/cart', { course_id });
+  const addToCart = async (item_id, type = 'course') => {
+    if (!user) throw new Error('يرجى تسجيل الدخول أولاً لإضافة المنتج إلى السلة');
+    
+    const payload = {};
+    if (type === 'flashcard_product') {
+      payload.flashcard_product_id = item_id;
+    } else {
+      payload.course_id = item_id;
+    }
+
+    const res = await API.post('/store/cart', payload);
     await fetchCart();
     return res.data;
   };

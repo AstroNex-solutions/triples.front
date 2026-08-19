@@ -15,12 +15,16 @@ import CoursePlayerPage from './pages/CoursePlayerPage';
 import AssessmentPage from './pages/AssessmentPage';
 import SelfAssessmentPage from './pages/SelfAssessmentPage';
 import QuestionBankPage from './pages/QuestionBankPage';
+import FlashcardsStorePage from './pages/FlashcardsStorePage';
+import FlashcardStudyPage from './pages/FlashcardStudyPage';
 import ArticlesPage from './pages/ArticlesPage';
 import LibraryPage from './pages/LibraryPage';
 import CartPage from './pages/CartPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import StudentDashboard from './pages/StudentDashboard';
+import SecureViewer from './pages/student/SecureViewer';
+import PaymentResultPage from './pages/PaymentResultPage';
 import AdminDashboard from './pages/AdminDashboard';
 import ContactPage from './pages/ContactPage';
 import AboutPage from './pages/AboutPage';
@@ -75,8 +79,13 @@ export default function App() {
           <Route path="/assessment/:assessmentId" element={<AssessmentPage />} />
           <Route path="/self-assessment/:id" element={<SelfAssessmentPage />} />
           <Route path="/question-bank/:id" element={<QuestionBankPage />} />
+          <Route path="/question-bank" element={<QuestionBankPage />} />
+          <Route path="/self-assessment" element={<SelfAssessmentPage />} />
+          <Route path="/study-flashcards/:productId" element={<FlashcardStudyPage />} />
           <Route path="/learn/:courseId" element={<CoursePlayerPage />} />
           <Route path="/learn/:courseId/lesson/:lessonId" element={<CoursePlayerPage />} />
+          <Route path="/secure-viewer" element={<SecureViewer />} />
+          <Route path="/payment-result" element={<PaymentResultPage />} />
         </Route>
 
         {/* ===== Instructor Dashboard - بدون Navbar ولا Footer ===== */}
@@ -91,6 +100,7 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/courses/:slug" element={<CourseDetailPage />} />
+          <Route path="/flashcards-store" element={<FlashcardsStorePage />} />
           <Route path="/articles" element={<ArticlesPage />} />
           <Route path="/library" element={<LibraryPage />} />
           <Route path="/cart" element={<CartPage />} />

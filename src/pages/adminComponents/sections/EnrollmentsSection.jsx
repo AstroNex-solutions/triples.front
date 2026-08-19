@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import API from '../../../api/axios';
-import { Loader2, Search } from 'lucide-react';
+import { Loader2, Search, Edit } from 'lucide-react';
 import { SectionHeader, Card, statusBadge, Modal, SubmitBtn } from '../ui/SharedUI';
 
 export default function EnrollmentsSection({ showMsg }) {
@@ -9,10 +9,14 @@ export default function EnrollmentsSection({ showMsg }) {
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [students, setStudents] = useState([]);
   const [courses, setCourses] = useState([]);
-  const [form, setForm] = useState({ user_id: '', course_id: '', is_paid: false });
+  const today = new Date().toISOString().split('T')[0];
+  const nextYear = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0];
+  const [form, setForm] = useState({ user_id: '', course_id: '', is_paid: false, start_date: today, end_date: nextYear });
+  const [editForm, setEditForm] = useState({ id: null, start_date: '', end_date: '', status: '' });
   const [studentSearch, setStudentSearch] = useState('');
   const [courseSearch, setCourseSearch] = useState('');
 
@@ -21,7 +25,7 @@ export default function EnrollmentsSection({ showMsg }) {
     try {
       const [eRes, sRes, cRes] = await Promise.all([
         API.get('/admin/enrollments'),
-        API.get('/admin/users?status=Student'),
+        API.get('/admin/users?status=Student&limit=1000'),
         API.get('/admin/courses')
       ]);
       setEnrollments(eRes.data.enrollments || []);
@@ -43,10 +47,35 @@ export default function EnrollmentsSection({ showMsg }) {
       await API.post('/admin/enrollments', form);
       showMsg('success', 'Enrollment added');
       setShowAdd(false);
-      setForm({ user_id: '', course_id: '', is_paid: false });
+      setForm({ user_id: '', course_id: '', is_paid: false, start_date: today, end_date: nextYear });
       fetchData();
     } catch (err) {
       showMsg('error', err.response?.data?.message || 'Error');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleEditClick = (enrollment) => {
+    setEditForm({
+      id: enrollment.id,
+      start_date: enrollment.start_date ? new Date(enrollment.start_date).toISOString().split('T')[0] : (enrollment.enrollment_date ? new Date(enrollment.enrollment_date).toISOString().split('T')[0] : ''),
+      end_date: enrollment.end_date ? new Date(enrollment.end_date).toISOString().split('T')[0] : '',
+      status: enrollment.status
+    });
+    setShowEdit(true);
+  };
+
+  const submitEdit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      await API.put(`/admin/enrollments/${editForm.id}`, editForm);
+      showMsg('success', 'Enrollment updated / تم التحديث بنجاح');
+      setShowEdit(false);
+      fetchData();
+    } catch (err) {
+      showMsg('error', err.response?.data?.message || 'Error updating enrollment');
     } finally {
       setSubmitting(false);
     }
@@ -69,8 +98,9 @@ export default function EnrollmentsSection({ showMsg }) {
                   <th className="p-3 text-start">{t('admin.sections.users.students')}</th>
                   <th className="p-3 text-start">{t('admin.sections.courses')}</th>
                   <th className="p-3 text-start">{t('admin.common.status')}</th>
-                  <th className="p-3 text-start">Progress / التقدم</th>
+                  <th className="p-3 text-start">{t('admin.common.progress')}</th>
                   <th className="p-3 text-start">{t('admin.common.date')}</th>
+                  <th className="p-3 text-center">{t('admin.common.actions')}</th>
                 </tr>
               </thead>
               <tbody>{enrollments.map(e => {
@@ -86,7 +116,27 @@ export default function EnrollmentsSection({ showMsg }) {
                         <span className="text-xs font-bold text-on-surface-variant">{Math.round(e.progress || 0)}%</span>
                       </div>
                     </td>
-                    <td className="p-3 text-xs text-on-surface-variant" dir="ltr">{new Date(e.enrollment_date).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'ar-EG')}</td>
+                    <td className="p-3 text-xs text-on-surface-variant" dir="ltr">
+                      <div>{new Date(e.enrollment_date).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'ar-EG')}</div>
+                      {e.end_date && (() => {
+                        const remainingDays = Math.ceil((new Date(e.end_date) - new Date()) / (1000 * 60 * 60 * 24));
+                        const isExpiringSoon = remainingDays < 30;
+                        const isExpired = remainingDays <= 0;
+                        return (
+                          <div className={`text-[10px] mt-1 font-bold ${isExpiringSoon || isExpired ? 'text-error' : 'opacity-80'}`}>
+                            Ends: {new Date(e.end_date).toLocaleDateString()}
+                            <span className="ms-1">
+                              ({isExpired ? 'منتهي' : `متبقي ${remainingDays} يوم`})
+                            </span>
+                          </div>
+                        );
+                      })()}
+                    </td>
+                    <td className="p-3 text-center">
+                      <button onClick={() => handleEditClick(e)} className="p-1.5 text-primary bg-primary/10 rounded-lg hover:bg-primary hover:text-white transition-all">
+                        <Edit size={14} />
+                      </button>
+                    </td>
                   </tr>
                 );
               })}</tbody>
@@ -159,6 +209,27 @@ export default function EnrollmentsSection({ showMsg }) {
             </div>
           </div>
 
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-on-surface-variant block">Start Date / تاريخ البدء</label>
+              <input 
+                type="date" 
+                value={form.start_date || ''} 
+                onChange={e => setForm({ ...form, start_date: e.target.value })} 
+                className="w-full py-2 px-4 bg-surface/80 border border-outline-variant/50 rounded-2xl text-sm text-on-surface focus:outline-none focus:border-primary transition-all" 
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-on-surface-variant block">End Date / تاريخ الانتهاء</label>
+              <input 
+                type="date" 
+                value={form.end_date || ''} 
+                onChange={e => setForm({ ...form, end_date: e.target.value })} 
+                className="w-full py-2 px-4 bg-surface/80 border border-outline-variant/50 rounded-2xl text-sm text-on-surface focus:outline-none focus:border-primary transition-all" 
+              />
+            </div>
+          </div>
+
           <div className="flex items-center gap-2 pt-2">
             <input 
               type="checkbox" 
@@ -171,6 +242,48 @@ export default function EnrollmentsSection({ showMsg }) {
           </div>
 
           <SubmitBtn loading={submitting} label="Add Enrollment / إضافة الاشتراك" disabled={!form.user_id || !form.course_id} />
+        </form>
+      </Modal>
+
+      {/* Edit Enrollment Modal */}
+      <Modal open={showEdit} onClose={() => setShowEdit(false)} title="Edit Enrollment / تعديل فترة الاشتراك">
+        <form onSubmit={submitEdit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-on-surface-variant block">Start Date / تاريخ البدء</label>
+              <input 
+                type="date" 
+                value={editForm.start_date || ''} 
+                onChange={e => setEditForm({ ...editForm, start_date: e.target.value })} 
+                className="w-full py-2 px-4 bg-surface/80 border border-outline-variant/50 rounded-2xl text-sm text-on-surface focus:outline-none focus:border-primary transition-all" 
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-on-surface-variant block">End Date / تاريخ الانتهاء</label>
+              <input 
+                type="date" 
+                value={editForm.end_date || ''} 
+                onChange={e => setEditForm({ ...editForm, end_date: e.target.value })} 
+                className="w-full py-2 px-4 bg-surface/80 border border-outline-variant/50 rounded-2xl text-sm text-on-surface focus:outline-none focus:border-primary transition-all" 
+              />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-on-surface-variant block">Status / حالة الاشتراك</label>
+            <select 
+              value={editForm.status} 
+              onChange={e => setEditForm({ ...editForm, status: e.target.value })} 
+              className="w-full py-2 px-4 bg-surface/80 border border-outline-variant/50 rounded-2xl text-sm text-on-surface focus:outline-none focus:border-primary transition-all"
+            >
+              <option value="active">Active / نشط</option>
+              <option value="suspended">Suspended / معلق (أو منتهي)</option>
+              <option value="completed">Completed / مكتمل</option>
+              <option value="dropped">Dropped / منسحب</option>
+              <option value="frozen">Frozen / مجمد</option>
+            </select>
+          </div>
+
+          <SubmitBtn loading={submitting} label="Save Changes / حفظ التعديلات" />
         </form>
       </Modal>
     </>

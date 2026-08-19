@@ -6,13 +6,14 @@ import {
   Play, 
   CheckCircle, 
   FileText, 
-  ArrowRight, 
-  ChevronDown, 
+  ArrowRight,
+  ChevronDown,
   Loader2, 
   BookOpen, 
   Check,
   Star
 } from 'lucide-react';
+import { getFileUrl } from '../utils/fileHelper';
 
 // ─── Sidebar Module/Lesson Tree ──────────────────────────────────────────────
 const PlayerModuleNode = ({ 
@@ -478,7 +479,7 @@ export default function CoursePlayerPage() {
                 <video 
                   key={currentLesson.id}
                   ref={videoRef}
-                  src={currentLesson.video_url.startsWith('http') ? currentLesson.video_url : `http://localhost:5000/uploads/${currentLesson.video_url}`}
+                  src={getFileUrl(currentLesson.video_url)}
                   controls 
                   controlsList="nodownload"
                   className="w-full h-full object-contain"
@@ -544,6 +545,49 @@ export default function CoursePlayerPage() {
               ) : (
                 <p className="text-on-surface-variant/70 italic">لا يوجد محتوى نصي إضافي مرفق مع هذا الدرس.</p>
               )}
+
+              {currentLesson?.attachments && (() => {
+                let atts = currentLesson.attachments;
+                if (typeof atts === 'string') {
+                  try { atts = JSON.parse(atts); } catch (e) { atts = []; }
+                }
+                if (!Array.isArray(atts)) atts = [];
+                
+                if (atts.length === 0) return null;
+
+                return (
+                  <div className="pt-6 border-t border-outline-variant/30 mt-6 space-y-4">
+                    <h3 className="text-sm font-bold text-on-surface flex items-center gap-2">
+                      <FileText size={16} className="text-primary" />
+                      <span>ملفات ومرفقات الدرس</span>
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {atts.map((file, idx) => {
+                        const fileUrl = typeof file === 'string' ? file : file.url;
+                        const fileName = typeof file === 'string' ? 'ملف مرفق' : (file.name || 'ملف مرفق');
+                        const fileSize = typeof file === 'object' && file.size ? file.size : null;
+                        const fullUrl = getFileUrl(fileUrl);
+                        
+                        return (
+                          <button
+                            key={idx}
+                            onClick={() => navigate('/secure-viewer', { state: { fileUrl: fullUrl, fileName: fileName } })}
+                            className="flex items-center gap-3 p-3 rounded-xl bg-surface border border-outline-variant/40 hover:bg-surface-container-low transition-colors group w-full text-right"
+                          >
+                            <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                              <FileText size={18} />
+                            </div>
+                            <div className="flex-1 overflow-hidden">
+                              <p className="text-xs font-bold text-on-surface truncate">{fileName}</p>
+                              {fileSize && <p className="text-[10px] text-on-surface-variant mt-0.5">{fileSize}</p>}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>

@@ -25,11 +25,13 @@ import BannersSection from './adminComponents/sections/BannersSection';
 import MessagesSection from './adminComponents/sections/MessagesSection';
 import ArticlesSection from './adminComponents/sections/ArticlesSection';
 import BooksSection from './adminComponents/sections/BooksSection';
+import FlashcardsAdminSection from './adminComponents/sections/FlashcardsAdminSection';
 import QuestionBankProductsSection from './adminComponents/sections/QuestionBankProductsSection';
 import SelfAssessmentProductsSection from './adminComponents/sections/SelfAssessmentProductsSection';
 import PartnersSection from './adminComponents/sections/PartnersSection';
 import FaqsSection from './adminComponents/sections/FaqsSection';
 import PagesSection from './adminComponents/sections/PagesSection';
+import BrokenVideosList from './adminComponents/BrokenVideosList';
 
 export default function AdminDashboard() {
   const { t, i18n } = useTranslation();
@@ -63,6 +65,7 @@ export default function AdminDashboard() {
         { key: 'categories', label: t('admin.dashboard.items.categories'), icon: Tag },
         { key: 'coupons', label: t('admin.dashboard.items.coupons'), icon: Ticket },
         { key: 'orders', label: t('admin.dashboard.items.orders'), icon: Package },
+        { key: 'flashcard-products', label: t('admin.dashboard.items.flashcards'), icon: BookMarked },
         { key: 'question-bank-products', label: t('admin.dashboard.items.questionBankProducts'), icon: Database },
         { key: 'self-assessment-products', label: t('admin.dashboard.items.selfAssessmentProducts'), icon: Target },
         { key: 'reviews', label: t('admin.dashboard.items.reviews'), icon: Star },
@@ -78,6 +81,7 @@ export default function AdminDashboard() {
         { key: 'pages', label: t('admin.dashboard.items.pages'), icon: FileText },
         { key: 'books', label: t('admin.dashboard.items.books'), icon: BookMarked },
         { key: 'messages', label: t('admin.dashboard.items.messages'), icon: Mail },
+        // { key: 'broken-videos', label: 'فحص الفيديوهات', icon: AlertCircle },
       ]
     }
   ];
@@ -212,11 +216,13 @@ export default function AdminDashboard() {
           {activeSection === 'messages' && <MessagesSection showMsg={showMsg} />}
           {activeSection === 'articles' && <ArticlesSection showMsg={showMsg} />}
           {activeSection === 'books' && <BooksSection showMsg={showMsg} />}
+          {activeSection === 'flashcard-products' && <FlashcardsAdminSection showMsg={showMsg} />}
           {activeSection === 'question-bank-products' && <QuestionBankProductsSection showMsg={showMsg} />}
           {activeSection === 'self-assessment-products' && <SelfAssessmentProductsSection showMsg={showMsg} />}
           {activeSection === 'partners' && <PartnersSection showMsg={showMsg} />}
           {activeSection === 'faqs' && <FaqsSection showMsg={showMsg} />}
           {activeSection === 'pages' && <PagesSection showMsg={showMsg} />}
+          {/* {activeSection === 'broken-videos' && <BrokenVideosList />} */}
         </div>
       </main>
     </div>

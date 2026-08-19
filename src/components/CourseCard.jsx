@@ -9,11 +9,15 @@ import {
   ShieldCheck, 
   Activity, 
   Loader2,
-  Check
+  Check,
+  Play,
+  Snowflake,
+  Unlock
 } from 'lucide-react';
 import { CartContext } from '../context/CartContext';
+import API from '../api/axios';
 
-export default function CourseCard({ course }) {
+export default function CourseCard({ course, enrollment, onEnrollmentUpdate }) {
   const { t, i18n } = useTranslation();
   const { addToCart } = useContext(CartContext);
   const [loading, setLoading] = useState(false);
@@ -34,6 +38,34 @@ export default function CourseCard({ course }) {
       setTimeout(() => setAdded(false), 2500);
     } catch (err) {
       console.error('Error adding to cart:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFreeze = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      setLoading(true);
+      await API.post(`/student/enrollments/${course.id}/freeze`);
+      if (onEnrollmentUpdate) onEnrollmentUpdate();
+    } catch (err) {
+      console.error('Error freezing course:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUnfreeze = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      setLoading(true);
+      await API.post(`/student/enrollments/${course.id}/unfreeze`);
+      if (onEnrollmentUpdate) onEnrollmentUpdate();
+    } catch (err) {
+      console.error('Error unfreezing course:', err);
     } finally {
       setLoading(false);
     }
@@ -133,31 +165,69 @@ export default function CourseCard({ course }) {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2">
-            <button 
-              onClick={handleAddToCart}
-              disabled={loading}
-              className={`p-2.5 rounded-xl border transition-all flex items-center justify-center ${
-                added 
-                  ? 'bg-emerald-500/20 text-emerald-500 border-emerald-500/40' 
-                  : 'bg-surface border-outline-variant/60 text-on-surface-variant hover:text-emerald-500 hover:border-emerald-500/40 hover:bg-emerald-500/10'
-              }`}
-              title={t('courseCard.addToCart')}
-            >
-              {loading ? (
-                <Loader2 size={16} className="animate-spin text-emerald-500" />
-              ) : added ? (
-                <Check size={16} className="text-emerald-500" />
-              ) : (
-                <ShoppingCart size={16} />
-              )}
-            </button>
+            {enrollment && (enrollment.status === 'active' || enrollment.status === 'frozen') ? (
+              <>
+                {enrollment.status === 'frozen' ? (
+                  <button 
+                    onClick={handleUnfreeze}
+                    disabled={loading}
+                    className="px-3 py-2 bg-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-white font-bold text-[10px] rounded-xl transition-all flex items-center justify-center gap-1 shrink-0"
+                    title="إلغاء التجميد"
+                  >
+                    {loading ? <Loader2 size={14} className="animate-spin" /> : <Unlock size={14} />}
+                    <span>إلغاء التجميد</span>
+                  </button>
+                ) : (
+                  <>
+                    <Link 
+                      to={`/learn/${course.id}`} 
+                      className="px-3 py-2 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1 shrink-0 border border-emerald-500/30"
+                    >
+                      <Play size={14} />
+                      <span>متابعة</span>
+                    </Link>
+                    {enrollment.freeze_count < 2 && (
+                      <button 
+                        onClick={handleFreeze}
+                        disabled={loading}
+                        className="px-2 py-2 bg-surface text-on-surface-variant hover:text-primary hover:bg-primary/10 border border-outline-variant/60 font-bold text-[10px] rounded-xl transition-all flex items-center justify-center gap-1 shrink-0"
+                        title={`تجميد الكورس (متبقي ${2 - enrollment.freeze_count})`}
+                      >
+                        {loading ? <Loader2 size={14} className="animate-spin" /> : <Snowflake size={14} />}
+                      </button>
+                    )}
+                  </>
+                )}
+              </>
+            ) : (
+              <>
+                <button 
+                  onClick={handleAddToCart}
+                  disabled={loading}
+                  className={`p-2.5 rounded-xl border transition-all flex items-center justify-center ${
+                    added 
+                      ? 'bg-emerald-500/20 text-emerald-500 border-emerald-500/40' 
+                      : 'bg-surface border-outline-variant/60 text-on-surface-variant hover:text-emerald-500 hover:border-emerald-500/40 hover:bg-emerald-500/10'
+                  }`}
+                  title={t('courseCard.addToCart')}
+                >
+                  {loading ? (
+                    <Loader2 size={16} className="animate-spin text-emerald-500" />
+                  ) : added ? (
+                    <Check size={16} className="text-emerald-500" />
+                  ) : (
+                    <ShoppingCart size={16} />
+                  )}
+                </button>
 
-            <Link 
-              to={`/courses/${course.slug}`} 
-              className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-500/15 transition-all flex items-center justify-center shrink-0"
-            >
-              {t('courseCard.details')}
-            </Link>
+                <Link 
+                  to={`/courses/${course.slug}`} 
+                  className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-500/15 transition-all flex items-center justify-center shrink-0"
+                >
+                  {t('courseCard.details')}
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>

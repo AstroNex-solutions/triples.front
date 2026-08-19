@@ -20,6 +20,7 @@ import QuestionBanksSection from './student/QuestionBanksSection';
 import OrdersSection from './student/OrdersSection';
 import LibrarySection from './student/LibrarySection';
 import SupportSection from './student/SupportSection';
+import FlashcardsStudentSection from './student/FlashcardsStudentSection';
 
 export default function StudentDashboard() {
   const { user, logout } = useContext(AuthContext);
@@ -41,17 +42,18 @@ export default function StudentDashboard() {
       title: t('student.dashboard.groups.learning'),
       items: [
         { key: 'courses', label: t('student.dashboard.items.courses'), icon: BookOpen },
+        { key: 'flashcards', label: t('student.dashboard.items.flashcards'), icon: BookMarked },
         { key: 'schedule', label: t('student.dashboard.items.schedule'), icon: Calendar },
       ]
     },
-    {
-      title: t('student.dashboard.groups.assessments'),
-      items: [
-        { key: 'assessments', label: t('student.dashboard.items.assessments'), icon: CheckCircle2 },
-        { key: 'self_assessments', label: t('student.dashboard.items.self_assessments'), icon: Award },
-        { key: 'question_banks', label: t('student.dashboard.items.question_banks'), icon: FileText },
-      ]
-    },
+    // {
+    //   title: t('student.dashboard.groups.assessments'),
+    //   items: [
+    //     { key: 'assessments', label: t('student.dashboard.items.assessments'), icon: CheckCircle2 },
+    //     { key: 'self_assessments', label: t('student.dashboard.items.self_assessments'), icon: Award },
+    //     { key: 'question_banks', label: t('student.dashboard.items.question_banks'), icon: FileText },
+    //   ]
+    // },
     {
       title: t('student.dashboard.groups.purchases'),
       items: [
@@ -171,6 +173,7 @@ export default function StudentDashboard() {
           {activeSection === 'overview' && <OverviewSection />}
           {activeSection === 'account' && <AccountSection showMsg={showMsg} />}
           {activeSection === 'courses' && <CoursesSection />}
+          {activeSection === 'flashcards' && <FlashcardsStudentSection />}
           {activeSection === 'schedule' && <ScheduleSection showMsg={showMsg} />}
           {activeSection === 'assessments' && <AssessmentsSection />}
           {activeSection === 'self_assessments' && <SelfAssessmentsSection />}

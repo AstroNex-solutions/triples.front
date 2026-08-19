@@ -1,21 +1,61 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, PlayCircle, Loader2, Compass } from 'lucide-react';
+import { BookOpen, PlayCircle, Loader2, Compass, Snowflake, Unlock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import API from '../../api/axios';
 import { SectionHeader, Card, getImageSrc } from './SharedUI';
+import Toast from '../../components/Toast';
 
 export default function CoursesSection() {
   const { t, i18n } = useTranslation();
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState(null);
   
+  const fetchEnrollments = () => {
+    setLoading(true);
+    API.get('/student/enrollments')
+      .then(r => setEnrollments(r.data.enrollments))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  };
+
   useEffect(() => {
-    API.get('/student/enrollments').then(r => setEnrollments(r.data.enrollments)).catch(console.error).finally(() => setLoading(false));
+    fetchEnrollments();
   }, []);
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleFreeze = async (courseId) => {
+    try {
+      setLoading(true);
+      await API.post(`/student/enrollments/${courseId}/freeze`);
+      showToast('تم تجميد الكورس بنجاح');
+      fetchEnrollments();
+    } catch (err) {
+      showToast(err.response?.data?.message || 'خطأ في التجميد', 'error');
+      setLoading(false);
+    }
+  };
+
+  const handleUnfreeze = async (courseId) => {
+    try {
+      setLoading(true);
+      await API.post(`/student/enrollments/${courseId}/unfreeze`);
+      showToast('تم إلغاء التجميد بنجاح');
+      fetchEnrollments();
+    } catch (err) {
+      showToast(err.response?.data?.message || 'خطأ في إلغاء التجميد', 'error');
+      setLoading(false);
+    }
+  };
 
   return (
     <>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       <SectionHeader title={t('student.courses.title')} count={enrollments.length}>
         <Link to="/courses" className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-xl text-xs font-bold hover:bg-primary-hover shadow-glow transition-all">
           <Compass size={16} />
@@ -49,9 +89,29 @@ export default function CoursesSection() {
                     </div>
                   </div>
                   
-                  <Link to={`/learn/${e.course_id}`} className="w-full py-2 bg-primary/10 text-primary hover:bg-primary/20 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer">
-                    <PlayCircle size={16} /> {t('student.courses.continueLearning')}
-                  </Link>
+                  {e.status === 'frozen' ? (
+                    <div className="space-y-2">
+                      <div className="w-full py-2 bg-surface-variant/50 text-on-surface-variant font-bold text-[10px] rounded-xl flex items-center justify-center gap-1.5 border border-outline-variant/30">
+                        <Snowflake size={14} />
+                        <span>الكورس مجمد حالياً</span>
+                      </div>
+                      <button onClick={() => handleUnfreeze(e.course_id)} className="w-full py-2 bg-primary text-on-primary hover:bg-primary-hover font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all">
+                        <Unlock size={14} /> إلغاء التجميد
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      <Link to={`/learn/${e.course_id}`} className="w-full py-2 bg-primary/10 text-primary hover:bg-primary/20 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer">
+                        <PlayCircle size={16} /> {t('student.courses.continueLearning')}
+                      </Link>
+                      
+                      {e.status === 'active' && e.freeze_count < 2 && (
+                        <button onClick={() => handleFreeze(e.course_id)} className="w-full py-1.5 bg-surface text-primary border border-primary/20 hover:bg-primary/10 font-bold text-[10px] rounded-xl flex items-center justify-center gap-1.5 transition-all">
+                          <Snowflake size={14} /> تجميد الكورس (متبقي {2 - e.freeze_count})
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               </Card>
             );

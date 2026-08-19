@@ -40,6 +40,7 @@ export default function Navbar() {
     const navLinks = [
         { name: t('navbar.home'), path: '/', icon: Home },
         { name: t('navbar.courses'), path: '/courses', icon: BookOpen },
+        { name: t('navbar.flashcards'), path: '/flashcards-store', icon: BookOpen },
         { name: t('navbar.articles'), path: '/articles', icon: FileText },
         { name: t('navbar.contact'), path: '/contact', icon: PhoneCall },
         { name: t('navbar.about'), path: '/about', icon: Info },

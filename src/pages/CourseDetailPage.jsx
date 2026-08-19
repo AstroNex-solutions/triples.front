@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import API from '../api/axios';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import Toast from '../components/Toast';
-import { 
-  Play, 
-  Award, 
-  BookOpen, 
-  Star, 
-  FileText, 
-  ShoppingCart, 
+import { getFileUrl } from '../utils/fileHelper';
+import {
+  Play,
+  Award,
+  BookOpen,
+  Star,
+  FileText,
+  ShoppingCart,
   Users,
   ChevronDown,
   ShieldCheck,
@@ -22,25 +24,28 @@ import {
   Share2,
   Clock,
   CheckCircle2,
-  Layers
+  Layers,
+  Snowflake,
+  Unlock
 } from 'lucide-react';
 
 const PublicModuleNode = ({ module, allModules, idx, level = 0, openModuleIds, toggleModule, setPreviewVideo }) => {
+  const { t } = useTranslation();
   const isOpen = openModuleIds.includes(module.id);
   const subModules = allModules.filter(m => m.submodule_id === module.id);
-  
+
   return (
-    <div 
+    <div
       className={`border border-outline-variant/40 rounded-2xl overflow-hidden transition-all bg-surface/50 hover:bg-surface/80 ${level > 0 ? 'mt-3 border-r-2 border-r-primary/50' : ''}`}
     >
-      <button 
+      <button
         onClick={() => toggleModule(module.id)}
         className={`w-full p-4 flex items-center justify-between text-right cursor-pointer ${level > 0 ? 'bg-surface-container-low/30' : ''}`}
       >
         <div className="space-y-0.5">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-primary">{level === 0 ? `موديول ${idx + 1}` : 'قسم فرعي'}</span>
-            <span className="text-xs text-on-surface-variant">• ({module.lessons?.length || 0} دروس)</span>
+            <span className="text-xs font-bold text-primary">{level === 0 ? `\${t('courseDetails.module', 'موديول')} \${idx + 1}` : t('courseDetails.subModule', 'قسم فرعي')}</span>
+            <span className="text-xs text-on-surface-variant">• ({module.lessons?.length || 0}  ${t('courseDetails.lessons', 'دروس')})</span>
           </div>
           <h3 className="text-sm sm:text-base font-bold text-on-surface">{module.name}</h3>
         </div>
@@ -54,7 +59,7 @@ const PublicModuleNode = ({ module, allModules, idx, level = 0, openModuleIds, t
           )}
 
           {module.lessons && module.lessons.map((lesson) => (
-            <div 
+            <div
               key={lesson.id}
               className="flex items-center justify-between p-3 rounded-xl bg-surface border border-outline-variant/30 hover:border-primary/40 transition-all text-xs sm:text-sm"
             >
@@ -65,23 +70,23 @@ const PublicModuleNode = ({ module, allModules, idx, level = 0, openModuleIds, t
                 <span className="font-semibold text-on-surface">{lesson.title}</span>
                 {lesson.is_free && (
                   <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    معاينة مجانية
+                    {t('courseDetails.freePreview', 'معاينة مجانية')}
                   </span>
                 )}
               </div>
 
               {lesson.is_free ? (
-                <button 
+                <button
                   onClick={() => setPreviewVideo({ title: lesson.title, url: lesson.video_url })}
                   className="text-xs font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
                 >
-                  <span>مشاهدة</span>
+                  <span>{t('courseDetails.watch', 'مشاهدة')}</span>
                   <ArrowRight size={14} className="rotate-180" />
                 </button>
               ) : (
                 <div className="flex items-center gap-1 text-on-surface-variant/60 text-xs">
                   <Lock size={12} />
-                  <span>مغلق</span>
+                  <span>{t('courseDetails.locked', 'مغلق')}</span>
                 </div>
               )}
             </div>
@@ -90,14 +95,14 @@ const PublicModuleNode = ({ module, allModules, idx, level = 0, openModuleIds, t
           {subModules.length > 0 && (
             <div className="pl-4 pr-1 mt-3 space-y-3 border-r border-outline-variant/20">
               {subModules.map((sm, smIdx) => (
-                <PublicModuleNode 
-                  key={sm.id} 
-                  module={sm} 
-                  allModules={allModules} 
-                  idx={smIdx} 
+                <PublicModuleNode
+                  key={sm.id}
+                  module={sm}
+                  allModules={allModules}
+                  idx={smIdx}
                   level={level + 1}
-                  openModuleIds={openModuleIds} 
-                  toggleModule={toggleModule} 
+                  openModuleIds={openModuleIds}
+                  toggleModule={toggleModule}
                   setPreviewVideo={setPreviewVideo}
                 />
               ))}
@@ -110,14 +115,16 @@ const PublicModuleNode = ({ module, allModules, idx, level = 0, openModuleIds, t
 };
 
 export default function CourseDetailPage() {
+  const { t, i18n } = useTranslation();
   const { slug } = useParams();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [addingToCart, setAddingToCart] = useState(false);
   const [openModuleIds, setOpenModuleIds] = useState([]);
   const [isEnrolled, setIsEnrolled] = useState(false);
+  const [enrollmentData, setEnrollmentData] = useState(null);
   const [previewVideo, setPreviewVideo] = useState(null); // { title: '', url: '' }
-  
+
   // حالة التحكم بالتنبيه الاحترافي
   const [toast, setToast] = useState(null);
 
@@ -129,23 +136,26 @@ export default function CourseDetailPage() {
       try {
         setLoading(true);
         const res = await API.get(`/courses/${slug}`);
-        console.log( res.data.course);
-        
+        console.log(res.data.course);
+
         const data = res.data.course;
         setCourse(data);
         if (data?.modules && data.modules.length > 0) {
           // فتح الموديول الأول بشكل افتراضي
           setOpenModuleIds([data.modules[0].id]);
         }
-        
+
         // Check enrollment if user is logged in
         if (user) {
           try {
             const enRes = await API.get('/student/enrollments');
             const enrollments = enRes.data.enrollments || [];
-            const enrolled = enrollments.some(e => e.course_id === data.id && (e.status === 'active' || e.status === 'completed'));
-            setIsEnrolled(enrolled);
-          } catch (e) {}
+            const enrollment = enrollments.find(e => e.course_id === data.id);
+            if (enrollment) {
+              setEnrollmentData(enrollment);
+              setIsEnrolled(enrollment.status === 'active' || enrollment.status === 'completed' || enrollment.status === 'frozen');
+            }
+          } catch (e) { }
         }
       } catch (err) {
         console.error('Error fetching course detail:', err);
@@ -158,6 +168,7 @@ export default function CourseDetailPage() {
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
   };
 
   const handleAddToCart = async () => {
@@ -165,16 +176,16 @@ export default function CourseDetailPage() {
     setAddingToCart(true);
     try {
       await addToCart(course.id);
-      showToast('تمت إضافة الدورة بنجاح إلى سلة الشراء!', 'success');
+      showToast(t('courseDetails.addedToCart', 'تمت إضافة الدورة بنجاح إلى سلة الشراء!'), 'success');
     } catch (err) {
-      showToast(err.response?.data?.message || err.message || 'حدث خطأ أثناء الإضافة للسلة', 'error');
+      showToast(err.response?.data?.message || err.message || t('courseDetails.addCartError', 'حدث خطأ أثناء الإضافة للسلة'), 'error');
     } finally {
       setAddingToCart(false);
     }
   };
 
   const toggleModule = (modId) => {
-    setOpenModuleIds((prev) => 
+    setOpenModuleIds((prev) =>
       prev.includes(modId) ? prev.filter(id => id !== modId) : [...prev, modId]
     );
   };
@@ -193,17 +204,17 @@ export default function CourseDetailPage() {
       navigator.share({
         title: course?.title,
         url: window.location.href,
-      }).catch(() => {});
+      }).catch(() => { });
     } else {
       navigator.clipboard.writeText(window.location.href);
-      showToast('تم نسخ رابط الدورة إلى الحافظة!', 'info');
+      showToast(t('courseDetails.linkCopied', 'تم نسخ رابط الدورة إلى الحافظة!'), 'info');
     }
   };
 
   // 1. شاشة التحميل الهيكلي (Skeleton Loader)
   if (loading) {
     return (
-      <div className="min-h-screen pb-20 pt-8 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto space-y-8 mt-24" dir="rtl">
+      <div className="min-h-screen pb-20 pt-8 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto space-y-8 mt-24" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
         <div className="h-96 rounded-3xl bg-surface-container-low/50 border border-outline-variant/30 animate-pulse p-8 relative overflow-hidden">
           <div className="w-1/3 h-8 bg-surface-container-high/60 rounded-xl mb-4" />
           <div className="w-2/3 h-12 bg-surface-container-high/60 rounded-xl mb-4" />
@@ -223,16 +234,16 @@ export default function CourseDetailPage() {
   // 2. حالة عدم وجود الدورة
   if (!course) {
     return (
-      <div className="min-h-[70vh] flex items-center justify-center px-4" dir="rtl">
+      <div className="min-h-[70vh] flex items-center justify-center px-4" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
         <div className="max-w-md w-full rounded-3xl bg-surface-container-low/60 border border-outline-variant/40 p-8 text-center backdrop-blur-xl space-y-4 shadow-2xl">
           <div className="w-16 h-16 rounded-2xl bg-error/10 text-error mx-auto flex items-center justify-center border border-error/20">
             <BookOpen size={32} />
           </div>
-          <h2 className="text-xl font-extrabold text-on-surface">عذراً، الدورة التدريبية غير موجودة</h2>
-          <p className="text-xs text-on-surface-variant leading-relaxed">ربما تم تغيير الرابط أو حذف الدورة من النظام.</p>
+          <h2 className="text-xl font-extrabold text-on-surface">{t('courseDetails.courseNotFound', 'عذراً، الدورة التدريبية غير موجودة')}</h2>
+          <p className="text-xs text-on-surface-variant leading-relaxed">{t('courseDetails.courseNotFoundMsg', 'ربما تم تغيير الرابط أو حذف الدورة من النظام.')}</p>
           <Link to="/courses" className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-on-primary font-bold text-xs rounded-2xl shadow-glow hover:bg-primary-hover transition-all">
             <ArrowRight size={16} />
-            <span>العودة لجميع الدورات</span>
+            <span>{t('courseDetails.backToCourses', 'العودة لجميع الدورات')}</span>
           </Link>
         </div>
       </div>
@@ -244,8 +255,8 @@ export default function CourseDetailPage() {
   const totalLessons = course.modules?.reduce((acc, m) => acc + (m.lessons?.length || 0), 0) || 0;
 
   return (
-    <div className="min-h-screen pb-20 pt-6 px-4 sm:px-6 lg:px-12 max-w-container-max mx-auto space-y-10 relative mt-24" dir="rtl">
-      
+    <div className="min-h-screen pb-20 pt-6 px-4 sm:px-6 lg:px-12 max-w-container-max mx-auto space-y-10 relative mt-24" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
+
       {/* التنبيه العائم */}
       <Toast toast={toast} onClose={() => setToast(null)} />
 
@@ -258,16 +269,16 @@ export default function CourseDetailPage() {
           <div className="lg:col-span-7 space-y-6">
             <div className="flex flex-wrap items-center gap-2.5">
               <span className="px-3.5 py-1 rounded-full text-xs font-extrabold bg-primary/15 text-primary border border-primary/30">
-                {course.category?.name || 'برمجة وتطوير'}
+                {course.category?.name || t('courseDetails.devCategory', 'برمجة وتطوير')}
               </span>
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1">
                 <Sparkles size={13} />
-                <span>دورة معتمدة</span>
+                <span>{t('courseDetails.certifiedCourse', 'دورة معتمدة')}</span>
               </span>
-              <button 
+              <button
                 onClick={handleShare}
                 className="mr-auto p-2 rounded-xl bg-surface/50 border border-outline-variant/30 text-on-surface-variant hover:text-primary transition-colors"
-                title="مشاركة الدورة"
+                title={t('courseDetails.shareCourse', 'مشاركة الدورة')}
               >
                 <Share2 size={16} />
               </button>
@@ -276,35 +287,35 @@ export default function CourseDetailPage() {
             <h1 className="text-2xl sm:text-4xl font-black text-on-surface leading-tight tracking-tight">
               {course.title}
             </h1>
-            
+
             <p className="text-on-surface-variant text-xs sm:text-sm leading-relaxed">
               {course.subtitle || course.short_description || course.description?.substring(0, 180)}
             </p>
-            
+
             <div className="flex flex-wrap items-center gap-6 text-xs sm:text-sm text-on-surface-variant/90 pt-4 border-t border-outline-variant/30">
               <div className="flex items-center gap-1.5 text-amber-400 font-extrabold">
                 <Star size={18} className="fill-amber-400" />
                 <span>{course.average_rating || 5.0}</span>
-                <span className="text-on-surface-variant font-medium text-xs">({course.reviews?.length || 0} تقييم)</span>
+                <span className="text-on-surface-variant font-medium text-xs">({course.reviews?.length || 0}  ${t('courseDetails.rating', 'تقييم')})</span>
               </div>
 
               <div className="flex items-center gap-1.5">
                 <Users size={16} className="text-primary" />
-                <span>{course.total_enrollments || 0} طالب مسجل</span>
+                <span>{course.total_enrollments || 0}  ${t('courseDetails.enrolledStudents', 'طالب مسجل')}</span>
               </div>
 
               <div className="flex items-center gap-1.5">
                 <Clock size={16} className="text-secondary" />
                 <span>
-                  {course.total_duration 
-                    ? `${Math.floor(course.total_duration / 60)} ساعة و ${course.total_duration % 60} دقيقة` 
-                    : 'مدة غير محددة'}
+                  {course.total_duration
+                    ? t('courseDetails.hoursAndMins', '{{hours}} ساعة و {{mins}} دقيقة', { hours: Math.floor(course.total_duration / 60), mins: course.total_duration % 60 })
+                    : t('courseDetails.durationNotSet', 'مدة غير محددة')}
                 </span>
               </div>
 
               <div className="flex items-center gap-1.5">
                 <Award size={16} className="text-emerald-400" />
-                <span>شهادة معتمدة</span>
+                <span>{t('courseDetails.certifiedInstructor', 'شهادة معتمدة')}</span>
               </div>
             </div>
 
@@ -314,7 +325,7 @@ export default function CourseDetailPage() {
                   {course.instructor.name?.[0] || 'D'}
                 </div>
                 <div>
-                  <p className="text-[11px] text-on-surface-variant/70">المحاضر والمعد</p>
+                  <p className="text-[11px] text-on-surface-variant/70">{t('courseDetails.instructorTitle', 'المحاضر والمعد')}</p>
                   <p className="text-xs sm:text-sm font-bold text-on-surface">{course.instructor.name}</p>
                 </div>
               </div>
@@ -323,18 +334,18 @@ export default function CourseDetailPage() {
 
           <div className="lg:col-span-5 relative">
             <div className="relative rounded-2xl overflow-hidden border border-outline-variant/50 shadow-2xl group">
-              <img 
-                src={import.meta.env.VITE_API_URL+course.image || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800'} 
-                alt={course.title} 
-                className="w-full h-64 sm:h-72 object-cover group-hover:scale-105 transition-transform duration-500" 
+              <img
+                src={getFileUrl(course.image) || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800'}
+                alt={course.title}
+                className="w-full h-64 sm:h-72 object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-              
+
               {course.modules?.[0]?.lessons?.[0] && (
-                <button 
+                <button
                   onClick={() => setPreviewVideo({ title: course.modules[0].lessons[0].title, url: course.modules[0].lessons[0].video_url })}
                   className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-primary/90 text-on-primary flex items-center justify-center shadow-glow hover:scale-110 transition-all border border-white/20 cursor-pointer"
-                  title="مشاهدة المعاينة المجانية"
+                  title={t('courseDetails.watchPreview', 'مشاهدة المعاينة المجانية')}
                 >
                   <Play size={26} className="mr-1 fill-on-primary" />
                 </button>
@@ -347,15 +358,15 @@ export default function CourseDetailPage() {
       {/* 2. Main Layout Details & Sticky Sidebar */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <div className="lg:col-span-8 space-y-8">
-          
+
           {/* Overview Section */}
           <div className="rounded-3xl bg-surface-container-low/60 border border-outline-variant/40 p-6 sm:p-8 backdrop-blur-xl space-y-4">
             <h2 className="text-lg sm:text-xl font-extrabold text-on-surface flex items-center gap-2">
               <FileText size={20} className="text-primary" />
-              <span>نظرة عامة عن الدورة</span>
+              <span>{t('courseDetails.overviewTitle', 'نظرة عامة عن الدورة')}</span>
             </h2>
             <div className="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
-              <p>{course.description || 'تمنحك هذه الدورة معرفة شاملة وتطبيقات عملية ومبسطة للوصول للإتقان والأداء الأكاديمي والمهني المتميز.'}</p>
+              <p>{course.description || t('courseDetails.defaultDesc', 'تمنحك هذه الدورة معرفة شاملة وتطبيقات عملية ومبسطة للوصول للإتقان والأداء الأكاديمي والمهني المتميز.')}</p>
             </div>
           </div>
 
@@ -365,27 +376,27 @@ export default function CourseDetailPage() {
               <div>
                 <h2 className="text-lg sm:text-xl font-extrabold text-on-surface flex items-center gap-2">
                   <BookOpen size={20} className="text-primary" />
-                  <span>منهاج وموديولات الدورة</span>
+                  <span>{t('courseDetails.curriculumTitle', 'منهاج وموديولات الدورة')}</span>
                 </h2>
                 <p className="text-xs text-on-surface-variant mt-0.5">
-                  يتضمن {course.modules?.length || 0} موديولات • {totalLessons} درس فيديو
+                  {t('courseDetails.curriculumStats', 'يتضمن {{modulesCount}} موديولات • {{lessonsCount}} درس فيديو', { modulesCount: course.modules?.length || 0, lessonsCount: totalLessons })}
                 </p>
               </div>
 
               {course.modules && course.modules.length > 0 && (
-                <button 
+                <button
                   onClick={toggleAllModules}
                   className="text-xs font-bold text-primary hover:underline flex items-center gap-1 bg-primary/10 px-3 py-1.5 rounded-xl border border-primary/20"
                 >
                   <Layers size={14} />
-                  <span>{openModuleIds.length === course.modules.length ? 'طي الكل' : 'توسيع الكل'}</span>
+                  <span>{openModuleIds.length === course.modules.length ? t('courseDetails.collapseAll', 'طي الكل') : t('courseDetails.expandAll', 'توسيع الكل')}</span>
                 </button>
               )}
             </div>
 
             <div className="space-y-3">
               {course.modules && course.modules.filter(m => !m.submodule_id).map((mod, idx) => (
-                <PublicModuleNode 
+                <PublicModuleNode
                   key={mod.id || idx}
                   module={mod}
                   allModules={course.modules}
@@ -404,7 +415,7 @@ export default function CourseDetailPage() {
         <div className="lg:col-span-4 sticky top-24 space-y-6">
           <div className="rounded-3xl bg-surface-container-low/80 border border-outline-variant/50 p-6 backdrop-blur-xl shadow-2xl space-y-6">
             <div className="space-y-1">
-              <span className="text-xs text-on-surface-variant/80 font-bold block">سعر الاشتراك بالدورة:</span>
+              <span className="text-xs text-on-surface-variant/80 font-bold block">{t('courseDetails.subscriptionPrice', 'سعر الاشتراك بالدورة:')}</span>
               <div className="flex items-baseline gap-3">
                 <span className="text-3xl font-black text-on-surface" dir="ltr">JOD {price}</span>
                 {originalPrice && (
@@ -417,15 +428,15 @@ export default function CourseDetailPage() {
 
             <div className="space-y-3">
               {isEnrolled ? (
-                <Link 
+                <Link
                   to={`/learn/${course.id}`}
                   className="w-full py-4 bg-primary text-on-primary font-bold text-sm rounded-2xl hover:bg-primary-hover transition-all flex items-center justify-center gap-2 shadow-glow cursor-pointer"
                 >
                   <Play size={18} className="fill-current" />
-                  <span>متابعة التعلم</span>
+                  <span>{t('courseDetails.resumeLearning', 'متابعة التعلم')}</span>
                 </Link>
               ) : (
-                <button 
+                <button
                   onClick={handleAddToCart}
                   disabled={addingToCart}
                   className="w-full py-4 bg-primary text-on-primary font-bold text-sm rounded-2xl hover:bg-primary-hover transition-all flex items-center justify-center gap-2 shadow-glow cursor-pointer disabled:opacity-60"
@@ -435,47 +446,47 @@ export default function CourseDetailPage() {
                   ) : (
                     <>
                       <ShoppingCart size={18} />
-                      <span>إضافة الدورة للسلة الآن</span>
+                      <span>{t('courseDetails.addToCartNow', 'إضافة الدورة للسلة الآن')}</span>
                     </>
                   )}
                 </button>
               )}
 
               {course.modules?.[0]?.lessons?.[0] && (
-                <button 
+                <button
                   onClick={() => setPreviewVideo({ title: course.modules[0].lessons[0].title, url: course.modules[0].lessons[0].video_url })}
                   className="w-full py-3.5 bg-surface border border-outline-variant/60 text-on-surface font-bold text-xs rounded-2xl hover:bg-surface-container transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Play size={16} className="text-primary" />
-                  <span>مشاهدة المعاينة المجانية</span>
+                  <span>{t('courseDetails.watchPreview', 'مشاهدة المعاينة المجانية')}</span>
                 </button>
               )}
             </div>
 
             <div className="space-y-3 pt-4 border-t border-outline-variant/30 text-xs text-on-surface-variant">
-              <p className="font-bold text-on-surface text-xs">تشتمل هذه الدورة على:</p>
-              
+              <p className="font-bold text-on-surface text-xs">{t('courseDetails.includesTitle', 'تشتمل هذه الدورة على:')}</p>
+
               <div className="flex items-center gap-2.5">
                 <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
-                <span>وصول كامل ومستمر مدى الحياة</span>
+                <span>{t('courseDetails.includeLifeTime', 'وصول كامل ومستمر مدى الحياة')}</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
-                <span>شرح تفاعلي وبنك أسئلة متكامل</span>
+                <span>{t('courseDetails.includeInteractive', 'شرح تفاعلي وبنك أسئلة متكامل')}</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
-                <span>شهادة إتمام معتمدة فور الانتهاء</span>
+                <span>{t('courseDetails.includeCert', 'شهادة إتمام معتمدة فور الانتهاء')}</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Globe2 size={16} className="text-primary shrink-0" />
-                <span>مشاهدة من الهاتف أو الحاسوب</span>
+                <span>{t('courseDetails.includeDevices', 'مشاهدة من الهاتف أو الحاسوب')}</span>
               </div>
             </div>
 
             <div className="pt-2 text-center text-[11px] text-on-surface-variant/70 flex items-center justify-center gap-1 border-t border-outline-variant/20">
               <ShieldCheck size={14} className="text-emerald-400" />
-              <span>ضمان استعادة الأموال وسداد آمن 100%</span>
+              <span>{t('courseDetails.moneyBack', 'ضمان استعادة الأموال وسداد آمن 100%')}</span>
             </div>
           </div>
         </div>
@@ -486,10 +497,10 @@ export default function CourseDetailPage() {
         <div className="rounded-3xl bg-surface-container-low/60 border border-outline-variant/40 p-6 sm:p-8 backdrop-blur-xl mt-8 space-y-6">
           <h2 className="text-lg sm:text-xl font-extrabold text-on-surface flex items-center gap-2 border-b border-outline-variant/30 pb-4">
             <Star size={20} className="text-amber-400 fill-amber-400" />
-            <span>آراء وتقييمات الطلاب</span>
-            <span className="text-sm text-on-surface-variant mr-auto font-normal">({course.reviews.length} تقييم)</span>
+            <span>{t('courseDetails.reviewsTitle', 'آراء وتقييمات الطلاب')}</span>
+            <span className="text-sm text-on-surface-variant mr-auto font-normal">({course.reviews.length}  ${t('courseDetails.rating', 'تقييم')})</span>
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {course.reviews.map((review, idx) => (
               <div key={idx} className="p-4 rounded-2xl bg-surface/50 border border-outline-variant/30 flex gap-4">
@@ -519,11 +530,11 @@ export default function CourseDetailPage() {
 
       {/* 4. Video Preview Modal */}
       {previewVideo && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in" dir="rtl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
           <div className="bg-surface rounded-3xl overflow-hidden w-full max-w-4xl border border-outline-variant/20 shadow-2xl">
             <div className="flex items-center justify-between p-4 border-b border-outline-variant/20 bg-surface-container-low/50">
               <h3 className="text-sm font-bold text-on-surface truncate">{previewVideo.title}</h3>
-              <button 
+              <button
                 onClick={() => setPreviewVideo(null)}
                 className="p-1.5 rounded-xl bg-surface border border-outline-variant/30 text-on-surface-variant hover:text-error hover:bg-error/10 transition-all cursor-pointer"
               >

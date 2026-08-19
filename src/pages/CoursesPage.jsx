@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import API from '../api/axios';
+import { AuthContext } from '../context/AuthContext';
 import CourseCard from '../components/CourseCard';
 import { 
   Search, 
@@ -20,6 +21,23 @@ export default function CoursesPage() {
   const [selectedCat, setSelectedCat] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('');
   const [loading, setLoading] = useState(true);
+  const [enrollments, setEnrollments] = useState([]);
+  const { user } = useContext(AuthContext);
+
+  const fetchEnrollments = useCallback(async () => {
+    if (user) {
+      try {
+        const res = await API.get('/student/enrollments');
+        setEnrollments(res.data.enrollments || []);
+      } catch (err) {
+        console.error('Error fetching enrollments:', err);
+      }
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchEnrollments();
+  }, [fetchEnrollments]);
 
   // دالة جلب الدورات
   const fetchCourses = useCallback(async () => {
@@ -194,9 +212,17 @@ export default function CoursesPage() {
       ) : (
         /* Courses Grid */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {courses.map(course => (
-            <CourseCard key={course.id} course={course} />
-          ))}
+          {courses.map(course => {
+            const enrollment = enrollments.find(e => e.course_id === course.id);
+            return (
+              <CourseCard 
+                key={course.id} 
+                course={course} 
+                enrollment={enrollment} 
+                onEnrollmentUpdate={fetchEnrollments} 
+              />
+            );
+          })}
         </div>
       )}
 
