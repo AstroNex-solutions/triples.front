@@ -1,97 +1,107 @@
+import { useOutletContext } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import API from '../../../api/axios';
-import { Loader2, Trash2 } from 'lucide-react';
-import { SectionHeader, Card, Modal, Input, Textarea, SubmitBtn } from '../ui/SharedUI';
+import { useTranslation } from 'react-i18next';
+import BooksList from './books/BooksList';
+import BookForm from './books/BookForm';
 
-export default function BooksSection({ showMsg }) {
-  const { t, i18n } = useTranslation();
+export default function BooksSection() {
+  const { showMsg } = useOutletContext();
+  const { t } = useTranslation();
+  
+  const [viewState, setViewState] = useState('list'); // 'list', 'add', 'edit'
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showAdd, setShowAdd] = useState(false);
-  const [form, setForm] = useState({ title: '', author_name: '', description: '', language: 'العربية', pages_count: '' });
-  const [files, setFiles] = useState({ book_file: null, cover_image: null });
-  const [sub, setSub] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [editingBook, setEditingBook] = useState(null);
 
-  const fetchBooks = () => { setLoading(true); API.get('/admin/books').then(r => setBooks(r.data.books || [])).catch(console.error).finally(() => setLoading(false)); };
+  const fetchBooks = () => { 
+    setLoading(true); 
+    API.get('/admin/books')
+      .then(r => setBooks(r.data.books || []))
+      .catch(console.error)
+      .finally(() => setLoading(false)); 
+  };
+  
   useEffect(() => { fetchBooks(); }, []);
 
-  const create = async (e) => {
-    e.preventDefault(); setSub(true);
+  const handleAddSubmit = async (form, files) => {
+    setSubmitting(true);
     try {
       const fd = new FormData();
       Object.entries(form).forEach(([k, v]) => fd.append(k, v));
       if (files.book_file) fd.append('book_file', files.book_file);
       if (files.cover_image) fd.append('cover_image', files.cover_image);
       await API.post('/admin/books', fd);
-      showMsg('success', t('admin.sections.books.addBook')); setShowAdd(false); fetchBooks();
-    } catch { showMsg('error', 'Error'); } finally { setSub(false); }
+      showMsg('success', t('admin.sections.books.addBook')); 
+      setViewState('list'); 
+      fetchBooks();
+    } catch { 
+      showMsg('error', 'Error adding book'); 
+    } finally { 
+      setSubmitting(false); 
+    }
   };
 
-  const del = async (id) => { 
+  const handleEditSubmit = async (form, files) => {
+    setSubmitting(true);
+    try {
+      const fd = new FormData();
+      Object.entries(form).forEach(([k, v]) => fd.append(k, v));
+      if (files.book_file) fd.append('book_file', files.book_file);
+      if (files.cover_image) fd.append('cover_image', files.cover_image);
+      // Assuming PUT route exists. If not, it needs to be added to backend, 
+      // but standard Astronex setup usually has PUT for /admin/books/:id
+      await API.put(`/admin/books/${editingBook.id}`, fd);
+      showMsg('success', 'Book updated successfully'); 
+      setViewState('list'); 
+      fetchBooks();
+    } catch { 
+      showMsg('error', 'Error updating book'); 
+    } finally { 
+      setSubmitting(false); 
+    }
+  };
+
+  const handleDelete = async (id) => { 
     if (!confirm('Delete? / هل أنت متأكد؟')) return; 
-    try { await API.delete(`/admin/books/${id}`); showMsg('success', t('admin.common.delete')); fetchBooks(); } 
-    catch { showMsg('error', 'Error'); } 
+    try { 
+      await API.delete(`/admin/books/${id}`); 
+      showMsg('success', t('admin.common.delete')); 
+      fetchBooks(); 
+    } catch { 
+      showMsg('error', 'Error deleting book'); 
+    } 
   };
 
   return (
-    <>
-      <SectionHeader title={t('admin.sections.books.title')} count={books.length} onAdd={() => setShowAdd(true)} addLabel={t('admin.sections.books.addBook')} />
-      {loading ? <div className="py-12 flex justify-center"><Loader2 size={24} className="animate-spin text-primary" /></div> : (
-        <Card>
-          <div className="overflow-x-auto">
-            <table className="w-full text-start text-xs sm:text-sm border-separate border-spacing-y-1">
-              <thead>
-                <tr className="text-on-surface-variant/70">
-                  <th className="p-3 text-start">{t('admin.sections.books.bookTitle')}</th>
-                  <th className="p-3 text-start">{t('admin.sections.articles.author')}</th>
-                  <th className="p-3 text-start">Language / اللغة</th>
-                  <th className="p-3 text-start">{t('admin.sections.books.download')}</th>
-                  <th className="p-3 text-center">{t('admin.common.actions')}</th>
-                </tr>
-              </thead>
-              <tbody>{books.map(b => {
-                const bTitle = b[`title_${i18n.language}`] || b.title;
-                return (
-                  <tr key={b.id} className="bg-surface/50 hover:bg-surface/80 transition-all">
-                    <td className="p-3 font-bold text-on-surface">{bTitle}</td>
-                    <td className="p-3 text-on-surface-variant">{b.author_name}</td>
-                    <td className="p-3 text-on-surface-variant">{b.language}</td>
-                    <td className="p-3 font-bold text-on-surface">{b.download_count || 0}</td>
-                    <td className="p-3 text-center">
-                      <button onClick={() => del(b.id)} className="p-1.5 rounded-lg bg-surface border border-outline-variant/40 text-on-surface-variant hover:text-rose-400 transition-all cursor-pointer">
-                        <Trash2 size={14} />
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}</tbody>
-            </table>
-          </div>
-        </Card>
+    <div className="space-y-6">
+      {viewState === 'list' && (
+        <BooksList 
+          books={books} 
+          loading={loading} 
+          onAdd={() => { setEditingBook(null); setViewState('add'); }}
+          onEdit={(book) => { setEditingBook(book); setViewState('edit'); }}
+          onDelete={handleDelete}
+        />
       )}
-      <Modal open={showAdd} onClose={() => setShowAdd(false)} title={t('admin.sections.books.addBook')}>
-        <form onSubmit={create} className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <Input label={`${t('admin.sections.books.bookTitle')} *`} required value={form.title} onChange={e => setForm({...form, title: e.target.value})} />
-            <Input label={`${t('admin.sections.articles.author')} *`} required value={form.author_name} onChange={e => setForm({...form, author_name: e.target.value})} />
-            <Input label="Language / اللغة" value={form.language} onChange={e => setForm({...form, language: e.target.value})} />
-            <Input label="Pages Count / عدد الصفحات" type="number" value={form.pages_count} onChange={e => setForm({...form, pages_count: e.target.value})} />
-          </div>
-          <Textarea label="Description / الوصف" value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-on-surface-variant block">Book PDF / ملف الكتاب (PDF) *</label>
-              <input type="file" accept=".pdf" onChange={e => setFiles({...files, book_file: e.target.files[0]})} className="text-sm text-on-surface-variant cursor-pointer" />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-on-surface-variant block">Cover Image / صورة الغلاف</label>
-              <input type="file" accept="image/*" onChange={e => setFiles({...files, cover_image: e.target.files[0]})} className="text-sm text-on-surface-variant cursor-pointer" />
-            </div>
-          </div>
-          <SubmitBtn loading={sub} label={t('admin.sections.books.addBook')} />
-        </form>
-      </Modal>
-    </>
+
+      {viewState === 'add' && (
+        <BookForm 
+          onSubmit={handleAddSubmit}
+          onCancel={() => setViewState('list')}
+          submitting={submitting}
+        />
+      )}
+
+      {viewState === 'edit' && (
+        <BookForm 
+          initialData={editingBook}
+          onSubmit={handleEditSubmit}
+          onCancel={() => setViewState('list')}
+          submitting={submitting}
+        />
+      )}
+    </div>
   );
 }

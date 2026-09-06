@@ -7,22 +7,42 @@ import ModulesList from './ModulesList';
 import SubModulesList from './SubModulesList';
 import LessonsList from './LessonsList';
 import LessonForm from './LessonForm';
+import CourseForm from './CourseForm';
+import Toast from '../../../../components/Toast';
 
 export default function CoursesManager({ showMsg }) {
   const { t, i18n } = useTranslation();
   
-  const [viewState, setViewState] = useState('courses'); // courses, modules, submodules, lessons
+  const [toast, setToast] = useState(null);
+  const internalShowMsg = (type, message) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 3000);
+  };
+  const activeShowMsg = showMsg || internalShowMsg;
+
+  const [viewState, setViewState] = useState('courses'); // courses, course-form, modules, submodules, lessons
   
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedModule, setSelectedModule] = useState(null);
   const [selectedSubModule, setSelectedSubModule] = useState(null);
   const [selectedLesson, setSelectedLesson] = useState(null);
+  
+  // For Course Form Categories
+  const [categories, setCategories] = useState([]);
 
   const navigateToCourses = () => {
     setViewState('courses');
     setSelectedCourse(null);
     setSelectedModule(null);
     setSelectedSubModule(null);
+  };
+
+  const navigateToCourseForm = (course = null, fetchedCategories = []) => {
+    setSelectedCourse(course);
+    if (fetchedCategories && fetchedCategories.length > 0) {
+      setCategories(fetchedCategories);
+    }
+    setViewState('course-form');
   };
 
   const navigateToModules = (course) => {
@@ -63,11 +83,20 @@ export default function CoursesManager({ showMsg }) {
           {t('admin.sections.courses') || 'الكورسات'}
         </button>
         
-        {selectedCourse && (
+        {selectedCourse && viewState !== 'course-form' && (
           <>
             <ChevronIcon size={16} className="text-on-surface-variant/50 shrink-0" />
             <button onClick={() => navigateToModules(selectedCourse)} className={`hover:text-primary transition-colors ${viewState === 'modules' ? 'text-primary' : 'text-on-surface-variant'} cursor-pointer`}>
               {selectedCourse.title}
+            </button>
+          </>
+        )}
+
+        {viewState === 'course-form' && (
+          <>
+            <ChevronIcon size={16} className="text-on-surface-variant/50 shrink-0" />
+            <button className="text-primary cursor-default">
+              {selectedCourse ? 'تعديل الكورس' : 'إضافة كورس جديد'}
             </button>
           </>
         )}
@@ -115,19 +144,35 @@ export default function CoursesManager({ showMsg }) {
   };
 
   return (
-    <div className="space-y-4 w-full">
+    <div className="space-y-4 w-full relative">
+      <Toast toast={toast} onClose={() => setToast(null)} />
       {renderBreadcrumbs()}
 
       {viewState === 'courses' && (
         <CoursesList 
-          showMsg={showMsg} 
-          onManageModules={navigateToModules} 
+          showMsg={activeShowMsg} 
+          onManageModules={navigateToModules}
+          onManageCourse={(course, cats) => navigateToCourseForm(course, cats)}
+        />
+      )}
+
+      {viewState === 'course-form' && (
+        <CourseForm
+          showMsg={activeShowMsg}
+          course={selectedCourse}
+          categories={categories}
+          onBack={navigateToCourses}
+          onSaveSuccess={(savedCourse) => {
+            if (savedCourse) {
+              setSelectedCourse(savedCourse);
+            }
+          }}
         />
       )}
 
       {viewState === 'modules' && selectedCourse && (
         <ModulesList 
-          showMsg={showMsg} 
+          showMsg={activeShowMsg} 
           course={selectedCourse} 
           onManageSubModules={navigateToSubModules}
           onManageLessons={(mod) => navigateToLessons(mod, 'module')}
@@ -136,7 +181,7 @@ export default function CoursesManager({ showMsg }) {
 
       {viewState === 'submodules' && selectedModule && (
         <SubModulesList 
-          showMsg={showMsg} 
+          showMsg={activeShowMsg} 
           course={selectedCourse} 
           parentModule={selectedModule}
           onManageLessons={(subMod) => navigateToLessons(subMod, 'submodule')}
@@ -145,7 +190,7 @@ export default function CoursesManager({ showMsg }) {
 
       {viewState === 'lessons' && (selectedModule || selectedSubModule) && (
         <LessonsList 
-          showMsg={showMsg} 
+          showMsg={activeShowMsg} 
           course={selectedCourse} 
           module={selectedSubModule || selectedModule} 
           isSubModule={!!selectedSubModule}
@@ -155,7 +200,7 @@ export default function CoursesManager({ showMsg }) {
 
       {viewState === 'lesson-form' && (selectedModule || selectedSubModule) && (
         <LessonForm
-          showMsg={showMsg}
+          showMsg={activeShowMsg}
           module={selectedSubModule || selectedModule}
           lesson={selectedLesson}
           onBack={() => navigateToLessons(selectedSubModule || selectedModule, selectedSubModule ? 'submodule' : 'module')}

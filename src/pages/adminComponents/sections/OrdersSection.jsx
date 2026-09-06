@@ -1,10 +1,12 @@
+import { useOutletContext } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import API from '../../../api/axios';
 import { Loader2, ChevronRight, ChevronLeft } from 'lucide-react';
 import { SectionHeader, Card, statusBadge } from '../ui/SharedUI';
 
-export default function OrdersSection({ showMsg }) {
+export default function OrdersSection() {
+  const { showMsg } = useOutletContext();
   const { t, i18n } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);

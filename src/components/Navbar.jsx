@@ -9,19 +9,17 @@ import ThemeToggle from './ThemeToggle';
 import {
     ShoppingBag,
     LogOut,
-    LayoutDashboard,
-    Sparkles,
     BookOpen,
-    Home,
     FileText,
-    PhoneCall,
-    Info
+    Info,
+    User,
+    Home
 } from 'lucide-react';
 
 export default function Navbar() {
     const { user, logout } = useContext(AuthContext);
     const { cartCount } = useContext(CartContext);
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const location = useLocation();
     const [scrolled, setScrolled] = useState(false);
     const [logoError, setLogoError] = useState(false);
@@ -35,15 +33,26 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const isActive = (path) => location.pathname === path;
+    const isActive = (path) => {
+        if (path.includes('?')) {
+            const basePath = path.split('?')[0];
+            if (location.pathname !== basePath) return false;
+            
+            const params = new URLSearchParams(path.split('?')[1]);
+            const targetCat = params.get('category');
+            
+            const currentParams = new URLSearchParams(location.search);
+            return currentParams.get('category') === targetCat;
+        }
+        return location.pathname === path;
+    };
 
     const navLinks = [
-        { name: t('navbar.home'), path: '/', icon: Home },
-        { name: t('navbar.courses'), path: '/courses', icon: BookOpen },
-        { name: t('navbar.flashcards'), path: '/flashcards-store', icon: BookOpen },
-        { name: t('navbar.articles'), path: '/articles', icon: FileText },
-        { name: t('navbar.contact'), path: '/contact', icon: PhoneCall },
-        { name: t('navbar.about'), path: '/about', icon: Info },
+        { name: i18n.language === 'ar' ? 'الرئيسية' : 'Home', path: '/', icon: Home },
+        { name: i18n.language === 'ar' ? 'الطب البشري' : 'Medicine', path: '/courses?category=Medicine', icon: BookOpen },
+        { name: i18n.language === 'ar' ? 'طب الأسنان' : 'Dentistry', path: '/courses?category=Dentistry', icon: BookOpen },
+        { name: i18n.language === 'ar' ? 'المدونة' : 'Blog', path: '/articles', icon: FileText },
+        { name: i18n.language === 'ar' ? 'من نحن' : 'About us', path: '/about', icon: Info },
     ];
 
     return (
@@ -53,22 +62,6 @@ export default function Navbar() {
                     : 'bg-background/70 backdrop-blur-md border-b border-transparent'
                 }`}
         >
-            {/* 1. الشريط العلوي الإخباري */}
-            <div className="w-full bg-primary text-on-primary overflow-hidden flex items-center py-1.5" dir="ltr">
-                <motion.div
-                    animate={{ x: ["0%", "-50%"] }}
-                    transition={{ repeat: Infinity, duration: 40, ease: "linear" }}
-                    className="flex whitespace-nowrap text-[11px] sm:text-xs font-bold tracking-wide"
-                >
-                    {[...Array(2)].map((_, i) => (
-                        <div key={i} className="flex items-center gap-16 px-8">
-                            <span className="flex items-center gap-2">{t('navbar.marquee.msg1')}</span>
-                            <span className="flex items-center gap-2">{t('navbar.marquee.msg2')}</span>
-                            <span className="flex items-center gap-2">{t('navbar.marquee.msg3')}</span>
-                        </div>
-                    ))}
-                </motion.div>
-            </div>
 
             {/* 2. الصف الرئيسي (الشعار وأزرار التفاعل) */}
             <div className={`transition-all duration-300 ${scrolled ? 'py-1' : 'py-2'} h-16 sm:h-20 max-w-container-max w-full mx-auto px-4 sm:px-6 lg:px-12 flex items-center justify-between`}>
@@ -140,35 +133,27 @@ export default function Navbar() {
                         <div className="flex items-center gap-2">
                             <Link
                                 to={user.status === 'Admin' ? '/admin' : (user.status === 'Student' ? '/dashboard' : '/instructor')}
-                                className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-primary text-on-primary text-xs sm:text-sm font-label-md rounded-2xl hover:bg-primary-hover transition-all duration-200 shadow-glow"
+                                className="p-2.5 text-on-surface-variant hover:text-primary transition-all duration-200 rounded-full hover:bg-surface-container-high border border-outline-variant/40"
+                                title={t('navbar.dashboard')}
                             >
-                                <LayoutDashboard size={16} />
-                                <span className="font-bold">{t('navbar.dashboard')}</span>
+                                <User size={20} />
                             </Link>
                             <button
                                 onClick={logout}
-                                className="p-2.5 text-error hover:bg-error-container/30 rounded-2xl transition-colors"
+                                className="p-2.5 text-error hover:bg-error-container/30 rounded-full transition-colors"
                                 title={t('navbar.logout')}
                             >
                                 <LogOut size={18} />
                             </button>
                         </div>
                     ) : (
-                        <div className="flex items-center gap-2">
-                            <Link
-                                to="/login"
-                                className="text-xs sm:text-sm font-label-md px-3 py-2 text-on-surface-variant hover:text-primary rounded-2xl transition-all"
-                            >
-                                {t('navbar.loginShort')}
-                            </Link>
-                            <Link
-                                to="/register"
-                                className="px-3.5 py-2 bg-primary text-on-primary text-xs sm:text-sm font-label-md rounded-2xl hover:bg-primary-hover transition-all flex items-center gap-1.5 shadow-glow"
-                            >
-                                <Sparkles size={14} />
-                                <span>{t('navbar.registerShort')}</span>
-                            </Link>
-                        </div>
+                        <Link
+                            to="/login"
+                            className="p-2.5 text-on-surface-variant hover:text-primary transition-all duration-200 rounded-full hover:bg-surface-container-high border border-outline-variant/40"
+                            title={t('navbar.loginShort')}
+                        >
+                            <User size={20} />
+                        </Link>
                     )}
                 </div>
             </div>

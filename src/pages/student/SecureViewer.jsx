@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ShieldAlert, ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../../context/AuthContext';
 import { getFileUrl } from '../../utils/fileHelper';
 
@@ -8,11 +9,12 @@ export default function SecureViewer() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+  const { t } = useTranslation();
   const [isFocused, setIsFocused] = useState(true);
 
   // Extract file url and name from state
   const fileUrl = getFileUrl(location.state?.fileUrl);
-  const fileName = location.state?.fileName || 'ملف آمن';
+  const fileName = location.state?.fileName || t('studentDashboard.secureViewer.secureFile', 'Secure File');
   console.log(fileUrl);
   
   useEffect(() => {
@@ -86,7 +88,7 @@ export default function SecureViewer() {
             <h1 className="text-sm font-bold text-on-surface">{fileName}</h1>
             <p className="text-[10px] text-on-surface-variant flex items-center gap-1">
               <ShieldAlert size={12} className="text-emerald-500" />
-              <span>هذا الملف محمي بحقوق الطبع والنشر</span>
+              <span>{t('studentDashboard.secureViewer.copyright', 'This file is protected by copyright')}</span>
             </p>
           </div>
         </div>

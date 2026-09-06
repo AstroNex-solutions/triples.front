@@ -66,7 +66,7 @@ export function Textarea({ label, ...props }) {
 
 export function SubmitBtn({ loading, label }) {
   const { t } = useTranslation();
-  const btnLabel = label || t('student.account.updateBtn');
+  const btnLabel = label || t('studentDashboard.shared.save', 'Save');
   return (
     <button type="submit" disabled={loading} className="py-2.5 px-6 bg-primary text-on-primary font-bold text-sm rounded-2xl hover:bg-primary-hover disabled:opacity-60 transition-all flex items-center gap-2 shadow-glow cursor-pointer">
       {loading ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />} {btnLabel}

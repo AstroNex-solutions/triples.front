@@ -1,10 +1,12 @@
+import { useOutletContext } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import API from '../../../api/axios';
-import { Loader2, Search, Edit } from 'lucide-react';
+import { Loader2, Search, Edit, ChevronLeft, ChevronRight } from 'lucide-react';
 import { SectionHeader, Card, statusBadge, Modal, SubmitBtn } from '../ui/SharedUI';
 
-export default function EnrollmentsSection({ showMsg }) {
+export default function EnrollmentsSection() {
+  const { showMsg } = useOutletContext();
   const { t, i18n } = useTranslation();
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,6 +21,10 @@ export default function EnrollmentsSection({ showMsg }) {
   const [editForm, setEditForm] = useState({ id: null, start_date: '', end_date: '', status: '' });
   const [studentSearch, setStudentSearch] = useState('');
   const [courseSearch, setCourseSearch] = useState('');
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const fetchData = async () => {
     setLoading(true);
@@ -103,7 +109,7 @@ export default function EnrollmentsSection({ showMsg }) {
                   <th className="p-3 text-center">{t('admin.common.actions')}</th>
                 </tr>
               </thead>
-              <tbody>{enrollments.map(e => {
+              <tbody>{enrollments.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map(e => {
                 const cTitle = e.course?.[`title_${i18n.language}`] || e.course?.title;
                 return (
                   <tr key={e.id} className="bg-surface/50 hover:bg-surface/80 transition-all">
@@ -142,6 +148,34 @@ export default function EnrollmentsSection({ showMsg }) {
               })}</tbody>
             </table>
           </div>
+          
+          {/* Pagination Controls */}
+          {enrollments.length > itemsPerPage && (
+            <div className="flex items-center justify-between border-t border-outline-variant/20 pt-4 mt-4">
+              <span className="text-xs text-on-surface-variant">
+                عرض {(currentPage - 1) * itemsPerPage + 1} إلى {Math.min(currentPage * itemsPerPage, enrollments.length)} من {enrollments.length}
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  className="p-1.5 rounded-lg border border-outline-variant/30 hover:bg-surface-container-high disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronRight size={16} /> {/* Note: ChevronRight goes back in RTL */}
+                </button>
+                <span className="text-xs font-bold text-on-surface">
+                  {currentPage} / {Math.ceil(enrollments.length / itemsPerPage)}
+                </span>
+                <button
+                  disabled={currentPage === Math.ceil(enrollments.length / itemsPerPage)}
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(enrollments.length / itemsPerPage)))}
+                  className="p-1.5 rounded-lg border border-outline-variant/30 hover:bg-surface-container-high disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft size={16} /> {/* Note: ChevronLeft goes forward in RTL */}
+                </button>
+              </div>
+            </div>
+          )}
         </Card>
       )}
 

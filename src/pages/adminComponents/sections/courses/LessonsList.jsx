@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import API from '../../../../api/axios';
 import { 
   Loader2, Plus, Edit3, Trash2, Video, FileText, 
-  ClipboardList, Lock, Paperclip
+  ClipboardList, Lock, Paperclip, PlayCircle, GripVertical
 } from 'lucide-react';
 import { Modal } from '../../ui/SharedUI';
+import { Reorder } from 'framer-motion';
 
 const parseAttachments = (atts) => {
   if (!atts) return [];
@@ -20,6 +21,7 @@ export default function LessonsList({ showMsg, course, module, isSubModule, onMa
   const [submitting, setSubmitting] = useState(false);
 
   const [itemToDelete, setItemToDelete] = useState(null);
+  const [videoToPlay, setVideoToPlay] = useState(null);
 
   const fetchLessons = async () => {
     setLoading(true);
@@ -28,7 +30,12 @@ export default function LessonsList({ showMsg, course, module, isSubModule, onMa
       const res = await API.get(`/admin/courses/${course.id}/modules`);
       const allModules = res.data.modules || [];
       const currentModule = allModules.find(m => m.id === module.id);
-      setLessons(currentModule?.lessons || []);
+      
+      const moduleLessons = currentModule?.lessons || [];
+      // Sort by order
+      moduleLessons.sort((a, b) => (a.order || 0) - (b.order || 0));
+      
+      setLessons(moduleLessons);
     } catch (err) {
       showMsg('error', 'خطأ في جلب الدروس');
     } finally {
@@ -39,6 +46,24 @@ export default function LessonsList({ showMsg, course, module, isSubModule, onMa
   useEffect(() => {
     fetchLessons();
   }, [module.id]);
+
+  const handleReorder = async (newOrder) => {
+    // Optimistic UI update
+    setLessons(newOrder);
+
+    // Prepare payload
+    const payload = newOrder.map((item, index) => ({
+      id: item.id,
+      order: index + 1
+    }));
+
+    try {
+      await API.put('/admin/lessons/reorder', { items: payload });
+    } catch (err) {
+      showMsg('error', 'حدث خطأ أثناء حفظ ترتيب الدروس');
+      fetchLessons(); // revert on failure
+    }
+  };
 
   const deleteLesson = async () => {
     if (!itemToDelete) return;
@@ -70,10 +95,13 @@ export default function LessonsList({ showMsg, course, module, isSubModule, onMa
           <p className="text-xs text-on-surface-variant mt-1">ابدأ بإضافة أول درس لهذا القسم</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <Reorder.Group axis="y" values={lessons} onReorder={handleReorder} className="space-y-3">
           {lessons.map((l) => (
-            <div key={l.id} className="p-4 bg-surface rounded-2xl border border-outline-variant/30 hover:border-primary/40 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 group">
+            <Reorder.Item key={l.id} value={l} className="p-4 bg-surface rounded-2xl border border-outline-variant/30 hover:border-primary/40 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 group cursor-grab active:cursor-grabbing">
               <div className="flex items-center gap-3">
+                <div className="text-on-surface-variant/50 hover:text-primary transition-colors cursor-grab">
+                  <GripVertical size={20} />
+                </div>
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border font-bold text-sm ${
                   l.lesson_type === 'video' ? 'bg-primary/10 text-primary border-primary/20' :
                   l.lesson_type === 'article' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
@@ -102,6 +130,17 @@ export default function LessonsList({ showMsg, course, module, isSubModule, onMa
               </div>
               
               <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                {l.lesson_type === 'video' && l.video_url && (
+                  <>
+                    <button 
+                      onClick={() => setVideoToPlay(l)}
+                      className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-colors cursor-pointer text-xs font-bold flex items-center gap-1.5" title="تشغيل الفيديو"
+                    >
+                      <PlayCircle size={14} /> تشغيل
+                    </button>
+                    <div className="w-[1px] h-6 bg-outline-variant/30 mx-1"></div>
+                  </>
+                )}
                 <button 
                   onClick={() => onManageLesson(l)}
                   className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors cursor-pointer text-xs font-bold flex items-center gap-1.5" title="تعديل الدرس"
@@ -116,10 +155,40 @@ export default function LessonsList({ showMsg, course, module, isSubModule, onMa
                   <Trash2 size={16} />
                 </button>
               </div>
-            </div>
+            </Reorder.Item>
           ))}
-        </div>
+        </Reorder.Group>
       )}
+
+      {/* Video Player Modal */}
+      <Modal open={!!videoToPlay} onClose={() => setVideoToPlay(null)} title={`عرض الفيديو: ${videoToPlay?.title || ''}`}>
+        <div className="aspect-video w-full relative bg-surface-container-low rounded-xl overflow-hidden border border-outline-variant/30 flex items-center justify-center">
+          {videoToPlay?.video_url ? (
+            <iframe 
+              src={
+                videoToPlay.video_url.includes('http') 
+                  ? videoToPlay.video_url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')
+                  : `https://iframe.mediadelivery.net/embed/${videoToPlay.bunny_library_id || '245464'}/${videoToPlay.video_url}`
+              }
+              className="w-full h-full"
+              allowFullScreen
+              allow="autoplay; fullscreen"
+            />
+          ) : (
+            <div className="text-on-surface-variant font-bold text-sm">لا يوجد رابط فيديو متاح</div>
+          )}
+        </div>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
+          {videoToPlay?.video_url && (
+            <a href={videoToPlay.video_url.includes('http') ? videoToPlay.video_url : `https://iframe.mediadelivery.net/embed/${videoToPlay.bunny_library_id || '245464'}/${videoToPlay.video_url}`} target="_blank" rel="noreferrer" className="text-xs font-bold text-primary hover:underline">
+              فتح في نافذة جديدة
+            </a>
+          )}
+          <button onClick={() => setVideoToPlay(null)} className="px-5 py-2 rounded-xl text-xs font-bold bg-surface-container-low hover:bg-surface-variant text-on-surface transition-colors cursor-pointer">
+            إغلاق
+          </button>
+        </div>
+      </Modal>
 
       {/* Delete Item Confirmation Modal */}
       <Modal open={!!itemToDelete} onClose={() => setItemToDelete(null)} title="تأكيد الحذف">

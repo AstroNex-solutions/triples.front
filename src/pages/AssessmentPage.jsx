@@ -67,7 +67,7 @@ export default function AssessmentPage() {
   const classes = {
     btnPrimary: `inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-[#111827] text-white rounded-xl font-bold hover:bg-[#000000] transition-all duration-200 shadow-sm hover:shadow-gray-300 active:scale-[0.98]`,
     btnSecondary: `inline-flex items-center gap-2 px-5 py-2.5 bg-surface-variant text-on-surface hover:bg-surface-variant rounded-xl font-semibold transition-all border border-outline-variant`,
-    card: `${brand.cardBg} rounded-3xl border ${brand.border} shadow-sm p-6 sm:p-8`,
+    card: `bg-surface rounded-3xl border border-outline-variant shadow-sm p-6 sm:p-8`,
     iconBox: `w-14 h-14 rounded-2xl flex items-center justify-center border`,
   };
 
@@ -199,13 +199,13 @@ export default function AssessmentPage() {
   // --- شاشة التحميل الحديثة ---
   if (loading) {
     return (
-      <div className={`flex flex-col items-center justify-center min-h-screen ${brand.bodyBg} font-['Tajawal']`} dir="rtl">
+      <div className={`flex flex-col items-center justify-center min-h-screen bg-[#F8FAFC] font-['Tajawal']`} dir="rtl">
         <div className="relative flex items-center justify-center">
-            <div className={`w-20 h-20 border-4 border-[${brand.primaryLight}] rounded-full`}></div>
-            <div className={`absolute w-20 h-20 border-4 border-t-[${brand.primary}] rounded-full animate-spin`}></div>
+            <div className={`w-20 h-20 border-4 border-[#EDE0F5] rounded-full`}></div>
+            <div className={`absolute w-20 h-20 border-4 border-t-[#4A0072] rounded-full animate-spin`}></div>
             <img src="/logo.png" alt="SSS" className='absolute w-10 h-10 opacity-80'/>
         </div>
-        <p className={`mt-6 text-xl font-bold text-[${brand.primary}] animate-pulse`}>جاري تحضير الاختبار...</p>
+        <p className={`mt-6 text-xl font-bold text-[#4A0072] animate-pulse`}>جاري تحضير الاختبار...</p>
         <p className="text-on-surface-variant mt-2">Triple S Academy</p>
       </div>
     );
@@ -214,13 +214,13 @@ export default function AssessmentPage() {
   // --- شاشة عدم العثور على الاختبار ---
   if (!assessment) {
     return (
-      <div className={`flex items-center justify-center min-h-screen ${brand.bodyBg} px-4 font-['Tajawal']`} dir="rtl">
+      <div className={`flex items-center justify-center min-h-screen bg-[#F8FAFC] px-4 font-['Tajawal']`} dir="rtl">
         <div className="max-w-md w-full bg-surface rounded-3xl shadow-xl p-10 text-center space-y-6 border border-outline-variant">
-          <div className="w-24 h-24 bg-red-50 rounded-full mx-auto flex items-center justify-center text-[${brand.jordanRed}] border-4 border-red-100 shadow-inner">
+          <div className="w-24 h-24 bg-red-50 rounded-full mx-auto flex items-center justify-center text-[#CE1126] border-4 border-red-100 shadow-inner">
             <AlertCircle size={56} strokeWidth={1.5} />
           </div>
-          <h2 className={`text-3xl font-extrabold ${brand.textDark}`}>الاختبار غير موجود</h2>
-          <p className={`${brand.textMain} text-lg leading-relaxed`}>عفواً، لم يتم العثور على الاختبار المطلوب. ربما تم نقله، حذفه، أو انتهت صلاحية الرابط.</p>
+          <h2 className={`text-3xl font-extrabold text-on-surface`}>الاختبار غير موجود</h2>
+          <p className={`text-on-surface-variant text-lg leading-relaxed`}>عفواً، لم يتم العثور على الاختبار المطلوب. ربما تم نقله، حذفه، أو انتهت صلاحية الرابط.</p>
           <div className="pt-4">
             <Link to={`/dashboard`} className={`${classes.btnPrimary} w-full`}>
               <ArrowRight size={20} /> العودة للوحة التحكم
@@ -257,12 +257,12 @@ export default function AssessmentPage() {
       <div className="max-w-4xl mx-auto space-y-4 mt-4 pb-6 font-['Tajawal']">
         <div className="flex justify-between items-center bg-surface p-3 rounded-xl border border-outline-variant shadow-sm">
           <div className="flex items-center gap-2">
-             <div className={`p-2 rounded-lg bg-[${brand.primaryLight}] text-[${brand.primary}]`}>
+             <div className={`p-2 rounded-lg bg-[#EDE0F5] text-[#4A0072]`}>
                 <BookOpen size={18}/>
              </div>
-             <span className={`${brand.textDark} font-bold text-base`}>مراجعة البطاقات ذهنياً</span>
+             <span className={`text-on-surface font-bold text-base`}>مراجعة البطاقات ذهنياً</span>
           </div>
-          <span className="text-[${brand.primary}] font-bold text-sm bg-[${brand.primaryLight}] px-3 py-1 rounded-full">
+          <span className="text-[#4A0072] font-bold text-sm bg-[#EDE0F5] px-3 py-1 rounded-full">
             البطاقة {currentCardIdx + 1} / {questions.length}
           </span>
         </div>
@@ -273,11 +273,11 @@ export default function AssessmentPage() {
             
             {/* وجه البطاقة (السؤال) */}
             <div 
-              className={`absolute inset-0 w-full h-full bg-surface border-2 ${brand.border} rounded-2xl p-6 flex flex-col items-center justify-center text-center [backface-visibility:hidden] group-hover:border-[${brand.primaryBorder}] transition-colors`}
+              className={`absolute inset-0 w-full h-full bg-surface border-2 border-outline-variant rounded-2xl p-6 flex flex-col items-center justify-center text-center [backface-visibility:hidden] group-hover:border-[#C9A8D8] transition-colors`}
               onClick={(e) => isMCQ && e.stopPropagation()} // منع القلب التلقائي في حالة الخيارات
             >
-              <HelpCircle size={40} className={`text-[${brand.primary}] mb-3 opacity-20`} />
-              <h3 className={`text-xl font-bold ${brand.textDark} leading-tight ${isMCQ ? 'mb-4' : ''}`}>{currentQ.question_text}</h3>
+              <HelpCircle size={40} className={`text-[#4A0072] mb-3 opacity-20`} />
+              <h3 className={`text-xl font-bold text-on-surface leading-tight ${isMCQ ? 'mb-4' : ''}`}>{currentQ.question_text}</h3>
               
               {isMCQ ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full mt-2">
@@ -289,14 +289,14 @@ export default function AssessmentPage() {
                           setUserAnswers(prev => ({ ...prev, [currentQ.id]: opt }));
                           setIsFlipped(true); // اقلب البطاقة لإظهار النتيجة
                        }}
-                       className={`p-3 bg-surface-variant hover:bg-[${brand.primaryLight}] text-sm font-bold text-[${brand.textDark}] rounded-xl border border-outline-variant hover:border-[${brand.primary}] transition-all text-center flex items-center justify-center`}
+                       className={`p-3 bg-surface-variant hover:bg-[#EDE0F5] text-sm font-bold text-[text-on-surface] rounded-xl border border-outline-variant hover:border-[#4A0072] transition-all text-center flex items-center justify-center`}
                     >
                       {opt}
                     </button>
                   ))}
                 </div>
               ) : (
-                <div className={`absolute bottom-4 flex items-center gap-1.5 text-xs font-medium text-[${brand.primary}] opacity-70`}>
+                <div className={`absolute bottom-4 flex items-center gap-1.5 text-xs font-medium text-[#4A0072] opacity-70`}>
                   <RotateCcw size={14} /> انقر لإظهار الإجابة
                 </div>
               )}
@@ -304,7 +304,7 @@ export default function AssessmentPage() {
             
             {/* ظهر البطاقة (الإجابة والنتيجة) */}
             <div 
-              className={`absolute inset-0 w-full h-full bg-[${brand.primaryLight}] border-2 border-[${brand.primaryBorder}] rounded-2xl p-6 flex flex-col items-center justify-center text-center [backface-visibility:hidden] [transform:rotateY(180deg)] shadow-inner`}
+              className={`absolute inset-0 w-full h-full bg-[#EDE0F5] border-2 border-[#C9A8D8] rounded-2xl p-6 flex flex-col items-center justify-center text-center [backface-visibility:hidden] [transform:rotateY(180deg)] shadow-inner`}
               onClick={(e) => e.stopPropagation()} 
             >
               {isMCQ ? (
@@ -345,10 +345,10 @@ export default function AssessmentPage() {
                  </div>
               ) : (
                 <>
-                  <CheckCircle2 size={40} className={`text-[${brand.primary}] mb-2 opacity-30 hidden sm:block`} />
+                  <CheckCircle2 size={40} className={`text-[#4A0072] mb-2 opacity-30 hidden sm:block`} />
                   <div className="space-y-3 w-full max-w-xl overflow-y-auto max-h-[120px] pr-2 custom-scrollbar mb-8">
                       <div className="bg-surface p-4 rounded-xl border border-purple-100 shadow-sm">
-                            <p className={`text-base font-bold text-[${brand.textDark}] leading-relaxed`}>الإجابة الصحيحة غير متوفرة لهذا النوع، هل كنت تعرفها؟</p>
+                            <p className={`text-base font-bold text-[text-on-surface] leading-relaxed`}>الإجابة الصحيحة غير متوفرة لهذا النوع، هل كنت تعرفها؟</p>
                       </div>
                   </div>
                   
@@ -410,12 +410,12 @@ export default function AssessmentPage() {
         const isAnswered = userAnswers[q.id] !== undefined && userAnswers[q.id] !== '';
 
         return (
-          <div key={q.id} id={`question-${q.id}`} className={`bg-surface rounded-xl border transition-all duration-300 p-4 shadow-sm hover:shadow-md ${isAnswered ? `border-[${brand.primaryBorder}] shadow-purple-50` : 'border-outline-variant'}`}>
+          <div key={q.id} id={`question-${q.id}`} className={`bg-surface rounded-xl border transition-all duration-300 p-4 shadow-sm hover:shadow-md ${isAnswered ? `border-[#C9A8D8] shadow-purple-50` : 'border-outline-variant'}`}>
             <div className="flex items-start gap-3 mb-3 border-b border-outline-variant pb-3">
-              <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center font-black ${isAnswered ? `bg-[${brand.primary}] text-white` : 'bg-surface-variant text-on-surface-variant'} border ${isAnswered ? `border-[${brand.primaryHover}]`: 'border-outline-variant'}`}>
+              <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center font-black ${isAnswered ? `bg-[#4A0072] text-white` : 'bg-surface-variant text-on-surface-variant'} border ${isAnswered ? `border-[#2D0054]`: 'border-outline-variant'}`}>
                 <span className='text-lg'>{idx + 1}</span>
               </div>
-              <h3 className={`text-lg font-bold ${brand.textDark} pt-1.5 leading-snug`}>
+              <h3 className={`text-lg font-bold text-on-surface pt-1.5 leading-snug`}>
                 {q.question_text}
               </h3>
             </div>
@@ -424,7 +424,7 @@ export default function AssessmentPage() {
               <div className="sm:pr-14 mt-2">
                 <textarea 
                   rows={q.question_type === 'essay' ? 4 : 2}
-                  className={`w-full bg-surface-variant border ${brand.border} rounded-xl p-3 text-[${brand.textDark}] focus:border-[${brand.primary}] focus:ring-2 focus:ring-[${brand.primaryLight}] outline-none transition-all resize-none text-sm leading-relaxed placeholder:text-on-surface-variant`}
+                  className={`w-full bg-surface-variant border border-outline-variant rounded-xl p-3 text-[text-on-surface] focus:border-[#4A0072] focus:ring-2 focus:ring-[#EDE0F5] outline-none transition-all resize-none text-sm leading-relaxed placeholder:text-on-surface-variant`}
                   placeholder="اكتب إجابتك هنا..."
                   value={userAnswers[q.id] || ''}
                   onChange={(e) => handleTextAnswer(q.id, e.target.value)}
@@ -439,8 +439,8 @@ export default function AssessmentPage() {
                       key={oIdx} 
                       className={`relative flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer overflow-hidden group ${
                         isSelected 
-                          ? `border-[${brand.selection}] bg-purple-50 shadow-inner` 
-                          : `border-outline-variant bg-surface hover:border-[${brand.primaryBorder}] hover:bg-[${brand.primaryLight}]/50`
+                          ? `border-[#5E35B1] bg-purple-50 shadow-inner` 
+                          : `border-outline-variant bg-surface hover:border-[#C9A8D8] hover:bg-[#EDE0F5]/50`
                       }`}
                     >
                       <input 
@@ -454,18 +454,18 @@ export default function AssessmentPage() {
                       
                       {/* مظهر خيار الراديو المخصص */}
                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors bg-surface ${
-                        isSelected ? `border-[${brand.selection}]` : 'border-outline-variant0 group-hover:border-purple-300'
+                        isSelected ? `border-[#5E35B1]` : 'border-outline-variant0 group-hover:border-purple-300'
                       }`}>
-                        {isSelected && <div className={`w-2.5 h-2.5 rounded-full bg-[${brand.selection}]`} />}
+                        {isSelected && <div className={`w-2.5 h-2.5 rounded-full bg-[#5E35B1]`} />}
                       </div>
                       
-                      <span className={`font-semibold text-sm leading-snug ${isSelected ? `text-[${brand.selection}]` : brand.textMain}`}>
+                      <span className={`font-semibold text-sm leading-snug ${isSelected ? `text-[#5E35B1]` : brand.textMain}`}>
                         {opt}
                       </span>
                       
                       {/* أيقونة صح خلفية خفيفة عند الاختيار */}
                       {isSelected && (
-                        <div className={`absolute left-5 top-1/2 -translate-y-1/2 text-[${brand.selection}] opacity-10`}>
+                        <div className={`absolute left-5 top-1/2 -translate-y-1/2 text-[#5E35B1] opacity-10`}>
                           <Check size={50} strokeWidth={3} />
                         </div>
                       )}
@@ -481,14 +481,14 @@ export default function AssessmentPage() {
   );
 
   return (
-    <div className={`min-h-screen ${brand.bodyBg} font-['Tajawal']`} dir="rtl">
+    <div className={`min-h-screen bg-[#F8FAFC] font-['Tajawal']`} dir="rtl">
       
       {/* 👑 ترويسة الهوية الاحترافية (Header) */}
-      <header className={`bg-surface/95 backdrop-blur-sm border-b ${brand.border} shadow-sm sticky top-0 z-50`}>
+      <header className={`bg-surface/95 backdrop-blur-sm border-b border-outline-variant shadow-sm sticky top-0 z-50`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           {/* الشعار والاسم */}
           <div className="flex items-center gap-2">
-            <Link to="/dashboard" className={`w-8 h-8 rounded-full bg-[${brand.primary}] flex items-center justify-center text-white shadow-sm hover:scale-105 transition-transform`}>
+            <Link to="/dashboard" className={`w-8 h-8 rounded-full bg-[#4A0072] flex items-center justify-center text-white shadow-sm hover:scale-105 transition-transform`}>
               <img src="/logo.png" alt="logo" className='w-6 h-6'/>
             </Link>
           </div>
@@ -496,7 +496,7 @@ export default function AssessmentPage() {
           {/* عنوان الاختبار وزر الخروج */}
           <div className="flex items-center gap-3">
              {hasStarted && !result && (
-                <div className={`text-sm font-semibold ${brand.textMain} hidden md:block max-w-sm truncate`}>
+                <div className={`text-sm font-semibold text-on-surface-variant hidden md:block max-w-sm truncate`}>
                     {assessment.title}
                 </div>
              )}
@@ -534,18 +534,18 @@ export default function AssessmentPage() {
         <div className="flex items-center justify-center p-4 mt-6 font-['Tajawal'] overflow-hidden">
           <div className="w-full max-w-3xl bg-surface rounded-3xl shadow-xl shadow-purple-100/30 relative border border-outline-variant">
             
-            <div className={`absolute top-0 left-0 right-0 h-2 bg-[${brand.primary}] rounded-t-full`}></div>
+            <div className={`absolute top-0 left-0 right-0 h-2 bg-[#4A0072] rounded-t-full`}></div>
 
             <div className="px-6 sm:px-10 py-10 text-center relative z-10">
-              <div className={`w-20 h-20 mx-auto rounded-2xl bg-[${brand.primaryLight}] flex items-center justify-center text-[${brand.primary}] mb-6 border-2 border-white shadow-md ring-1 ring-purple-50`}>
+              <div className={`w-20 h-20 mx-auto rounded-2xl bg-[#EDE0F5] flex items-center justify-center text-[#4A0072] mb-6 border-2 border-white shadow-md ring-1 ring-purple-50`}>
                 {isAssignment ? <FileText size={40} strokeWidth={1.5} /> : isFlashcard ? <BookOpen size={40} strokeWidth={1.5} /> : <Target size={40} strokeWidth={1.5} />}
               </div>
               
-              <span className={`inline-block bg-[${brand.primaryLight}] text-[${brand.primary}] px-3 py-1 rounded-full font-bold text-xs mb-2`}>
+              <span className={`inline-block bg-[#EDE0F5] text-[#4A0072] px-3 py-1 rounded-full font-bold text-xs mb-2`}>
                 {isAssignment ? 'تكليف دراسي' : isFlashcard ? 'بطاقات مراجعة' : 'اختبار تقييمي'}
               </span>
-              <h2 className={`text-2xl sm:text-3xl font-black ${brand.textDark} mb-3 leading-tight`}>{assessment.title}</h2>
-              {assessment.description && <p className={`${brand.textMain} text-sm mb-6 max-w-xl mx-auto leading-relaxed`}>{assessment.description}</p>}
+              <h2 className={`text-2xl sm:text-3xl font-black text-on-surface mb-3 leading-tight`}>{assessment.title}</h2>
+              {assessment.description && <p className={`text-on-surface-variant text-sm mb-6 max-w-xl mx-auto leading-relaxed`}>{assessment.description}</p>}
               
               {/* شبكة المعلومات */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 py-6 border-y border-outline-variant mb-8 bg-surface-variant/50 rounded-2xl px-4">
@@ -554,27 +554,27 @@ export default function AssessmentPage() {
                     <div className="flex flex-col items-center gap-1 p-3 rounded-xl bg-surface border border-outline-variant shadow-sm">
                       <div className={`p-2 rounded-lg bg-blue-50 text-blue-600`}><Clock size={20} /></div>
                       <span className="text-xs font-semibold text-on-surface-variant">المدة</span>
-                      <span className={`text-base font-extrabold ${brand.textDark}`}>{assessment.duration_minutes ? `${assessment.duration_minutes} دقيقة` : 'مفتوح'}</span>
+                      <span className={`text-base font-extrabold text-on-surface`}>{assessment.duration_minutes ? `${assessment.duration_minutes} دقيقة` : 'مفتوح'}</span>
                     </div>
                     
                     <div className="flex flex-col items-center gap-1 p-3 rounded-xl bg-surface border border-outline-variant shadow-sm">
                       <div className={`p-2 rounded-lg bg-amber-50 text-amber-600`}><LayoutList size={20} /></div>
                       <span className="text-xs font-semibold text-on-surface-variant">الأسئلة</span>
-                      <span className={`text-base font-extrabold ${brand.textDark}`}>{questions.length} سؤال</span>
+                      <span className={`text-base font-extrabold text-on-surface`}>{questions.length} سؤال</span>
                     </div>
                     
                     <div className="flex flex-col items-center gap-1 p-3 rounded-xl bg-surface border border-outline-variant shadow-sm">
-                      <div className={`p-2 rounded-lg bg-green-50 text-[${brand.jordanGreen}]`}><Award size={20} /></div>
+                      <div className={`p-2 rounded-lg bg-green-50 text-[#007A3D]`}><Award size={20} /></div>
                       <span className="text-xs font-semibold text-on-surface-variant">الدرجة</span>
-                      <span className={`text-base font-extrabold ${brand.textDark}`}>{assessment.total_marks || 100}</span>
+                      <span className={`text-base font-extrabold text-on-surface`}>{assessment.total_marks || 100}</span>
                     </div>
                   </>
                 )}
                 {isFlashcard && (
                   <div className="flex flex-col items-center gap-1 p-3 rounded-xl bg-surface border border-outline-variant shadow-sm sm:col-span-3">
-                    <div className={`p-2 rounded-lg bg-[${brand.primaryLight}] text-[${brand.primary}]`}><BookOpen size={24} /></div>
+                    <div className={`p-2 rounded-lg bg-[#EDE0F5] text-[#4A0072]`}><BookOpen size={24} /></div>
                     <span className="text-xs font-semibold text-on-surface-variant">عدد البطاقات</span>
-                    <span className={`text-xl font-extrabold ${brand.textDark}`}>{questions.length}</span>
+                    <span className={`text-xl font-extrabold text-on-surface`}>{questions.length}</span>
                   </div>
                 )}
               </div>
@@ -594,10 +594,10 @@ export default function AssessmentPage() {
       {hasStarted && !result && (
         <>
           {/* شريط التقدم والوقت المثبت العلوي (تحت الـ Header مباشرة) */}
-          <div className="sticky top-14 z-40 bg-surface/95 backdrop-blur-sm border-b ${brand.border} shadow-sm font-['Tajawal']">
+          <div className="sticky top-14 z-40 bg-surface/95 backdrop-blur-sm border-b border-outline-variant shadow-sm font-['Tajawal']">
               {/* شريط التقدم اللطيف */}
               <div className="h-2 w-full bg-surface-variant overflow-hidden">
-                <div className={`h-full bg-[${brand.primary}] transition-all duration-500 ease-out rounded-l-full relative`} style={{ width: `${progressPercentage}%` }}>
+                <div className={`h-full bg-[#4A0072] transition-all duration-500 ease-out rounded-l-full relative`} style={{ width: `${progressPercentage}%` }}>
                     <div className='absolute inset-0 bg-surface/30 animate-pulse'></div>
                 </div>
               </div>
@@ -605,7 +605,7 @@ export default function AssessmentPage() {
               <div className="max-w-7xl mx-auto px-4 sm:px-6 h-12 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className={`bg-surface-variant text-on-surface-variant px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 border border-outline-variant`}>
-                    <Target size={14} className='text-[${brand.primary}]' />
+                    <Target size={14} className='text-[#4A0072]' />
                     <span>
                         {isFlashcard 
                             ? `تم العرض: ${currentCardIdx + 1} / ${questions.length}` 
@@ -618,10 +618,10 @@ export default function AssessmentPage() {
                 {timeLeft !== null && assessment.type !== 'flashcard' && (
                   <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 font-bold transition-all duration-300 ${
                     timeLeft < 120
-                      ? `bg-red-50 border-[${brand.jordanRed}] text-[${brand.jordanRed}] animate-pulse` 
-                      : `bg-surface ${brand.border} ${brand.textDark}`
+                      ? `bg-red-50 border-[#CE1126] text-[#CE1126] animate-pulse` 
+                      : `bg-surface border-outline-variant text-on-surface`
                   }`}>
-                    <Clock size={16} className={timeLeft < 120 ? `text-[${brand.jordanRed}]` : 'text-on-surface-variant'} />
+                    <Clock size={16} className={timeLeft < 120 ? `text-[#CE1126]` : 'text-on-surface-variant'} />
                     <span dir="ltr" className="text-sm mt-0.5 tabular-nums">{formatTime(timeLeft)}</span>
                   </div>
                 )}
@@ -635,7 +635,7 @@ export default function AssessmentPage() {
 
           {/* شريط الإنهاء السفلي المثبت (فقط للاختبارات والتكليفات) */}
           {hasStarted && !result && questions.length > 0 && !isFlashcard && (
-            <div className="fixed bottom-0 left-0 right-0 p-3 bg-surface/95 backdrop-blur-sm border-t ${brand.border} shadow-[0_-5px_20px_-10px_rgba(0,0,0,0.1)] z-40 flex justify-center font-['Tajawal']">
+            <div className="fixed bottom-0 left-0 right-0 p-3 bg-surface/95 backdrop-blur-sm border-t border-outline-variant shadow-[0_-5px_20px_-10px_rgba(0,0,0,0.1)] z-40 flex justify-center font-['Tajawal']">
               <button 
                 onClick={() => handleSubmitQuiz(false)} 
                 className={`${classes.btnPrimary} w-full max-w-sm text-sm py-2.5 rounded-xl group shadow-sm`}
@@ -651,7 +651,7 @@ export default function AssessmentPage() {
       {/* --- شاشة النتيجة الاحترافية --- */}
       {result && (
         <div className="flex items-center justify-center p-4 mt-6 md:mt-10 font-['Tajawal'] pb-10 overflow-hidden">
-          <div className={`w-full max-w-2xl bg-surface rounded-[2rem] shadow-xl p-8 sm:p-10 text-center relative border ${brand.border}`}>
+          <div className={`w-full max-w-2xl bg-surface rounded-[2rem] shadow-xl p-8 sm:p-10 text-center relative border border-outline-variant`}>
             
             {/* خط هوية علوي بلون الحالة */}
             <div className={`absolute top-0 left-0 right-0 h-2 rounded-t-[2rem] ${
@@ -680,7 +680,7 @@ export default function AssessmentPage() {
                 }
               </h2>
 
-              <p className={`${brand.textMain} text-sm sm:text-base max-w-lg mx-auto leading-relaxed`}>
+              <p className={`text-on-surface-variant text-sm sm:text-base max-w-lg mx-auto leading-relaxed`}>
                 {isAssignment 
                     ? 'شكراً لجهودك. سيقوم القسم الأكاديمي بمراجعة ما قدمته ورصد الدرجة في أقرب وقت ممكن.'
                     : result.passed
@@ -695,7 +695,7 @@ export default function AssessmentPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 relative z-10">
                     <div className="text-center sm:text-right sm:border-l border-outline-variant sm:pl-6">
                       <p className="text-on-surface-variant font-bold mb-1 text-xs">الدرجة المستحقة</p>
-                      <p className={`text-4xl font-black ${brand.textDark}`}>{result.score}<span className="text-xl text-on-surface-variant font-bold"> / {result.totalMarks}</span></p>
+                      <p className={`text-4xl font-black text-on-surface`}>{result.score}<span className="text-xl text-on-surface-variant font-bold"> / {result.totalMarks}</span></p>
                     </div>
                     <div className="text-center sm:text-right">
                       <p className="text-on-surface-variant font-bold mb-1 text-xs">النسبة المئوية</p>

@@ -1,3 +1,4 @@
+import { useOutletContext } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import API from '../../../api/axios';
@@ -5,7 +6,8 @@ import { Loader2, Trash2, Edit, ClipboardList } from 'lucide-react';
 import { SectionHeader, Card, statusBadge, Modal, Select, Input, Textarea, SubmitBtn, Badge } from '../ui/SharedUI';
 import QuestionsManager from '../ui/QuestionsManager';
 
-export default function SelfAssessmentProductsSection({ showMsg }) {
+export default function SelfAssessmentProductsSection() {
+  const { showMsg } = useOutletContext();
   const { t, i18n } = useTranslation();
   const [products, setProducts] = useState([]);
   const [courses, setCourses] = useState([]);

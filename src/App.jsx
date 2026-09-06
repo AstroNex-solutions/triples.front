@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Routes, Route, Outlet } from 'react-router-dom';
+import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -18,23 +18,58 @@ import QuestionBankPage from './pages/QuestionBankPage';
 import FlashcardsStorePage from './pages/FlashcardsStorePage';
 import FlashcardStudyPage from './pages/FlashcardStudyPage';
 import ArticlesPage from './pages/ArticlesPage';
+import ArticleDetailPage from './pages/ArticleDetailPage';
 import LibraryPage from './pages/LibraryPage';
 import CartPage from './pages/CartPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import StudentDashboard from './pages/StudentDashboard';
 import SecureViewer from './pages/student/SecureViewer';
+import OverviewSection from './pages/student/OverviewSection';
+import AccountSection from './pages/student/AccountSection';
+import CoursesSection from './pages/student/CoursesSection';
+import ScheduleSection from './pages/student/ScheduleSection';
+import AssessmentsSection from './pages/student/AssessmentsSection';
+import SelfAssessmentsSection from './pages/student/SelfAssessmentsSection';
+import QuestionBanksSection from './pages/student/QuestionBanksSection';
+import OrdersSection from './pages/student/OrdersSection';
+import LibrarySection from './pages/student/LibrarySection';
+import SupportSection from './pages/student/SupportSection';
+import FlashcardsStudentSection from './pages/student/FlashcardsStudentSection';
 import PaymentResultPage from './pages/PaymentResultPage';
 import AdminDashboard from './pages/AdminDashboard';
 import ContactPage from './pages/ContactPage';
-import AboutPage from './pages/AboutPage';
+import AboutUsPage from './pages/AboutUsPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import InstructorDashboard from './pages/InstructorDashboard';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 
+// Admin Sections
+import DashboardSection from './pages/adminComponents/sections/DashboardSection';
+import AdminUsersSection from './pages/adminComponents/sections/UsersSection';
+import AdminSessionsSection from './pages/adminComponents/sections/SessionsSection';
+import AdminCategoriesSection from './pages/adminComponents/sections/CategoriesSection';
+import AdminCoursesSection from './pages/adminComponents/sections/CoursesSection';
+import AdminEnrollmentsSection from './pages/adminComponents/sections/EnrollmentsSection';
+import AdminAssessmentsSection from './pages/adminComponents/sections/AssessmentsSection';
+import AdminCouponsSection from './pages/adminComponents/sections/CouponsSection';
+import AdminOrdersSection from './pages/adminComponents/sections/OrdersSection';
+import AdminReviewsSection from './pages/adminComponents/sections/ReviewsSection';
+import AdminBannersSection from './pages/adminComponents/sections/BannersSection';
+import AdminMessagesSection from './pages/adminComponents/sections/MessagesSection';
+import AdminArticlesSection from './pages/adminComponents/sections/ArticlesSection';
+import AdminBooksSection from './pages/adminComponents/sections/BooksSection';
+import AdminFlashcardsSection from './pages/adminComponents/sections/FlashcardsAdminSection';
+import AdminQuestionBankProductsSection from './pages/adminComponents/sections/QuestionBankProductsSection';
+import AdminSelfAssessmentProductsSection from './pages/adminComponents/sections/SelfAssessmentProductsSection';
+import AdminPartnersSection from './pages/adminComponents/sections/PartnersSection';
+import AdminFaqsSection from './pages/adminComponents/sections/FaqsSection';
+import AdminPagesSection from './pages/adminComponents/sections/PagesSection';
+
 import { useThemeStore } from './store/themeStore';
+import AboutPage from './pages/AboutPage';
 
 // Layout يحتوي على Navbar و Footer - يستخدم لكل الصفحات العادية
 function MainLayout({ showSplash }) {
@@ -70,12 +105,47 @@ export default function App() {
 
         {/* ===== Admin Dashboard - بدون Navbar ولا Footer ===== */}
         <Route element={<ProtectedRoute allowedRoles={['Admin']} />}>
-          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin" element={<AdminDashboard />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<DashboardSection />} />
+            <Route path="users" element={<AdminUsersSection />} />
+            <Route path="sessions" element={<AdminSessionsSection />} />
+            <Route path="categories" element={<AdminCategoriesSection />} />
+            <Route path="courses" element={<AdminCoursesSection />} />
+            <Route path="enrollments" element={<AdminEnrollmentsSection />} />
+            <Route path="assessments" element={<AdminAssessmentsSection />} />
+            <Route path="coupons" element={<AdminCouponsSection />} />
+            <Route path="orders" element={<AdminOrdersSection />} />
+            <Route path="reviews" element={<AdminReviewsSection />} />
+            <Route path="banners" element={<AdminBannersSection />} />
+            <Route path="messages" element={<AdminMessagesSection />} />
+            <Route path="articles" element={<AdminArticlesSection />} />
+            <Route path="books" element={<AdminBooksSection />} />
+            <Route path="flashcard-products" element={<AdminFlashcardsSection />} />
+            <Route path="question-bank-products" element={<AdminQuestionBankProductsSection />} />
+            <Route path="self-assessment-products" element={<AdminSelfAssessmentProductsSection />} />
+            <Route path="partners" element={<AdminPartnersSection />} />
+            <Route path="faqs" element={<AdminFaqsSection />} />
+            <Route path="pages" element={<AdminPagesSection />} />
+          </Route>
         </Route>
 
         {/* ===== Student Dashboard - بدون Navbar ولا Footer ===== */}
         <Route element={<ProtectedRoute allowedRoles={['Student']} />}>
-          <Route path="/dashboard" element={<StudentDashboard />} />
+          <Route path="/dashboard" element={<StudentDashboard />}>
+            <Route index element={<Navigate to="overview" replace />} />
+            <Route path="overview" element={<OverviewSection />} />
+            <Route path="account" element={<AccountSection />} />
+            <Route path="courses" element={<CoursesSection />} />
+            <Route path="flashcards" element={<FlashcardsStudentSection />} />
+            <Route path="schedule" element={<ScheduleSection />} />
+            <Route path="assessments" element={<AssessmentsSection />} />
+            <Route path="self_assessments" element={<SelfAssessmentsSection />} />
+            <Route path="question_banks" element={<QuestionBanksSection />} />
+            <Route path="orders" element={<OrdersSection />} />
+            <Route path="library" element={<LibrarySection />} />
+            <Route path="support" element={<SupportSection />} />
+          </Route>
           <Route path="/assessment/:assessmentId" element={<AssessmentPage />} />
           <Route path="/self-assessment/:id" element={<SelfAssessmentPage />} />
           <Route path="/question-bank/:id" element={<QuestionBankPage />} />
@@ -98,10 +168,13 @@ export default function App() {
 
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
+          {/* Extras / Features */}
+          <Route path="/about" element={<AboutUsPage />} />
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/courses/:slug" element={<CourseDetailPage />} />
           <Route path="/flashcards-store" element={<FlashcardsStorePage />} />
           <Route path="/articles" element={<ArticlesPage />} />
+          <Route path="/articles/:id" element={<ArticleDetailPage />} />
           <Route path="/library" element={<LibraryPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/contact" element={<ContactPage />} />

@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../context/AuthContext';
 import {
@@ -9,33 +9,13 @@ import {
 } from 'lucide-react';
 
 import { Avatar } from './adminComponents/ui/SharedUI';
-import DashboardSection from './adminComponents/sections/DashboardSection';
-import UsersSection from './adminComponents/sections/UsersSection';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import ThemeToggle from '../components/ThemeToggle';
-import SessionsSection from './adminComponents/sections/SessionsSection';
-import CategoriesSection from './adminComponents/sections/CategoriesSection';
-import CoursesSection from './adminComponents/sections/CoursesSection';
-import EnrollmentsSection from './adminComponents/sections/EnrollmentsSection';
-import AssessmentsSection from './adminComponents/sections/AssessmentsSection';
-import CouponsSection from './adminComponents/sections/CouponsSection';
-import OrdersSection from './adminComponents/sections/OrdersSection';
-import ReviewsSection from './adminComponents/sections/ReviewsSection';
-import BannersSection from './adminComponents/sections/BannersSection';
-import MessagesSection from './adminComponents/sections/MessagesSection';
-import ArticlesSection from './adminComponents/sections/ArticlesSection';
-import BooksSection from './adminComponents/sections/BooksSection';
-import FlashcardsAdminSection from './adminComponents/sections/FlashcardsAdminSection';
-import QuestionBankProductsSection from './adminComponents/sections/QuestionBankProductsSection';
-import SelfAssessmentProductsSection from './adminComponents/sections/SelfAssessmentProductsSection';
-import PartnersSection from './adminComponents/sections/PartnersSection';
-import FaqsSection from './adminComponents/sections/FaqsSection';
-import PagesSection from './adminComponents/sections/PagesSection';
-import BrokenVideosList from './adminComponents/BrokenVideosList';
 
 export default function AdminDashboard() {
   const { t, i18n } = useTranslation();
-  const [activeSection, setActiveSection] = useState('dashboard');
+  const location = useLocation();
+  const activeSection = location.pathname.split('/').pop() || 'dashboard';
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [globalMsg, setGlobalMsg] = useState({ type: '', text: '' });
   
@@ -56,7 +36,7 @@ export default function AdminDashboard() {
         { key: 'users', label: t('admin.dashboard.items.users'), icon: Users },
         { key: 'courses', label: t('admin.dashboard.items.courses'), icon: BookOpen },
         { key: 'enrollments', label: t('admin.dashboard.items.enrollments'), icon: GraduationCap },
-        { key: 'assessments', label: t('admin.dashboard.items.assessments'), icon: ClipboardList },
+        // { key: 'assessments', label: t('admin.dashboard.items.assessments'), icon: ClipboardList },
       ]
     },
     {
@@ -65,9 +45,9 @@ export default function AdminDashboard() {
         { key: 'categories', label: t('admin.dashboard.items.categories'), icon: Tag },
         { key: 'coupons', label: t('admin.dashboard.items.coupons'), icon: Ticket },
         { key: 'orders', label: t('admin.dashboard.items.orders'), icon: Package },
-        { key: 'flashcard-products', label: t('admin.dashboard.items.flashcards'), icon: BookMarked },
-        { key: 'question-bank-products', label: t('admin.dashboard.items.questionBankProducts'), icon: Database },
-        { key: 'self-assessment-products', label: t('admin.dashboard.items.selfAssessmentProducts'), icon: Target },
+        // { key: 'flashcard-products', label: t('admin.dashboard.items.flashcards'), icon: BookMarked },
+        // { key: 'question-bank-products', label: t('admin.dashboard.items.questionBankProducts'), icon: Database },
+        // { key: 'self-assessment-products', label: t('admin.dashboard.items.selfAssessmentProducts'), icon: Target },
         { key: 'reviews', label: t('admin.dashboard.items.reviews'), icon: Star },
       ]
     },
@@ -139,7 +119,7 @@ export default function AdminDashboard() {
                 return (
                   <button
                     key={item.key}
-                    onClick={() => setActiveSection(item.key)}
+                    onClick={() => navigate(`/admin/${item.key}`)}
                     title={!sidebarOpen ? item.label : undefined}
                     className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
                       isActive
@@ -181,6 +161,17 @@ export default function AdminDashboard() {
             </span>
           </div>
           <div className="flex items-center gap-3">
+            <a 
+              href="/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="p-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors flex items-center gap-2 text-xs font-bold"
+              title={i18n.language === 'ar' ? 'الاطلاع على الموقع' : 'View Website'}
+            >
+              <Globe size={18} />
+              <span className="hidden sm:inline">{i18n.language === 'ar' ? 'عرض الموقع' : 'View Website'}</span>
+            </a>
+            <div className="w-px h-6 bg-outline-variant/30 hidden sm:block"></div>
             <ThemeToggle />
             <LanguageSwitcher />
             <Avatar name="Admin User" size="sm" />
@@ -202,27 +193,7 @@ export default function AdminDashboard() {
           )}
 
           {/* Active Section Rendering */}
-          {activeSection === 'dashboard' && <DashboardSection />}
-          {activeSection === 'users' && <UsersSection showMsg={showMsg} />}
-          {activeSection === 'sessions' && <SessionsSection showMsg={showMsg} />}
-          {activeSection === 'categories' && <CategoriesSection showMsg={showMsg} />}
-          {activeSection === 'courses' && <CoursesSection showMsg={showMsg} />}
-          {activeSection === 'enrollments' && <EnrollmentsSection showMsg={showMsg} />}
-          {activeSection === 'assessments' && <AssessmentsSection showMsg={showMsg} />}
-          {activeSection === 'coupons' && <CouponsSection showMsg={showMsg} />}
-          {activeSection === 'orders' && <OrdersSection showMsg={showMsg} />}
-          {activeSection === 'reviews' && <ReviewsSection showMsg={showMsg} />}
-          {activeSection === 'banners' && <BannersSection showMsg={showMsg} />}
-          {activeSection === 'messages' && <MessagesSection showMsg={showMsg} />}
-          {activeSection === 'articles' && <ArticlesSection showMsg={showMsg} />}
-          {activeSection === 'books' && <BooksSection showMsg={showMsg} />}
-          {activeSection === 'flashcard-products' && <FlashcardsAdminSection showMsg={showMsg} />}
-          {activeSection === 'question-bank-products' && <QuestionBankProductsSection showMsg={showMsg} />}
-          {activeSection === 'self-assessment-products' && <SelfAssessmentProductsSection showMsg={showMsg} />}
-          {activeSection === 'partners' && <PartnersSection showMsg={showMsg} />}
-          {activeSection === 'faqs' && <FaqsSection showMsg={showMsg} />}
-          {activeSection === 'pages' && <PagesSection showMsg={showMsg} />}
-          {/* {activeSection === 'broken-videos' && <BrokenVideosList />} */}
+          <Outlet context={{ showMsg }} />
         </div>
       </main>
     </div>

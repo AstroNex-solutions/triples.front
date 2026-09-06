@@ -158,7 +158,7 @@ export default function QuestionsManager({ target, onClose, showMsg, onUpdate })
             
             <form onSubmit={saveQuestion} className="space-y-4">
               <Select label="نوع السؤال *" value={form.question_type} onChange={e => setForm({ ...form, question_type: e.target.value })} required>
-                <option value="mcq">اختيار من متعدد (MCQ)</option>
+                <option value="mcq">اختيار من متعدد</option>
                 <option value="true_false">صح وخطأ</option>
                 <option value="short_answer">إجابة قصيرة</option>
                 <option value="essay">مقال</option>

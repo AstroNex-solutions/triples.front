@@ -4,31 +4,21 @@ import { AuthContext } from '../context/AuthContext';
 import {
   BookOpen, Award, Shield, Settings,
   Calendar, CheckCircle2, AlertCircle, MessageSquare, BookMarked, ShoppingBag,
-  ChevronRight, ChevronLeft, FileText, Globe, LogOut
+  ChevronRight, ChevronLeft, FileText, Globe, LogOut, Home
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle';
 
 import { Avatar } from './student/SharedUI';
-import OverviewSection from './student/OverviewSection';
-import AccountSection from './student/AccountSection';
-import CoursesSection from './student/CoursesSection';
-import ScheduleSection from './student/ScheduleSection';
-import AssessmentsSection from './student/AssessmentsSection';
-import SelfAssessmentsSection from './student/SelfAssessmentsSection';
-import QuestionBanksSection from './student/QuestionBanksSection';
-import OrdersSection from './student/OrdersSection';
-import LibrarySection from './student/LibrarySection';
-import SupportSection from './student/SupportSection';
-import FlashcardsStudentSection from './student/FlashcardsStudentSection';
 
 export default function StudentDashboard() {
   const { user, logout } = useContext(AuthContext);
   const { t, i18n } = useTranslation();
-  const [activeSection, setActiveSection] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [globalMsg, setGlobalMsg] = useState({ type: '', text: '' });
   const navigate = useNavigate();
+  const location = useLocation();
+  const activeSection = location.pathname.split('/').pop() === 'dashboard' ? 'overview' : location.pathname.split('/').pop();
 
   const menuGroups = [
     {
@@ -122,7 +112,7 @@ export default function StudentDashboard() {
                 return (
                   <button 
                     key={item.key} 
-                    onClick={() => setActiveSection(item.key)} 
+                    onClick={() => navigate(`/dashboard/${item.key}`)} 
                     title={!sidebarOpen ? item.label : undefined}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${isActive ? 'bg-primary text-on-primary shadow-sm font-bold' : 'text-on-surface-variant hover:bg-surface-variant/30 hover:text-on-surface'}`}
                   >
@@ -148,6 +138,10 @@ export default function StudentDashboard() {
             </span>
           </div>
           <div className="flex items-center gap-3">
+            <button onClick={() => navigate('/')} className="px-3 py-2 rounded-xl bg-surface/50 border border-outline-variant/30 text-on-surface-variant hover:bg-primary hover:border-primary hover:text-on-primary transition-all shadow-sm cursor-pointer flex items-center gap-2" title="زيارة الموقع / Visit Site">
+              <Home size={16} />
+              <span className="hidden sm:inline text-xs font-bold">Visit Site</span>
+            </button>
             <ThemeToggle />
             <button onClick={toggleLanguage} className="p-2 rounded-xl bg-surface/50 border border-outline-variant/30 text-on-surface-variant hover:bg-surface hover:text-primary transition-all shadow-sm cursor-pointer" title="تغيير اللغة / Change Language">
               <Globe size={18} />
@@ -170,17 +164,7 @@ export default function StudentDashboard() {
             </div>
           )}
 
-          {activeSection === 'overview' && <OverviewSection />}
-          {activeSection === 'account' && <AccountSection showMsg={showMsg} />}
-          {activeSection === 'courses' && <CoursesSection />}
-          {activeSection === 'flashcards' && <FlashcardsStudentSection />}
-          {activeSection === 'schedule' && <ScheduleSection showMsg={showMsg} />}
-          {activeSection === 'assessments' && <AssessmentsSection />}
-          {activeSection === 'self_assessments' && <SelfAssessmentsSection />}
-          {activeSection === 'question_banks' && <QuestionBanksSection />}
-          {activeSection === 'orders' && <OrdersSection />}
-          {activeSection === 'library' && <LibrarySection />}
-          {activeSection === 'support' && <SupportSection showMsg={showMsg} />}
+          <Outlet context={{ showMsg }} />
         </div>
       </main>
     </div>

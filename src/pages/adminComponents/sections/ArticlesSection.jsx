@@ -1,93 +1,103 @@
 import React, { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import API from '../../../api/axios';
-import { Loader2, Trash2 } from 'lucide-react';
-import { SectionHeader, Card, statusBadge, Modal, Input, Select, Textarea, SubmitBtn } from '../ui/SharedUI';
+import ArticlesList from './articles/ArticlesList';
+import ArticleForm from './articles/ArticleForm';
 
-export default function ArticlesSection({ showMsg }) {
-  const { t, i18n } = useTranslation();
+export default function ArticlesSection() {
+  const { showMsg } = useOutletContext();
+  const { t } = useTranslation();
+  
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showAdd, setShowAdd] = useState(false);
-  const [form, setForm] = useState({ title: '', content: '', summary: '', status: 'published' });
-  const [file, setFile] = useState(null);
-  const [sub, setSub] = useState(false);
+  
+  // View state: 'list' | 'add' | 'edit'
+  const [view, setView] = useState('list');
+  const [currentArticle, setCurrentArticle] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const fetchArticles = () => { setLoading(true); API.get('/admin/articles').then(r => setArticles(r.data.articles || [])).catch(console.error).finally(() => setLoading(false)); };
-  useEffect(() => { fetchArticles(); }, []);
+  const fetchArticles = () => {
+    setLoading(true);
+    API.get('/admin/articles')
+      .then(r => setArticles(r.data.articles || []))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  };
 
-  const create = async (e) => {
-    e.preventDefault(); setSub(true);
+  useEffect(() => {
+    fetchArticles();
+  }, []);
+
+  const handleAdd = () => {
+    setCurrentArticle(null);
+    setView('add');
+  };
+
+  const handleEdit = (article) => {
+    setCurrentArticle(article);
+    setView('edit');
+  };
+
+  const handleCancel = () => {
+    setView('list');
+    setCurrentArticle(null);
+  };
+
+  const handleSubmit = async (form, file) => {
+    setSubmitting(true);
     try {
       const fd = new FormData();
       Object.entries(form).forEach(([k, v]) => fd.append(k, v));
       if (file) fd.append('image', file);
-      await API.post('/admin/articles', fd);
-      showMsg('success', t('admin.sections.articles.addArticle')); setShowAdd(false); fetchArticles();
-    } catch { showMsg('error', 'Error'); } finally { setSub(false); }
+
+      if (view === 'add') {
+        await API.post('/admin/articles', fd);
+        showMsg('success', t('admin.sections.articles.addArticle'));
+      } else if (view === 'edit' && currentArticle) {
+        await API.put(`/admin/articles/${currentArticle.id}`, fd);
+        showMsg('success', t('admin.common.save'));
+      }
+      
+      fetchArticles();
+      setView('list');
+    } catch (err) {
+      showMsg('error', 'Error saving article');
+      console.error(err);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const del = async (id) => { 
-    if (!confirm('Are you sure? / هل أنت تأكد؟')) return; 
-    try { 
-      await API.delete(`/admin/articles/${id}`); 
-      showMsg('success', t('admin.common.delete')); 
-      fetchArticles(); 
-    } catch { showMsg('error', 'Error'); } 
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure? / هل أنت متأكد؟')) return;
+    try {
+      await API.delete(`/admin/articles/${id}`);
+      showMsg('success', t('admin.common.delete'));
+      fetchArticles();
+    } catch {
+      showMsg('error', 'Error deleting article');
+    }
   };
+
+  if (view === 'add' || view === 'edit') {
+    return (
+      <ArticleForm 
+        initialData={currentArticle} 
+        onSubmit={handleSubmit} 
+        onCancel={handleCancel} 
+        submitting={submitting} 
+      />
+    );
+  }
 
   return (
-    <>
-      <SectionHeader title={t('admin.sections.articles.title')} count={articles.length} onAdd={() => setShowAdd(true)} addLabel={t('admin.sections.articles.addArticle')} />
-      {loading ? <div className="py-12 flex justify-center"><Loader2 size={24} className="animate-spin text-primary" /></div> : (
-        <Card>
-          <div className="overflow-x-auto">
-            <table className="w-full text-start text-xs sm:text-sm border-separate border-spacing-y-1">
-              <thead>
-                <tr className="text-on-surface-variant/70">
-                  <th className="p-3 text-start">{t('admin.sections.articles.articleTitle')}</th>
-                  <th className="p-3 text-start">{t('admin.sections.articles.author')}</th>
-                  <th className="p-3 text-start">{t('admin.common.status')}</th>
-                  <th className="p-3 text-start">{t('admin.sections.articles.views')}</th>
-                  <th className="p-3 text-center">{t('admin.common.actions')}</th>
-                </tr>
-              </thead>
-              <tbody>{articles.map(a => {
-                const aTitle = a[`title_${i18n.language}`] || a.title;
-                return (
-                  <tr key={a.id} className="bg-surface/50 hover:bg-surface/80 transition-all">
-                    <td className="p-3 font-bold text-on-surface max-w-[200px] truncate">{aTitle}</td>
-                    <td className="p-3 text-on-surface-variant">{a.author?.name || '—'}</td>
-                    <td className="p-3">{statusBadge(a.status)}</td>
-                    <td className="p-3 text-on-surface-variant">{a.views_count || 0}</td>
-                    <td className="p-3 text-center">
-                      <button onClick={() => del(a.id)} className="p-1.5 rounded-lg bg-surface border border-outline-variant/40 text-on-surface-variant hover:text-rose-400 transition-all cursor-pointer">
-                        <Trash2 size={14} />
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}</tbody>
-            </table>
-          </div>
-        </Card>
-      )}
-      <Modal open={showAdd} onClose={() => setShowAdd(false)} title={t('admin.sections.articles.addArticle')}>
-        <form onSubmit={create} className="space-y-4">
-          <Input label={`${t('admin.sections.articles.articleTitle')} *`} required value={form.title} onChange={e => setForm({...form, title: e.target.value})} />
-          <Textarea label="Summary / الملخص" value={form.summary} onChange={e => setForm({...form, summary: e.target.value})} />
-          <Textarea label="Content / المحتوى *" required value={form.content} onChange={e => setForm({...form, content: e.target.value})} />
-          <Select label={t('admin.common.status')} value={form.status} onChange={e => setForm({...form, status: e.target.value})}>
-            <option value="published">Published</option>
-            <option value="draft">Draft</option>
-          </Select>
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-on-surface-variant block">Article Image / صورة المقال</label>
-            <input type="file" accept="image/*" onChange={e => setFile(e.target.files[0])} className="text-sm text-on-surface-variant cursor-pointer" />
-          </div>
-          <SubmitBtn loading={sub} label={t('admin.sections.articles.addArticle')} />
-        </form>
-      </Modal>
-    </>
+    <ArticlesList 
+      articles={articles} 
+      loading={loading} 
+      onAdd={handleAdd} 
+      onEdit={handleEdit} 
+      onDelete={handleDelete} 
+    />
   );
 }

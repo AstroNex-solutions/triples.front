@@ -105,7 +105,7 @@ export default function LessonForm({ showMsg, module, lesson, onBack }) {
             <Select label="نوع الدرس" value={form.lesson_type} onChange={e => setForm({ ...form, lesson_type: e.target.value })}>
               <option value="video">فيديو تفاعلي</option>
               <option value="article">مقال نصي</option>
-              <option value="quiz">اختبار (Quiz)</option>
+              <option value="quiz">اختبار</option>
             </Select>
             <Input label="الترتيب" type="number" value={form.order} onChange={e => setForm({ ...form, order: e.target.value })} />
           </div>

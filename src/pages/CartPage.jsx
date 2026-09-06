@@ -143,13 +143,21 @@ export default function CartPage() {
         <div className="lg:col-span-2 space-y-4">
           {items.map((item) => {
             const isFlashcard = !!item.flashcard_product_id && !!item.flashcard_product;
+            const isPackage = !!item.package_id && !!item.package;
             const product = isFlashcard ? item.flashcard_product : (item.course || {});
             
-            const price = isFlashcard ? (product.price || 0) : (product.discount_price || product.price || 0);
-            const originalPrice = isFlashcard ? null : (product.discount_price ? product.price : null);
-            
-            const title = product.title || 'عنصر غير معروف';
-            const typeLabel = isFlashcard ? 'فلاش كارد' : (product.category?.name || t('cart.courseType', 'دورة تدريبية'));
+            let price = isFlashcard ? (product.price || 0) : (product.discount_price || product.price || 0);
+            let originalPrice = isFlashcard ? null : (product.discount_price ? product.price : null);
+            let title = product.title || 'عنصر غير معروف';
+            let typeLabel = isFlashcard ? 'فلاش كارد' : (product.category?.name || t('cart.courseType', 'دورة تدريبية'));
+
+            if (isPackage) {
+              price = item.package.price || 0;
+              originalPrice = null; // Assuming packages don't have discount_price currently
+              const pkgName = i18n.language === 'en' ? (item.package.name_en || item.package.name_ar) : (item.package.name_ar || item.package.name_en);
+              title = `${title} - ${pkgName}`;
+              typeLabel = t('cart.packageType', 'باقة اشتراك');
+            }
 
             return (
               <div 
@@ -171,7 +179,7 @@ export default function CartPage() {
                       {title}
                     </h3>
                     <p className="text-xs text-on-surface-variant/70">
-                      {isFlashcard ? 'وصول لجميع كروت الفصل' : t('cart.courseAccessInfo', 'وصول كامل لجميع المحاضرات والمواد العلمية')}
+                      {isPackage ? (i18n.language === 'en' ? (item.package.note_en || item.package.note_ar) : (item.package.note_ar || item.package.note_en)) : (isFlashcard ? 'وصول لجميع كروت الفصل' : t('cart.courseAccessInfo', 'وصول كامل لجميع المحاضرات والمواد العلمية'))}
                     </p>
                   </div>
                 </div>

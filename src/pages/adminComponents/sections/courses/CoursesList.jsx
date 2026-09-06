@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next';
 import API from '../../../../api/axios';
 import { 
   Loader2, BookOpen, Plus, CheckCircle2, Users, Play, Trash2, 
-  Upload, Settings
+  Upload, Settings, Copy
 } from 'lucide-react';
 import { SectionHeader, Card, Badge, statusBadge, Modal, Input, Select, Textarea, SubmitBtn } from '../../ui/SharedUI';
 import { getFileUrl } from '../../../../utils/fileHelper';
 
-export default function CoursesList({ showMsg, onManageModules }) {
+export default function CoursesList({ showMsg, onManageModules, onManageCourse }) {
   const { t, i18n } = useTranslation();
   
   const [courses, setCourses] = useState([]);
@@ -16,12 +16,10 @@ export default function CoursesList({ showMsg, onManageModules }) {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  const [showAdd, setShowAdd] = useState(false);
-  const [showEditCourse, setShowEditCourse] = useState(null);
   const [itemToDelete, setItemToDelete] = useState(null);
   
-  const [form, setForm] = useState({ title: '', subtitle: '', description: '', level: 'beginner', price: '0', category_id: '' });
-  const [file, setFile] = useState(null);
+  const [showDuplicateCourse, setShowDuplicateCourse] = useState(null);
+  const [duplicateForm, setDuplicateForm] = useState({ newName: '', newNameAr: '' });
 
   // Instructor assignment
   const [showAssignInstructor, setShowAssignInstructor] = useState(null); // course object
@@ -64,35 +62,6 @@ export default function CoursesList({ showMsg, onManageModules }) {
     }
   };
 
-  const createCourse = async (e) => {
-    e.preventDefault(); setSubmitting(true);
-    try {
-      const fd = new FormData();
-      Object.entries(form).forEach(([k, v]) => fd.append(k, v));
-      if (file) fd.append('image', file);
-      await API.post('/admin/courses', fd);
-      showMsg('success', 'تم إنشاء الكورس بنجاح');
-      setShowAdd(false);
-      setForm({ title: '', subtitle: '', description: '', level: 'beginner', price: '0', category_id: '' });
-      setFile(null); fetchData();
-    } catch (err) { showMsg('error', err.response?.data?.message || 'خطأ في إنشاء الكورس'); }
-    finally { setSubmitting(false); }
-  };
-
-  const updateCourse = async (e) => {
-    e.preventDefault(); setSubmitting(true);
-    try {
-      const fd = new FormData();
-      Object.entries(form).forEach(([k, v]) => fd.append(k, v));
-      if (file) fd.append('image', file);
-      await API.put(`/admin/courses/${showEditCourse.id}`, fd);
-      showMsg('success', 'تم تحديث الكورس بنجاح');
-      setShowEditCourse(null);
-      setForm({ title: '', subtitle: '', description: '', level: 'beginner', price: '0', category_id: '' });
-      setFile(null); fetchData();
-    } catch (err) { showMsg('error', err.response?.data?.message || 'خطأ في تحديث الكورس'); }
-    finally { setSubmitting(false); }
-  };
 
   const handleAddInstructor = async (instructorId) => {
     if (!showAssignInstructor) return;
@@ -106,6 +75,22 @@ export default function CoursesList({ showMsg, onManageModules }) {
         return prev;
       });
     } catch (err) { showMsg('error', err.response?.data?.message || 'خطأ في إضافة المحاضر'); }
+  };
+
+  const handleDuplicateCourse = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      await API.post(`/admin/courses/${showDuplicateCourse.id}/duplicate`, duplicateForm);
+      showMsg('success', 'تم استنساخ الكورس بنجاح');
+      setShowDuplicateCourse(null);
+      setDuplicateForm({ newName: '', newNameAr: '' });
+      fetchData();
+    } catch (err) {
+      showMsg('error', err.response?.data?.message || 'خطأ في الاستنساخ');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleRemoveInstructor = async (instructorId) => {
@@ -127,7 +112,7 @@ export default function CoursesList({ showMsg, onManageModules }) {
       <SectionHeader
         title={t('admin.sections.courses') || 'الكورسات'}
         count={courses.length}
-        onAdd={() => setShowAdd(true)}
+        onAdd={() => onManageCourse(null, categories)}
         addLabel="كورس جديد"
       />
 
@@ -146,7 +131,7 @@ export default function CoursesList({ showMsg, onManageModules }) {
             <p className="text-xs text-on-surface-variant max-w-sm mx-auto leading-relaxed">
               ابدأ بإنشاء أول كورس، ثم أضف الموديولات والدروس التفاعلية.
             </p>
-            <button onClick={() => setShowAdd(true)} className="px-5 py-2.5 bg-primary text-on-primary font-bold text-xs rounded-2xl shadow-glow hover:bg-primary-hover transition-all inline-flex items-center gap-2 cursor-pointer">
+            <button onClick={() => onManageCourse(null, categories)} className="px-5 py-2.5 bg-primary text-on-primary font-bold text-xs rounded-2xl shadow-glow hover:bg-primary-hover transition-all inline-flex items-center gap-2 cursor-pointer">
               <Plus size={16} /><span>إنشاء كورس جديد</span>
             </button>
           </div>
@@ -210,13 +195,19 @@ export default function CoursesList({ showMsg, onManageModules }) {
                         <Users size={12} /><span>محاضرون</span>
                       </button>
                       <button 
-                        onClick={() => {
-                          setForm({ title: c.title, subtitle: c.subtitle || '', description: c.description || '', level: c.level || 'beginner', price: c.price || '0', category_id: c.category_id || '' });
-                          setFile(null); setShowEditCourse(c);
-                        }} 
+                        onClick={() => onManageCourse(c, categories)} 
                         className="p-1.5 rounded-xl bg-surface border border-outline-variant/40 text-on-surface-variant hover:text-primary transition-all cursor-pointer" title="تعديل الكورس"
                       >
                         <Settings size={14} /> {/* Used Settings icon here for Edit as Edit3 was not imported, but wait I can just use BookOpen or import Edit3 */}
+                      </button>
+                      <button 
+                        onClick={() => {
+                          setDuplicateForm({ newName: c.title + ' (نسخة)', newNameAr: (c.title_ar || c.title) + ' (نسخة)' });
+                          setShowDuplicateCourse(c);
+                        }} 
+                        className="p-1.5 rounded-xl bg-surface border border-outline-variant/40 text-on-surface-variant hover:text-emerald-400 transition-all cursor-pointer" title="استنساخ الكورس"
+                      >
+                        <Copy size={14} />
                       </button>
                       <button 
                         onClick={() => setItemToDelete({ type: 'course', id: c.id, name: c.title })} 
@@ -239,70 +230,26 @@ export default function CoursesList({ showMsg, onManageModules }) {
         </div>
       )}
 
-      {/* Modals for Create, Edit, Assign Instructor, Delete */}
+      {/* Modals for Create, Edit, Assign Instructor, Delete, Duplicate */}
 
-      <Modal open={showAdd} onClose={() => setShowAdd(false)} title="إنشاء كورس جديد">
-        <form onSubmit={createCourse} className="space-y-4">
-          <Input label="عنوان الكورس *" required placeholder="مثال: الدبلومة الشاملة" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
-          <Input label="العنوان الفرعي" placeholder="نظرة مبسطة وتطبيقية..." value={form.subtitle} onChange={e => setForm({ ...form, subtitle: e.target.value })} />
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <Select label="المستوى" value={form.level} onChange={e => setForm({ ...form, level: e.target.value })}>
-              <option value="beginner">مبتدئ</option>
-              <option value="intermediate">متوسط</option>
-              <option value="advanced">متقدم</option>
-            </Select>
-            <Input label="السعر ($)" type="number" step="0.01" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} dir="ltr" />
-            <Select label="التصنيف" value={form.category_id} onChange={e => setForm({ ...form, category_id: e.target.value })}>
-              <option value="">اختر التصنيف</option>
-              {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
-            </Select>
-          </div>
-          <Textarea label="الوصف التفصيلي" placeholder="شرح كافة المحاور..." value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-on-surface-variant block">صورة غلاف الكورس</label>
-            <div className="border-2 border-dashed border-outline-variant/40 rounded-2xl p-4 text-center hover:border-primary/50 transition-colors bg-surface-container-low/30">
-              <input type="file" id="adminCourseImg" accept="image/*" onChange={e => setFile(e.target.files[0])} className="hidden" />
-              <label htmlFor="adminCourseImg" className="cursor-pointer space-y-1 block">
-                <Upload size={24} className="mx-auto text-primary" />
-                <span className="text-xs font-bold text-on-surface block">{file ? file.name : 'اضغط لاختيار صورة الغلاف'}</span>
-                <span className="text-[10px] text-on-surface-variant/70 block">PNG, JPG حتى 5MB</span>
-              </label>
-            </div>
-          </div>
-          <SubmitBtn loading={submitting} label="إنشاء الكورس الآن" />
+      <Modal open={!!showDuplicateCourse} onClose={() => setShowDuplicateCourse(null)} title="استنساخ الكورس">
+        <form onSubmit={handleDuplicateCourse} className="space-y-4">
+          <Input 
+            label="الاسم الجديد للكورس *" 
+            required 
+            value={duplicateForm.newName} 
+            onChange={e => setDuplicateForm({ ...duplicateForm, newName: e.target.value })} 
+          />
+          <Input 
+            label="الاسم الجديد (عربي)" 
+            value={duplicateForm.newNameAr} 
+            onChange={e => setDuplicateForm({ ...duplicateForm, newNameAr: e.target.value })} 
+          />
+          <SubmitBtn text="استنساخ الآن" loading={submitting} />
         </form>
       </Modal>
 
-      <Modal open={!!showEditCourse} onClose={() => { setShowEditCourse(null); setForm({ title: '', subtitle: '', description: '', level: 'beginner', price: '0', category_id: '' }); }} title="تعديل الكورس">
-        <form onSubmit={updateCourse} className="space-y-4">
-          <Input label="عنوان الكورس *" required placeholder="مثال: الدبلومة الشاملة" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
-          <Input label="العنوان الفرعي" value={form.subtitle} onChange={e => setForm({ ...form, subtitle: e.target.value })} />
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <Select label="المستوى" value={form.level} onChange={e => setForm({ ...form, level: e.target.value })}>
-              <option value="beginner">مبتدئ</option>
-              <option value="intermediate">متوسط</option>
-              <option value="advanced">متقدم</option>
-            </Select>
-            <Input label="السعر ($)" type="number" step="0.01" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} dir="ltr" />
-            <Select label="التصنيف" value={form.category_id} onChange={e => setForm({ ...form, category_id: e.target.value })}>
-              <option value="">اختر التصنيف</option>
-              {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
-            </Select>
-          </div>
-          <Textarea label="الوصف التفصيلي" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-on-surface-variant block">تغيير صورة الغلاف</label>
-            <div className="border-2 border-dashed border-outline-variant/40 rounded-2xl p-4 text-center hover:border-primary/50 transition-colors bg-surface-container-low/30">
-              <input type="file" id="adminCourseImgEdit" accept="image/*" onChange={e => setFile(e.target.files[0])} className="hidden" />
-              <label htmlFor="adminCourseImgEdit" className="cursor-pointer space-y-1 block">
-                <Upload size={24} className="mx-auto text-primary" />
-                <span className="text-xs font-bold text-on-surface block">{file ? file.name : 'اضغط لاختيار صورة جديدة'}</span>
-              </label>
-            </div>
-          </div>
-          <SubmitBtn loading={submitting} label="تحديث الكورس" />
-        </form>
-      </Modal>
+
 
       {/* Delete Confirmation */}
       <Modal open={!!itemToDelete} onClose={() => setItemToDelete(null)} title="تأكيد الحذف">

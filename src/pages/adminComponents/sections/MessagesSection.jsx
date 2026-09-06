@@ -1,10 +1,12 @@
+import { useOutletContext } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import API from '../../../api/axios';
 import { Loader2, MessageSquare, X, Mail } from 'lucide-react';
 import { SectionHeader, Card, statusBadge, Modal, Textarea } from '../ui/SharedUI';
 
-export default function MessagesSection({ showMsg }) {
+export default function MessagesSection() {
+  const { showMsg } = useOutletContext();
   const { t, i18n } = useTranslation();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);

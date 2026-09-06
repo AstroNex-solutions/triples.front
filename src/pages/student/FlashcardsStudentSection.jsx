@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { SectionHeader, Card } from './SharedUI';
 import API from '../../api/axios';
 
-// Specialty Resolver for Student Dashboard
+// Specialty Resolver for Student Dashboard - Using more harmonious or primary colors
 const getStudentSpecialty = (title = '', description = '') => {
   const text = `${title} ${description}`.toLowerCase();
   
@@ -18,8 +18,8 @@ const getStudentSpecialty = (title = '', description = '') => {
       icon: Microscope,
       tag: 'Microbiology • أحياء دقيقة',
       gradient: 'from-emerald-500 to-teal-600',
-      badge: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800/80',
-      iconBox: 'bg-emerald-50 text-emerald-600 border-emerald-200/80 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/80',
+      badge: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
+      iconBox: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
       shadow: 'hover:shadow-emerald-500/10'
     };
   }
@@ -28,8 +28,8 @@ const getStudentSpecialty = (title = '', description = '') => {
       icon: Heart,
       tag: 'Cardiovascular • قلب وأوعية',
       gradient: 'from-rose-500 to-red-600',
-      badge: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800/80',
-      iconBox: 'bg-rose-50 text-rose-600 border-rose-200/80 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800/80',
+      badge: 'bg-rose-500/10 text-rose-600 border-rose-500/20',
+      iconBox: 'bg-rose-500/10 text-rose-600 border-rose-500/20',
       shadow: 'hover:shadow-rose-500/10'
     };
   }
@@ -38,8 +38,8 @@ const getStudentSpecialty = (title = '', description = '') => {
       icon: Pill,
       tag: 'Pharmacology • علم الأدوية',
       gradient: 'from-amber-500 to-orange-600',
-      badge: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800/80',
-      iconBox: 'bg-amber-50 text-amber-600 border-amber-200/80 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800/80',
+      badge: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+      iconBox: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
       shadow: 'hover:shadow-amber-500/10'
     };
   }
@@ -47,10 +47,10 @@ const getStudentSpecialty = (title = '', description = '') => {
     return {
       icon: Brain,
       tag: 'Neurology • علم الأعصاب',
-      gradient: 'from-purple-500 to-indigo-600',
-      badge: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/50 dark:text-purple-300 dark:border-purple-800/80',
-      iconBox: 'bg-purple-50 text-purple-600 border-purple-200/80 dark:bg-purple-950/40 dark:text-purple-400 dark:border-purple-800/80',
-      shadow: 'hover:shadow-purple-500/10'
+      gradient: 'from-violet-500 to-indigo-600',
+      badge: 'bg-violet-500/10 text-violet-600 border-violet-500/20',
+      iconBox: 'bg-violet-500/10 text-violet-600 border-violet-500/20',
+      shadow: 'hover:shadow-violet-500/10'
     };
   }
   if (text.includes('bio') || text.includes('chem') || text.includes('dna') || text.includes('كيمياء') || text.includes('وراث')) {
@@ -58,8 +58,8 @@ const getStudentSpecialty = (title = '', description = '') => {
       icon: Dna,
       tag: 'Biochemistry • كيمياء حيوية',
       gradient: 'from-cyan-500 to-teal-600',
-      badge: 'bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/50 dark:text-cyan-300 dark:border-cyan-800/80',
-      iconBox: 'bg-cyan-50 text-cyan-600 border-cyan-200/80 dark:bg-cyan-950/40 dark:text-cyan-400 dark:border-cyan-800/80',
+      badge: 'bg-cyan-500/10 text-cyan-600 border-cyan-500/20',
+      iconBox: 'bg-cyan-500/10 text-cyan-600 border-cyan-500/20',
       shadow: 'hover:shadow-cyan-500/10'
     };
   }
@@ -68,8 +68,8 @@ const getStudentSpecialty = (title = '', description = '') => {
       icon: Bone,
       tag: 'Anatomy • تشريح وعظام',
       gradient: 'from-sky-500 to-blue-600',
-      badge: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/50 dark:text-sky-300 dark:border-sky-800/80',
-      iconBox: 'bg-sky-50 text-sky-600 border-sky-200/80 dark:bg-sky-950/40 dark:text-sky-400 dark:border-sky-800/80',
+      badge: 'bg-sky-500/10 text-sky-600 border-sky-500/20',
+      iconBox: 'bg-sky-500/10 text-sky-600 border-sky-500/20',
       shadow: 'hover:shadow-sky-500/10'
     };
   }
@@ -77,10 +77,10 @@ const getStudentSpecialty = (title = '', description = '') => {
   return {
     icon: Atom,
     tag: 'Medical Sciences • علوم طبية',
-    gradient: 'from-teal-600 to-cyan-700',
-    badge: 'bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/50 dark:text-teal-300 dark:border-teal-800/80',
-    iconBox: 'bg-teal-50 text-teal-600 border-teal-200/80 dark:bg-teal-950/40 dark:text-teal-400 dark:border-teal-800/80',
-    shadow: 'hover:shadow-teal-500/10'
+    gradient: 'from-primary to-primary-hover',
+    badge: 'bg-primary/10 text-primary border-primary/20',
+    iconBox: 'bg-primary/10 text-primary border-primary/20',
+    shadow: 'hover:shadow-primary/10'
   };
 };
 
@@ -109,50 +109,50 @@ export default function FlashcardsStudentSection() {
   return (
     <div className="space-y-6">
       {/* 1. Header Banner & Quick Action */}
-      <div className="bg-gradient-to-l from-teal-950 via-slate-900 to-slate-950 text-white rounded-3xl p-6 sm:p-8 border border-teal-500/30 shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
+      <div className="bg-gradient-to-br from-primary to-violet-600 text-on-primary rounded-3xl p-6 sm:p-8 shadow-lg shadow-primary/20 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none translate-y-1/3 -translate-x-1/3" />
 
         <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/20 text-teal-300 text-xs font-black border border-teal-400/30">
-              <Sparkles size={13} className="animate-pulse" />
-              <span>{t('flashcards.student.spaceBadge')}</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-black border border-white/30 backdrop-blur-sm">
+              <Sparkles size={13} className="text-amber-300 animate-pulse" />
+              <span>{t('studentDashboard.flashcards.spaceBadge', 'Smart Spaced Repetition')}</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-teal-50">
-              {t('flashcards.student.title')}
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+              {t('studentDashboard.flashcards.title')}
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
-              {t('flashcards.student.subtitle')}
+            <p className="text-xs sm:text-sm text-white/80 max-w-xl leading-relaxed">
+              {t('studentDashboard.flashcards.subtitle', 'Review your active flashcard decks.')}
             </p>
           </div>
 
           <button
             onClick={() => navigate('/flashcards-store')}
-            className="px-5 py-3 rounded-2xl bg-gradient-to-l from-teal-500 to-emerald-400 hover:from-teal-400 hover:to-emerald-300 text-slate-950 font-black text-xs transition-all shadow-md flex items-center gap-2 cursor-pointer shrink-0"
+            className="px-5 py-3 rounded-2xl bg-white text-primary font-black text-xs transition-all shadow-md hover:shadow-lg hover:-translate-y-1 hover:bg-white/90 flex items-center gap-2 cursor-pointer shrink-0"
           >
             <BookmarkPlus size={16} />
-            <span>{t('flashcards.student.exploreNew')}</span>
+            <span>{t('studentDashboard.flashcards.explore', 'Explore Store')}</span>
           </button>
         </div>
       </div>
 
       {/* 2. Search & Stats Toolbar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-4 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm transition-colors">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-surface/60 backdrop-blur-md p-4 rounded-2xl border border-outline-variant/30 shadow-sm transition-colors">
         <div className="relative w-full sm:w-80">
-          <Search size={16} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none" />
+          <Search size={16} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder={t('flashcards.student.searchPlaceholder')}
-            className="w-full pl-4 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
+            placeholder={t('studentDashboard.flashcards.search', 'Search decks...')}
+            className="w-full pl-4 pr-10 py-2.5 bg-surface-container-low border border-outline-variant/30 rounded-xl text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
           />
         </div>
 
-        <div className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400">
-          <span>{t('flashcards.student.totalAvailable')}</span>
-          <span className="px-2.5 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 font-mono font-black border border-teal-200 dark:border-teal-800/80">
+        <div className="flex items-center gap-2 text-xs font-bold text-on-surface-variant">
+          <span>{t('flashcards.student.totalAvailable') || 'Available Decks:'}</span>
+          <span className="px-2.5 py-1 rounded-lg bg-primary/10 text-primary font-mono font-black border border-primary/20">
             {flashcards.length}
           </span>
         </div>
@@ -160,30 +160,30 @@ export default function FlashcardsStudentSection() {
       
       {/* 3. Flashcards Grid */}
       {loading ? (
-        <div className="py-16 flex flex-col items-center justify-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800">
-          <Loader2 size={36} className="animate-spin text-teal-600 mb-3" />
-          <span className="text-xs font-bold text-slate-400">{t('flashcards.student.loading')}</span>
+        <div className="py-16 flex flex-col items-center justify-center bg-surface rounded-3xl border border-outline-variant/30 shadow-sm">
+          <Loader2 size={36} className="animate-spin text-primary mb-3" />
+          <span className="text-xs font-bold text-on-surface-variant">{t('flashcards.student.loading') || 'Loading flashcards...'}</span>
         </div>
       ) : flashcards.length === 0 ? (
-        <Card className="text-center py-16 px-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm">
-          <div className="w-20 h-20 bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800 rounded-3xl flex items-center justify-center mx-auto mb-4 text-teal-600 dark:text-teal-400">
+        <Card className="text-center py-16 px-6">
+          <div className="w-20 h-20 bg-primary/10 border border-primary/20 rounded-3xl flex items-center justify-center mx-auto mb-4 text-primary">
             <BookOpen size={36} />
           </div>
-          <h3 className="text-xl font-black text-slate-800 dark:text-slate-100 mb-2">{t('flashcards.student.emptyTitle')}</h3>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-6 leading-relaxed">
-            {t('flashcards.student.emptyDesc')}
+          <h3 className="text-xl font-black text-on-surface mb-2">{t('flashcards.student.emptyTitle') || 'No Flashcards Yet'}</h3>
+          <p className="text-xs sm:text-sm text-on-surface-variant max-w-md mx-auto mb-6 leading-relaxed">
+            {t('flashcards.student.emptyDesc') || 'You haven\'t added any flashcards yet. Visit the store to explore and add flashcard decks to your library.'}
           </p>
           <button 
             onClick={() => navigate('/flashcards-store')}
-            className="px-6 py-3 bg-gradient-to-l from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white font-black text-xs rounded-xl shadow-md transition-all cursor-pointer inline-flex items-center gap-2"
+            className="px-6 py-3 bg-primary hover:bg-primary-hover text-on-primary font-black text-xs rounded-xl shadow-md transition-all cursor-pointer inline-flex items-center gap-2 hover:-translate-y-1"
           >
             <Sparkles size={16} />
-            <span>{t('flashcards.student.browseStore')}</span>
+            <span>{t('flashcards.student.browseStore') || 'Browse Store'}</span>
           </button>
         </Card>
       ) : filteredDecks.length === 0 ? (
-        <div className="py-12 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800">
-          <p className="text-xs font-bold text-slate-500 dark:text-slate-400">{t('flashcards.student.noMatch')}</p>
+        <div className="py-12 text-center bg-surface rounded-3xl border border-outline-variant/30 shadow-sm">
+          <p className="text-xs font-bold text-on-surface-variant">{t('flashcards.student.noMatch') || 'No decks match your search.'}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -194,7 +194,7 @@ export default function FlashcardsStudentSection() {
             return (
               <div 
                 key={f.id} 
-                className={`group bg-white dark:bg-slate-900/95 rounded-3xl border border-slate-200/90 dark:border-slate-800 hover:border-teal-500/40 dark:hover:border-teal-500/50 p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-[0_15px_35px_rgba(15,23,42,0.06)] dark:hover:shadow-[0_15px_35px_rgba(0,0,0,0.3)] relative overflow-hidden ${specialty.shadow}`}
+                className={`group bg-surface rounded-3xl border border-outline-variant/30 hover:border-primary/40 p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-lg relative overflow-hidden ${specialty.shadow}`}
               >
                 {/* Top Colored Border */}
                 <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${specialty.gradient}`} />
@@ -202,43 +202,43 @@ export default function FlashcardsStudentSection() {
                 <div>
                   {/* Category Pill */}
                   <div className="flex items-center justify-between gap-2 mb-4">
-                    <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg border ${specialty.badge} truncate`}>
+                    <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg border truncate ${specialty.badge}`}>
                       {specialty.tag}
                     </span>
-                    <span className="flex items-center gap-1 text-[10px] font-mono font-bold text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/50 px-2 py-0.5 rounded border border-teal-200 dark:border-teal-800/80">
-                      <CheckCircle2 size={11} /> {t('flashcards.student.activeStatus')}
+                    <span className="flex items-center gap-1 text-[10px] font-mono font-bold text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20">
+                      <CheckCircle2 size={11} /> {t('flashcards.student.activeStatus') || 'Active'}
                     </span>
                   </div>
 
                   {/* Icon & Title */}
                   <div className="flex items-start gap-4 mb-4">
-                    <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform ${specialty.iconBox}`}>
+                    <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform ${specialty.iconBox}`}>
                       <IconComponent size={22} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-black text-slate-900 dark:text-slate-100 text-base leading-snug group-hover:text-teal-700 dark:group-hover:text-teal-400 transition-colors line-clamp-2">
+                      <h3 className="font-black text-on-surface text-base leading-snug group-hover:text-primary transition-colors line-clamp-2">
                         {f.title}
                       </h3>
-                      <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">
-                        {t('flashcards.student.clinicalPack')}
+                      <span className="text-[10px] font-mono text-on-surface-variant">
+                        {t('flashcards.student.clinicalPack') || 'Clinical Pack'}
                       </span>
                     </div>
                   </div>
 
                   {/* Description */}
-                  <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-3 mb-6 leading-relaxed">
+                  <p className="text-xs text-on-surface-variant line-clamp-3 mb-6 leading-relaxed">
                     {f.description || t('flashcards.student.defaultDesc')}
                   </p>
                 </div>
 
                 {/* Launch Button */}
-                <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                <div className="pt-4 border-t border-outline-variant/20">
                   <button 
                     onClick={() => navigate(`/study-flashcards/${f.id}`)}
-                    className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-l from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white rounded-xl font-black text-xs shadow-md shadow-teal-700/20 hover:shadow-lg transition-all cursor-pointer group-hover:scale-[1.01]"
+                    className="w-full flex items-center justify-center gap-2 py-3 bg-primary hover:bg-primary-hover text-on-primary rounded-xl font-black text-xs shadow-md transition-all cursor-pointer group-hover:scale-[1.01]"
                   >
                     <Play size={15} className="fill-current" />
-                    <span>{t('flashcards.student.startSession')}</span>
+                    <span>{t('flashcards.student.startSession') || 'Start Session'}</span>
                   </button>
                 </div>
               </div>
@@ -249,4 +249,3 @@ export default function FlashcardsStudentSection() {
     </div>
   );
 }
-

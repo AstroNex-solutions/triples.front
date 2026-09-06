@@ -1,3 +1,4 @@
+import { useOutletContext } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import API from '../../../api/axios';
@@ -6,7 +7,8 @@ import { SectionHeader, Card, statusBadge, Modal, Select, Input, Textarea, Submi
 
 import QuestionsManager from '../ui/QuestionsManager';
 
-export default function AssessmentsSection({ showMsg }) {
+export default function AssessmentsSection() {
+  const { showMsg } = useOutletContext();
   const { t, i18n } = useTranslation();
   const [assessments, setAssessments] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -28,7 +28,7 @@ export const CartProvider = ({ children }) => {
     fetchCart();
   }, [user]);
 
-  const addToCart = async (item_id, type = 'course') => {
+  const addToCart = async (item_id, type = 'course', package_id = null) => {
     if (!user) throw new Error('يرجى تسجيل الدخول أولاً لإضافة المنتج إلى السلة');
     
     const payload = {};
@@ -36,6 +36,7 @@ export const CartProvider = ({ children }) => {
       payload.flashcard_product_id = item_id;
     } else {
       payload.course_id = item_id;
+      if (package_id) payload.package_id = package_id;
     }
 
     const res = await API.post('/store/cart', payload);

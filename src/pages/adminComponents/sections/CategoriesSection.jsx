@@ -1,10 +1,12 @@
+import { useOutletContext } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import API from '../../../api/axios';
 import { Loader2, Trash2, X } from 'lucide-react';
 import { SectionHeader, Card, Badge, Modal, Input, Textarea, SubmitBtn } from '../ui/SharedUI';
 
-export default function CategoriesSection({ showMsg }) {
+export default function CategoriesSection() {
+  const { showMsg } = useOutletContext();
   const { t, i18n } = useTranslation();
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState([]);

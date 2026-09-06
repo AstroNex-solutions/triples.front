@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { PlusCircle, X, Loader2, CheckCircle2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -10,7 +11,7 @@ export function Card({ children, className = '' }) {
   );
 }
 
-export function StatCard({ label, value, icon: Icon, color = 'primary' }) {
+export function StatCard({ label, value, icon: Icon, color = 'primary', to }) {
   const colors = {
     primary: 'bg-primary/15 border-primary/20 text-primary',
     emerald: 'bg-emerald-500/15 border-emerald-500/20 text-emerald-400',
@@ -19,8 +20,9 @@ export function StatCard({ label, value, icon: Icon, color = 'primary' }) {
     rose: 'bg-rose-500/15 border-rose-500/20 text-rose-400',
     violet: 'bg-violet-500/15 border-violet-500/20 text-violet-400',
   };
-  return (
-    <Card className="flex items-center justify-between">
+  
+  const content = (
+    <Card className={`flex items-center justify-between ${to ? 'hover:scale-105 hover:shadow-lg transition-all duration-300 cursor-pointer' : ''}`}>
       <div className="space-y-1">
         <p className="text-xs font-bold text-on-surface-variant">{label}</p>
         <h3 className="text-2xl font-black text-on-surface">{value}</h3>
@@ -30,6 +32,8 @@ export function StatCard({ label, value, icon: Icon, color = 'primary' }) {
       </div>
     </Card>
   );
+
+  return to ? <Link to={to} className="block">{content}</Link> : content;
 }
 
 export function SectionHeader({ title, count, onAdd, addLabel }) {

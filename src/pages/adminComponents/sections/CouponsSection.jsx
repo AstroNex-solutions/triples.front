@@ -1,10 +1,12 @@
+import { useOutletContext } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import API from '../../../api/axios';
 import { Loader2, Trash2 } from 'lucide-react';
 import { SectionHeader, Card, Badge, Modal, Input, Select, Textarea, SubmitBtn } from '../ui/SharedUI';
 
-export default function CouponsSection({ showMsg }) {
+export default function CouponsSection() {
+  const { showMsg } = useOutletContext();
   const { t } = useTranslation();
   const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);

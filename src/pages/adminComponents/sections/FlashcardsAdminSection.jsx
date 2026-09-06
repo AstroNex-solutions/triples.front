@@ -1,41 +1,55 @@
+import { useOutletContext } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import API from '../../../api/axios';
 import { Loader2, Trash2, Edit } from 'lucide-react';
-import { SectionHeader, Card, Modal, Input, Textarea, SubmitBtn, Badge } from '../ui/SharedUI';
+import { SectionHeader, Card, Modal, Input, Textarea, SubmitBtn, Badge, Select } from '../ui/SharedUI';
 import FlashcardsManager from '../ui/FlashcardsManager';
 
-export default function FlashcardsAdminSection({ showMsg }) {
+export default function FlashcardsAdminSection() {
+  const { showMsg } = useOutletContext();
   const { t, i18n } = useTranslation();
   const [products, setProducts] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
-  const [form, setForm] = useState({ id: null, title: '', description: '', price: 0, is_active: true });
+  const [form, setForm] = useState({ id: null, title: '', description: '', price: 0, is_active: true, course_id: '' });
   const [submitting, setSubmitting] = useState(false);
   const [manageCardsFor, setManageCardsFor] = useState(null);
 
-  const fetchData = () => {
+  const fetchData = async () => {
     setLoading(true);
-    API.get('/admin/flashcard-products')
-      .then((p) => { setProducts(p.data.products || []); })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    try {
+      const [p, c] = await Promise.all([
+        API.get('/admin/flashcard-products'),
+        API.get('/admin/courses')
+      ]);
+      setProducts(p.data.products || []);
+      setCourses(c.data.courses || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
   useEffect(() => { fetchData(); }, []);
 
   const resetForm = () => {
-    setForm({ id: null, title: '', description: '', price: 0, is_active: true });
+    setForm({ id: null, title: '', description: '', price: 0, is_active: true, course_id: '' });
     setShowAdd(false);
   };
 
   const saveProduct = async (e) => {
     e.preventDefault(); setSubmitting(true);
     try {
+      const payload = { ...form };
+      if (!payload.course_id) payload.course_id = null; // Send null if empty
+      
       if (form.id) {
-        await API.put(`/admin/flashcard-products/${form.id}`, form);
+        await API.put(`/admin/flashcard-products/${form.id}`, payload);
         showMsg('success', 'تم التحديث بنجاح');
       } else {
-        await API.post('/admin/flashcard-products', form);
+        await API.post('/admin/flashcard-products', payload);
         showMsg('success', 'تم الإضافة بنجاح');
       }
       resetForm(); fetchData();
@@ -50,7 +64,7 @@ export default function FlashcardsAdminSection({ showMsg }) {
   };
 
   const editProduct = (p) => {
-    setForm({ id: p.id, title: p.title, description: p.description || '', price: p.price, is_active: p.is_active });
+    setForm({ id: p.id, title: p.title, description: p.description || '', price: p.price, is_active: p.is_active, course_id: p.course_id || '' });
     setShowAdd(true);
   };
 
@@ -64,6 +78,7 @@ export default function FlashcardsAdminSection({ showMsg }) {
               <thead>
                 <tr className="text-on-surface-variant/70">
                   <th className="p-3 text-start">المنتج</th>
+                  <th className="p-3 text-start">الكورس التابع</th>
                   <th className="p-3 text-start">السعر</th>
                   <th className="p-3 text-start">الحالة</th>
                   <th className="p-3 text-center">الإجراءات</th>
@@ -72,6 +87,7 @@ export default function FlashcardsAdminSection({ showMsg }) {
               <tbody>{products.map(p => (
                 <tr key={p.id} className="bg-surface/50 hover:bg-surface/80 transition-all">
                   <td className="p-3 font-bold text-on-surface">{p.title}</td>
+                  <td className="p-3 text-on-surface-variant">{p.course ? p.course.title : 'عام (بدون كورس)'}</td>
                   <td className="p-3 font-bold text-on-surface">${p.price}</td>
                   <td className="p-3">{p.is_active ? <Badge text="نشط" variant="success" /> : <Badge text="غير نشط" variant="danger" />}</td>
                   <td className="p-3 text-center">
@@ -90,6 +106,12 @@ export default function FlashcardsAdminSection({ showMsg }) {
       <Modal open={showAdd} onClose={resetForm} title={form.id ? 'تعديل المنتج' : 'إضافة منتج'}>
         <form onSubmit={saveProduct} className="space-y-4">
           <Input label="العنوان *" required value={form.title} onChange={e => setForm({...form, title: e.target.value})} />
+          
+          <Select label="الكورس التابع" value={form.course_id} onChange={e => setForm({...form, course_id: e.target.value})}>
+            <option value="">عام (بدون كورس محدد)</option>
+            {courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
+          </Select>
+          
           <Textarea label="الوصف" value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
           <Input label="السعر ($)" type="number" step="0.01" min="0" required value={form.price} onChange={e => setForm({...form, price: e.target.value})} />
           <div className="flex items-center gap-2 text-sm font-bold text-on-surface mt-2">

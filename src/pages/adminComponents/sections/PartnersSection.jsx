@@ -1,10 +1,12 @@
+import { useOutletContext } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import API from '../../../api/axios';
 import { Loader2, Trash2, Edit, ImageIcon } from 'lucide-react';
 import { SectionHeader, Card, Modal, Select, Input, SubmitBtn, Badge } from '../ui/SharedUI';
 
-export default function PartnersSection({ showMsg }) {
+export default function PartnersSection() {
+  const { showMsg } = useOutletContext();
   const { t, i18n } = useTranslation();
   const [partners, setPartners] = useState([]);
   const [loading, setLoading] = useState(true);

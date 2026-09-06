@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import API from '../../../../api/axios';
-import { Loader2, Plus, Edit3, Trash2, Play, FolderPlus } from 'lucide-react';
+import { Loader2, Plus, Edit3, Trash2, Play, FolderPlus, GripVertical } from 'lucide-react';
 import { Modal, Input, Textarea, SubmitBtn } from '../../ui/SharedUI';
+import { Reorder } from 'framer-motion';
 
 export default function SubModulesList({ showMsg, course, parentModule, onManageLessons }) {
   const [modules, setModules] = useState([]);
@@ -27,6 +28,8 @@ export default function SubModulesList({ showMsg, course, parentModule, onManage
           lessonsCount: m.lessons?.length || 0
         };
       });
+      // Sort by order
+      enrichedModules.sort((a, b) => (a.order || 0) - (b.order || 0));
 
       setModules(enrichedModules);
     } catch (err) {
@@ -39,6 +42,24 @@ export default function SubModulesList({ showMsg, course, parentModule, onManage
   useEffect(() => {
     fetchSubModules();
   }, [parentModule.id]);
+
+  const handleReorder = async (newOrder) => {
+    // Optimistic UI update
+    setModules(newOrder);
+
+    // Prepare payload
+    const payload = newOrder.map((item, index) => ({
+      id: item.id,
+      order: index + 1
+    }));
+
+    try {
+      await API.put('/admin/modules/reorder', { items: payload });
+    } catch (err) {
+      showMsg('error', 'حدث خطأ أثناء حفظ الترتيب');
+      fetchSubModules(); // revert on failure
+    }
+  };
 
   const createSubModule = async (e) => {
     e.preventDefault(); setSubmitting(true);
@@ -92,10 +113,13 @@ export default function SubModulesList({ showMsg, course, parentModule, onManage
           <p className="text-xs text-on-surface-variant mt-1">ابدأ بالإضافة للتقسيم المتفرع</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <Reorder.Group axis="y" values={modules} onReorder={handleReorder} className="space-y-3">
           {modules.map((m, idx) => (
-            <div key={m.id} className="p-4 bg-surface rounded-2xl border border-outline-variant/30 hover:border-primary/40 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <Reorder.Item key={m.id} value={m} className="p-4 bg-surface rounded-2xl border border-outline-variant/30 hover:border-primary/40 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-grab active:cursor-grabbing">
               <div className="flex items-center gap-3">
+                <div className="text-on-surface-variant/50 hover:text-primary transition-colors cursor-grab">
+                  <GripVertical size={20} />
+                </div>
                 <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0 border border-emerald-500/20 font-bold text-sm">
                   {idx + 1}
                 </div>
@@ -131,9 +155,9 @@ export default function SubModulesList({ showMsg, course, parentModule, onManage
                   <Trash2 size={16} />
                 </button>
               </div>
-            </div>
+            </Reorder.Item>
           ))}
-        </div>
+        </Reorder.Group>
       )}
 
       <Modal open={showAdd} onClose={() => setShowAdd(false)} title="إضافة موديول فرعي">

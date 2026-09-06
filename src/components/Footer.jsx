@@ -2,146 +2,167 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Mail, 
-  Headphones, 
-  BookOpen, 
-  GraduationCap, 
-  Layers, 
-  Globe2,
-  Share2,
+  MapPin,
+  ChevronLeft,
+  ChevronRight,
   Youtube,
-  QrCode
+  Facebook,
+  Instagram,
+  Twitter,
+  BookOpen
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function Footer() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [logoError, setLogoError] = useState(false);
+  const isAr = i18n.language === 'ar';
+  const ChevronIcon = isAr ? ChevronLeft : ChevronRight;
 
   return (
-    <footer className="w-full bg-primary text-on-primary py-12 relative overflow-hidden">
+    <footer className="w-full bg-surface-container-lowest border-t border-outline-variant/30 text-on-surface pt-16 pb-8 relative overflow-hidden">
       
-      {/* Visual Ambient Glow Background */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-surface/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-10 w-80 h-80 bg-secondary-container/10 rounded-full blur-2xl pointer-events-none" />
+      {/* Background decorations */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(#6D02A5_1px,transparent_1px)] [background-size:20px_20px] opacity-[0.03] pointer-events-none dark:opacity-[0.05]"></div>
 
-      <div className="max-w-container-max mx-auto px-4 sm:px-6 lg:px-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* 1. Brand & Description Section */}
-        <div className="flex flex-col justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-                <img 
-                  alt="Triple S Academy Logo" 
-                  className="h-24 object-contain text-center" 
-                  src="/logo.png"
-                  onError={() => setLogoError(true)}
-                />
-            </div>
-            <p className="text-sm font-label-md leading-relaxed text-on-primary/90">
-              {t('footer.description')}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-12">
+          
+          {/* 1. Brand */}
+          <div className="space-y-6">
+            {!logoError ? (
+              <img 
+                src="/logo.png" 
+                alt="Logo" 
+                className="h-20 object-contain"
+                onError={() => setLogoError(true)}
+              />
+            ) : (
+              <h3 className="text-2xl font-black text-primary">Triple S</h3>
+            )}
+            <p className="text-sm text-on-surface-variant leading-relaxed">
+              {t('footer.description') || 'منصة تعليمية رائدة تهدف لتقديم أفضل محتوى لطلاب الكليات الطبية بأحدث التقنيات وأفضل الخبراء.'}
             </p>
-          </div>
-
-          <div className="flex items-center gap-2 text-xs opacity-75">
-            <Globe2 size={16} />
-            <span>{t('footer.certified')}</span>
-          </div>
-        </div>
-
-        {/* 2. Quick Links */}
-        <div className="flex flex-col gap-3">
-          <h4 className="text-base font-bold text-on-primary border-b border-on-primary/15 pb-2">
-            {t('footer.quickLinks')}
-          </h4>
-          <nav className="flex flex-col gap-2.5 text-sm">
-            <Link to="/" className="opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all duration-200 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-secondary-fixed/60" />
-              {t('navbar.home')}
-            </Link>
-            <Link to="/courses" className="opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all duration-200 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-secondary-fixed/60" />
-              {t('footer.allCourses')}
-            </Link>
-            <Link to="/articles" className="opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all duration-200 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-secondary-fixed/60" />
-              {t('footer.blogAndNews')}
-            </Link>
-          </nav>
-        </div>
-
-        {/* 4. Contact & Social Channels */}
-        <div className="flex flex-col gap-3">
-          <h4 className="text-base font-bold text-on-primary border-b border-on-primary/15 pb-2">
-            {t('footer.contactAndSupport')}
-          </h4>
-          <div className="flex flex-col gap-3 text-sm">
-            <a 
-              href="mailto:info@triplesacademy.com" 
-              className="flex items-center gap-2.5 opacity-85 hover:opacity-100 hover:text-secondary-fixed transition-colors"
-            >
-              <Mail size={18} />
-              <span className="dir-ltr text-right">info@triplesacademy.com</span>
-            </a>
-            <div className="flex items-center gap-2.5 opacity-85">
-              <Headphones size={18} />
-              <span>{t('footer.helpCenter')}</span>
-            </div>
-          </div>
-
-          <div className="pt-2">
-            <span className="text-xs opacity-70 block mb-2">{t('footer.quickChannels')}</span>
-            <div className="flex gap-2">
-              <button 
-                type="button"
-                title={t('footer.scanQr')}
-                aria-label={t('footer.scanQr')}
-                className="p-2 bg-surface/10 hover:bg-surface/20 hover:text-secondary-fixed rounded-xl transition-all duration-200"
-              >
-                <QrCode size={18} />
-              </button>
-              <a 
-                href="https://youtube.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                title={t('footer.youtubeChannel')}
-                aria-label={t('footer.youtubeChannel')}
-                className="p-2 bg-surface/10 hover:bg-surface/20 hover:text-secondary-fixed rounded-xl transition-all duration-200 flex items-center justify-center"
-              >
+            <div className="flex items-center gap-3">
+              <a href="#" className="w-10 h-10 rounded-xl bg-surface border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary/50 transition-all shadow-sm">
+                <Facebook size={18} />
+              </a>
+              <a href="#" className="w-10 h-10 rounded-xl bg-surface border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-rose-500 hover:border-rose-500/50 transition-all shadow-sm">
+                <Instagram size={18} />
+              </a>
+              <a href="#" className="w-10 h-10 rounded-xl bg-surface border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-sky-500 hover:border-sky-500/50 transition-all shadow-sm">
+                <Twitter size={18} />
+              </a>
+              <a href="#" className="w-10 h-10 rounded-xl bg-surface border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-red-500 hover:border-red-500/50 transition-all shadow-sm">
                 <Youtube size={18} />
               </a>
-              <button 
-                type="button"
-                title={t('footer.sharePlatform')}
-                aria-label={t('footer.sharePlatform')}
-                className="p-2 bg-surface/10 hover:bg-surface/20 hover:text-secondary-fixed rounded-xl transition-all duration-200"
-              >
-                <Share2 size={18} />
-              </button>
             </div>
+          </div>
+
+          {/* 2. Quick Links */}
+          <div className="space-y-6">
+            <h4 className="text-lg font-bold text-on-surface relative inline-block">
+              {t('footer.quickLinks') || 'روابط سريعة'}
+              <div className="absolute -bottom-2 left-0 w-1/2 h-1 bg-primary rounded-full"></div>
+            </h4>
+            <ul className="space-y-3">
+              {[
+                { name: t('navbar.home') || 'الرئيسية', path: '/' },
+                { name: t('footer.allCourses') || 'جميع الكورسات', path: '/courses' },
+                { name: t('footer.blogAndNews') || 'المدونة', path: '/articles' },
+                { name: t('navbar.about') || 'من نحن', path: '/about' },
+                { name: t('navbar.contact') || 'تواصل معنا', path: '/contact' }
+              ].map((link, idx) => (
+                <li key={idx}>
+                  <Link to={link.path} className="flex items-center gap-2 text-sm text-on-surface-variant hover:text-primary transition-colors group">
+                    <ChevronIcon size={14} className="text-primary/50 group-hover:text-primary transition-colors" />
+                    <span>{link.name}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* 3. Specialities */}
+          <div className="space-y-6">
+            <h4 className="text-lg font-bold text-on-surface relative inline-block">
+              {isAr ? 'أقسامنا' : 'Departments'}
+              <div className="absolute -bottom-2 left-0 w-1/2 h-1 bg-secondary rounded-full"></div>
+            </h4>
+            <ul className="space-y-3">
+              {[
+                { name: isAr ? 'الطب البشري' : 'Medicine', path: '/courses?category=الطب البشري' },
+                { name: isAr ? 'طب الأسنان' : 'Dentistry', path: '/courses?category=طب الأسنان' }
+              ].map((link, idx) => (
+                <li key={idx}>
+                  <Link to={link.path} className="flex items-center gap-2 text-sm text-on-surface-variant hover:text-secondary transition-colors group">
+                    <BookOpen size={14} className="text-secondary/50 group-hover:text-secondary transition-colors" />
+                    <span>{link.name}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* 4. Contact Info */}
+          <div className="space-y-6">
+            <h4 className="text-lg font-bold text-on-surface relative inline-block">
+              {t('footer.contactAndSupport') || 'تواصل معنا'}
+              <div className="absolute -bottom-2 left-0 w-1/2 h-1 bg-tertiary rounded-full"></div>
+            </h4>
+            <ul className="space-y-4">
+              <li>
+                <a href="mailto:info@triplesacademy.com" className="flex items-start gap-3 group">
+                  <div className="w-8 h-8 rounded-lg bg-surface border border-outline-variant/30 flex items-center justify-center text-on-surface-variant group-hover:text-primary group-hover:border-primary/50 transition-all shrink-0">
+                    <Mail size={14} />
+                  </div>
+                  <div className="flex flex-col pt-1 text-sm text-on-surface-variant group-hover:text-primary transition-colors">
+                    <span className="font-bold text-xs opacity-70 mb-0.5">{isAr ? 'البريد الإلكتروني' : 'Email'}</span>
+                    <span dir="ltr">info@triplesacademy.com</span>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <div className="flex items-start gap-3 group cursor-default">
+                  <div className="w-8 h-8 rounded-lg bg-surface border border-outline-variant/30 flex items-center justify-center text-on-surface-variant group-hover:text-primary group-hover:border-primary/50 transition-all shrink-0">
+                    <MapPin size={14} />
+                  </div>
+                  <div className="flex flex-col pt-1 text-sm text-on-surface-variant group-hover:text-primary transition-colors">
+                    <span className="font-bold text-xs opacity-70 mb-0.5">{isAr ? 'العنوان' : 'Location'}</span>
+                    <span>{isAr ? 'القاهرة، جمهورية مصر العربية' : 'Cairo, Egypt'}</span>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="pt-8 border-t border-outline-variant/30 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="text-xs text-on-surface-variant font-medium flex flex-wrap justify-center gap-1.5 items-center">
+            <span>© {new Date().getFullYear()} Triple S Academy.</span>
+            <span>{t('footer.poweredBy') || 'Powered by'}</span>
+            <a 
+              href="https://astronexsolutions.com/en/" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="font-bold text-primary hover:underline hover:text-primary-hover transition-colors"
+            >
+              AstroNex Solutions
+            </a>
+          </div>
+          
+          <div className="flex items-center gap-6 text-xs font-bold text-on-surface-variant">
+            <Link to="/privacy" className="hover:text-primary transition-colors">{t('footer.privacy') || 'سياسة الخصوصية'}</Link>
+            <Link to="/terms" className="hover:text-primary transition-colors">{t('footer.terms') || 'الشروط والأحكام'}</Link>
           </div>
         </div>
 
       </div>
-
-      {/* Footer Bottom Bar */}
-    <div className="max-w-container-max mx-auto px-4 sm:px-6 lg:px-12 mt-10 pt-6 border-t border-on-primary/15 flex flex-col sm:flex-row items-center justify-between text-xs opacity-75 gap-3">
-  <p className="flex items-center gap-1 flex-wrap">
-    <a 
-      href="https://astronexsolutions.com/en/" 
-      target="_blank" 
-      rel="noopener noreferrer" 
-      className="font-bold hover:underline hover:opacity-100 transition-opacity"
-    >
-      AstroNex Solutions
-    </a>
-    <span>© {new Date().getFullYear()} {t('footer.poweredBy')}</span>
-  </p>
-  <div className="font-bold flex items-center gap-4">
-    <Link to="/privacy" className="hover:underline hover:opacity-100">{t('footer.privacy')}</Link>
-    <span>•</span>
-    <Link to="/terms" className="hover:underline hover:opacity-100">{t('footer.terms')}</Link>
-  </div>
-</div>
     </footer>
   );
 }

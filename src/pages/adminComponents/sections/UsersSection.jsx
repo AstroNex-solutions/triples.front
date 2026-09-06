@@ -1,3 +1,4 @@
+import { useOutletContext } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import API from '../../../api/axios';
@@ -6,7 +7,8 @@ import {
 } from 'lucide-react';
 import { SectionHeader, Card, Badge, statusBadge, Modal, Input, Select, SubmitBtn } from '../ui/SharedUI';
 
-export default function UsersSection({ showMsg }) {
+export default function UsersSection() {
+  const { showMsg } = useOutletContext();
   const { t, i18n } = useTranslation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);

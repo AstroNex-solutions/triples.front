@@ -132,8 +132,8 @@ export default function FlashcardsManager({ product, onClose, showMsg }) {
       {/* Deck Modal */}
       <Modal open={showDeckModal} onClose={() => setShowDeckModal(false)} title={deckForm.id ? 'تعديل الفصل' : 'إضافة فصل'}>
         <form onSubmit={saveDeck} className="space-y-4">
-          <Input label="اسم الشابتر (Chapter) *" required value={deckForm.chapter_name} onChange={e => setDeckForm({...deckForm, chapter_name: e.target.value})} />
-          <Input label="اسم الموضوع (Topic) *" required value={deckForm.topic_name} onChange={e => setDeckForm({...deckForm, topic_name: e.target.value})} />
+          <Input label="اسم الفصل *" required value={deckForm.chapter_name} onChange={e => setDeckForm({...deckForm, chapter_name: e.target.value})} />
+          <Input label="اسم الموضوع *" required value={deckForm.topic_name} onChange={e => setDeckForm({...deckForm, topic_name: e.target.value})} />
           <Input label="الترتيب" type="number" required value={deckForm.order} onChange={e => setDeckForm({...deckForm, order: e.target.value})} />
           <div className="pt-4 border-t border-outline-variant/30 flex justify-end gap-3">
             <button type="button" onClick={() => setShowDeckModal(false)} className="px-4 py-2 text-sm font-bold text-on-surface-variant">إلغاء</button>
