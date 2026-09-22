@@ -19,12 +19,14 @@ import { useTranslation } from 'react-i18next';
 
 export default function RegisterPage() {
   const { t } = useTranslation();
-  const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [status, setStatus] = useState('Student');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -34,10 +36,18 @@ export default function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (password !== confirmPassword) {
+      setError(t('auth.register.passwordMismatch', 'كلمة المرور غير متطابقة') || 'كلمة المرور غير متطابقة');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await register({ name, username, email, password, status });
+      const fullName = `${firstName} ${lastName}`.trim();
+      const generatedUsername = `${firstName.toLowerCase().replace(/[^a-z0-9]/g, '')}${Math.floor(Math.random() * 10000)}`;
+      await register({ name: fullName, username: generatedUsername, email, password, status });
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || t('auth.register.errCreate'));
@@ -47,14 +57,14 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-10">
+    <div className="min-h-screen bg-surface flex items-center justify-center px-4 py-10 relative overflow-hidden">
       {/* Background Glow Elements */}
-      <div className="relative w-full max-w-lg">
-        <div className="absolute -top-12 -right-12 w-80 h-80 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-12 -left-12 w-80 h-80 bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 -right-20 w-96 h-96 bg-primary/20 rounded-full blur-3xl opacity-50 pointer-events-none animate-pulse" />
+      <div className="absolute -bottom-10 -left-20 w-96 h-96 bg-secondary/20 rounded-full blur-3xl opacity-50 pointer-events-none animate-pulse" style={{ animationDelay: '1s' }} />
 
+      <div className="relative w-full max-w-lg z-10">
         {/* Form Card */}
-        <div className="relative rounded-3xl bg-surface-container-low/70 border border-outline-variant/40 p-6 sm:p-10 backdrop-blur-xl shadow-xl space-y-6">
+        <div className="relative rounded-3xl bg-surface/60 border border-outline-variant/30 dark:border-white/5 p-8 sm:p-10 backdrop-blur-2xl shadow-2xl hover:shadow-primary/5 transition-shadow duration-500 space-y-6">
           
           {/* Header */}
           <div className="text-center space-y-2">
@@ -79,40 +89,40 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             
 
-            {/* Name Input */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-on-surface-variant block">
-                {t('auth.register.fullName')}
-              </label>
-              <div className="relative">
-                <User size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant/60" />
-                <input 
-                  type="text" 
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder={t('auth.register.namePlaceholder')}
-                  className="w-full pr-10 pl-4 py-3 bg-surface/80 border border-outline-variant/50 rounded-2xl text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
-                />
+            {/* Name Inputs */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-on-surface-variant block">
+                  {t('auth.register.firstName') || 'الاسم الأول'}
+                </label>
+                <div className="relative group">
+                  <User size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant/50 group-focus-within:text-primary transition-colors duration-300" />
+                  <input 
+                    type="text" 
+                    required
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder={t('auth.register.firstNamePlaceholder') || 'الاسم الأول'}
+                    className="w-full pr-10 pl-4 py-3 bg-surface/50 hover:bg-surface/80 border border-outline-variant/30 rounded-2xl text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:bg-background focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/15 transition-all duration-300"
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* Username Input */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-on-surface-variant block">
-                {t('auth.register.username')}
-              </label>
-              <div className="relative">
-                <AtSign size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant/60" />
-                <input 
-                  type="text" 
-                  required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="username"
-                  className="w-full pr-10 pl-4 py-3 bg-surface/80 border border-outline-variant/50 rounded-2xl text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
-                  dir="ltr"
-                />
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-on-surface-variant block">
+                  {t('auth.register.lastName') || 'الاسم الأخير'}
+                </label>
+                <div className="relative group">
+                  <User size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant/50 group-focus-within:text-primary transition-colors duration-300" />
+                  <input 
+                    type="text" 
+                    required
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder={t('auth.register.lastNamePlaceholder') || 'الاسم الأخير'}
+                    className="w-full pr-10 pl-4 py-3 bg-surface/50 hover:bg-surface/80 border border-outline-variant/30 rounded-2xl text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:bg-background focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/15 transition-all duration-300"
+                  />
+                </div>
               </div>
             </div>
 
@@ -121,15 +131,15 @@ export default function RegisterPage() {
               <label className="text-xs font-bold text-on-surface-variant block">
                 {t('auth.login.email')}
               </label>
-              <div className="relative">
-                <Mail size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant/60" />
+              <div className="relative group">
+                <Mail size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant/50 group-focus-within:text-primary transition-colors duration-300" />
                 <input 
                   type="email" 
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="w-full pr-10 pl-4 py-3 bg-surface/80 border border-outline-variant/50 rounded-2xl text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                  className="w-full pr-10 pl-4 py-3 bg-surface/50 hover:bg-surface/80 border border-outline-variant/30 rounded-2xl text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:bg-background focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/15 transition-all duration-300"
                   dir="ltr"
                 />
               </div>
@@ -140,24 +150,51 @@ export default function RegisterPage() {
               <label className="text-xs font-bold text-on-surface-variant block">
                 {t('auth.login.password')}
               </label>
-              <div className="relative">
-                <Lock size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant/60" />
+              <div className="relative group">
+                <Lock size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant/50 group-focus-within:text-primary transition-colors duration-300" />
                 <input 
                   type={showPassword ? 'text' : 'password'} 
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pr-10 pl-11 py-3 bg-surface/80 border border-outline-variant/50 rounded-2xl text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                  className="w-full pr-10 pl-11 py-3 bg-surface/50 hover:bg-surface/80 border border-outline-variant/30 rounded-2xl text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:bg-background focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/15 transition-all duration-300"
                   dir="ltr"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant/60 hover:text-on-surface transition-colors"
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant/50 hover:text-primary transition-colors duration-300"
                   tabIndex="-1"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Confirm Password Input */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-on-surface-variant block">
+                {t('auth.register.confirmPassword') || 'تأكيد كلمة المرور'}
+              </label>
+              <div className="relative group">
+                <Lock size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant/50 group-focus-within:text-primary transition-colors duration-300" />
+                <input 
+                  type={showConfirmPassword ? 'text' : 'password'} 
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full pr-10 pl-11 py-3 bg-surface/50 hover:bg-surface/80 border border-outline-variant/30 rounded-2xl text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:bg-background focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/15 transition-all duration-300"
+                  dir="ltr"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant/50 hover:text-primary transition-colors duration-300"
+                  tabIndex="-1"
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             </div>
@@ -166,7 +203,7 @@ export default function RegisterPage() {
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full py-3.5 bg-primary text-on-primary font-bold text-sm rounded-2xl hover:bg-primary-hover disabled:opacity-60 transition-all flex items-center justify-center gap-2 shadow-glow cursor-pointer mt-3"
+              className="w-full py-3.5 bg-gradient-to-r from-primary to-primary-hover text-on-primary font-bold text-sm rounded-2xl hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 disabled:opacity-60 disabled:hover:translate-y-0 transition-all duration-300 flex items-center justify-center gap-2 mt-4"
             >
               {loading ? (
                 <>

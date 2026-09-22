@@ -20,26 +20,34 @@ export default {
         'surface-container-high': 'rgb(var(--color-surface-container-high) / <alpha-value>)',
         'surface-container-highest': 'rgb(var(--color-surface-container-highest) / <alpha-value>)',
         primary: {
-          DEFAULT: '#6D02A5',
-          hover: '#BB88D3',
-          light: '#8A50BA',
+          DEFAULT: '#663399',
+          hover: '#8b5cf6', // a lighter purple for hover
+          light: '#A2C9E4', // using the light blue as light
+          dark: '#333879',  // dark blue
+          darkest: '#1B1B48', // very dark blue
         },
         'on-primary': '#ffffff',
         'primary-container': 'rgb(var(--color-primary-container) / <alpha-value>)',
         'on-primary-container': 'rgb(var(--color-on-primary-container) / <alpha-value>)',
-        secondary: '#0ea5e9',
+        secondary: {
+          DEFAULT: '#4DBFB3', // teal
+          hover: '#38bdf8',
+          light: '#A2C9E4',
+        },
         'on-secondary': '#ffffff',
         'secondary-container': 'rgb(var(--color-secondary-container) / <alpha-value>)',
         'on-secondary-container': 'rgb(var(--color-on-secondary-container) / <alpha-value>)',
-        'secondary-fixed': '#38bdf8',
-        'on-secondary-fixed': '#082f49',
-        tertiary: '#8b5cf6',
+        'secondary-fixed': '#4DBFB3',
+        'on-secondary-fixed': '#1B1B48',
+        tertiary: '#333879',
         'on-tertiary': '#ffffff',
         error: '#ef4444',
         'on-error': '#ffffff',
         'error-container': 'rgb(var(--color-error-container) / <alpha-value>)',
         'outline': 'rgb(var(--color-outline) / <alpha-value>)',
         'outline-variant': 'rgb(var(--color-outline-variant) / <alpha-value>)',
+        dark: '#333333',
+        light: '#FFFFFF',
       },
       spacing: {
         'xs': '0.5rem',
@@ -60,7 +68,7 @@ export default {
       },
       fontFamily: {
         arabic: ['Cairo', 'sans-serif'],
-        sans: ['Cairo', 'Outfit', 'sans-serif'],
+        sans: ['Coolvetica', 'Co Text', 'Cairo', 'sans-serif'],
       },
       maxWidth: {
         'container-max': '1280px',
@@ -68,8 +76,8 @@ export default {
       boxShadow: {
         'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
         'soft': '0 20px 50px -15px rgba(15, 23, 42, 0.06)',
-        'glow': '0 10px 30px -5px rgba(109, 2, 165, 0.35)',
-        'glow-secondary': '0 10px 30px -5px rgba(14, 165, 233, 0.35)',
+        'glow': '0 10px 30px -5px rgba(102, 51, 153, 0.35)',
+        'glow-secondary': '0 10px 30px -5px rgba(77, 191, 179, 0.35)',
       }
     },
   },

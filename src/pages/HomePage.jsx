@@ -92,7 +92,7 @@ export default function HomePage() {
               const bDesc = i18n.language === 'ar' ? (banner.description_ar || banner.description) : banner.description;
               const bImage = i18n.language === 'ar' && banner.image_ar ? banner.image_ar : banner.image;
               const bBtnText = i18n.language === 'ar' ? (banner.button_text_ar || banner.button_text || 'ابدأ رحلتك') : (banner.button_text || "Start your journey");
-              const bUrl = banner.url || banner.button_url || '/register';
+              const bUrl = banner.url || banner.button_url || '/courses?category=Medicine';
               const imagePath = bImage.startsWith('/uploads/') ? bImage.replace('/uploads/', '') : (bImage.startsWith('uploads/') ? bImage.replace('uploads/', '') : bImage);
               const imageUrl = bImage ? (bImage.startsWith('http') ? bImage : `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}/uploads/${imagePath}`) : null;
 
@@ -233,7 +233,7 @@ export default function HomePage() {
       <section className="py-24 bg-surface-container-low/30 border-y border-outline-variant">
         <div className="max-w-7xl mx-auto px-4 lg:px-8 text-center">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-on-background mb-16">
-            {i18n.language === 'ar' ? 'كل ما تحتاجه في منصة واحدة' : 'All you need in one platform'}
+            {i18n.language === 'ar' ? 'كل ما تحتاجه في منصة واحدة' : 'Everything you need in one place'}
           </h2>
           
           <div className="flex flex-wrap justify-center items-center gap-10 md:gap-16 lg:gap-24">

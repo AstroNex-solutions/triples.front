@@ -121,7 +121,7 @@ export default function CoursesSection() {
                   ) : (
                     <div className="flex flex-col gap-2">
                       <div className="flex gap-2">
-                        <Link to={`/learn/${e.course_id}`} className="flex-1 py-2 bg-primary/10 text-primary hover:bg-primary/20 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer">
+                        <Link to={`/dashboard/learn/${e.course_id}`} className="flex-1 py-2 bg-primary/10 text-primary hover:bg-primary/20 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer">
                           <PlayCircle size={16} /> {t('studentDashboard.courses.continue')}
                         </Link>
                         <button onClick={() => { setSelectedCourse(e); setReviewData({rating: 5, review_text: ''}); setReviewModalOpen(true); }} className="px-3 py-2 bg-surface border border-outline-variant/40 text-on-surface hover:text-yellow-500 font-bold text-xs rounded-xl flex items-center justify-center transition-all cursor-pointer" title={t('studentDashboard.courses.rateCourse', 'Rate Course')}>

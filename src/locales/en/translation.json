@@ -149,6 +149,12 @@
       "fullName": "Full Name",
       "namePlaceholder": "e.g. John Doe",
       "username": "Username",
+      "firstName": "First Name",
+      "firstNamePlaceholder": "First Name",
+      "lastName": "Last Name",
+      "lastNamePlaceholder": "Last Name",
+      "confirmPassword": "Confirm Password",
+      "passwordMismatch": "Passwords do not match",
       "submit": "Create Account",
       "submitting": "Creating account...",
       "haveAccount": "Already have an account?",
@@ -275,15 +281,61 @@
         "orders": "Purchase History",
         "library": "Articles & Library",
         "support": "Technical Support"
-      }
+      },
+      "overview": "Overview",
+      "courseContent": "Course Content",
+      "flashcards": "Flashcards",
+      "questionsBank": "Questions Bank",
+      "selfAssessment": "Self Assessment",
+      "performance": "Performance",
+      "freeze": "Freeze",
+      "purchaseHistory": "Purchase History",
+      "myLibrary": "My Library",
+      "supportTickets": "Support Tickets",
+      "studentRole": "Student on platform"
     },
     "overview": {
-      "welcome": "Welcome back! 👋",
+      "welcome": "Welcome, ",
       "subtitle": "Track your progress and continue your journey toward success.",
       "enrolledCourses": "Enrolled Courses",
       "completedCourses": "Completed Courses",
       "pendingAssessments": "Available Exams",
-      "ordersCount": "Purchases"
+      "ordersCount": "Purchases",
+      "student": "Student",
+      "subscribeToUnlock": "Subscribe to unlock",
+      "myCourses": "My Courses",
+      "lessons": "Lessons",
+      "contentExperts": "CONTENT EXPERTS",
+      "noModules": "There are no modules in this course currently.",
+      "noCourses": "No enrolled courses",
+      "noCoursesDesc": "You haven't enrolled in any courses yet. Start your educational journey by enrolling in a new course",
+      "browseCourses": "Browse Courses",
+      "cards": {
+        "flashcards": {
+          "title": "Flashcards",
+          "subtitle": "Study with flashcards"
+        },
+        "qbank": {
+          "title": "Question Bank",
+          "subtitle": "Practice questions"
+        },
+        "selfAssessment": {
+          "title": "Self Assessment",
+          "subtitle": "Test your knowledge"
+        },
+        "schedule": {
+          "title": "Schedule",
+          "subtitle": "Manage your time"
+        },
+        "performance": {
+          "title": "Performance",
+          "subtitle": "Track progress"
+        },
+        "freeze": {
+          "title": "Freeze",
+          "subtitle": "Pause subscription"
+        }
+      }
     },
     "account": {
       "title": "Profile Settings",

@@ -149,6 +149,12 @@
       "fullName": "الاسم الكامل",
       "namePlaceholder": "مثال: أحمد صبري",
       "username": "اسم المستخدم",
+      "firstName": "الاسم الأول",
+      "firstNamePlaceholder": "الاسم الأول",
+      "lastName": "الاسم الأخير",
+      "lastNamePlaceholder": "الاسم الأخير",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "passwordMismatch": "كلمة المرور غير متطابقة",
       "submit": "إنشاء الحساب",
       "submitting": "جاري إنشاء الحساب...",
       "haveAccount": "لديك حساب بالفعل؟",
@@ -275,15 +281,61 @@
         "orders": "سجل المشتريات",
         "library": "المقالات والمكتبة",
         "support": "الدعم الفني"
-      }
+      },
+      "overview": "نظرة عامة",
+      "courseContent": "محتوى الكورس",
+      "flashcards": "البطاقات التعليمية",
+      "questionsBank": "بنك الأسئلة",
+      "selfAssessment": "التقييم الذاتي",
+      "performance": "الأداء",
+      "freeze": "إيقاف الاشتراك",
+      "purchaseHistory": "سجل المشتريات",
+      "myLibrary": "مكتبتي",
+      "supportTickets": "تذاكر الدعم",
+      "studentRole": "طالب بالمنصة"
     },
     "overview": {
-      "welcome": "مرحباً بعودتك! 👋",
+      "welcome": "مرحباً، ",
       "subtitle": "تابع تقدمك واستكمل رحلتك التعليمية نحو النجاح.",
       "enrolledCourses": "كورساتي المسجلة",
       "completedCourses": "الكورسات المكتملة",
       "pendingAssessments": "اختبارات متاحة",
-      "ordersCount": "المشتريات"
+      "ordersCount": "المشتريات",
+      "student": "طالب",
+      "subscribeToUnlock": "اشترك لتفعيل الميزة",
+      "myCourses": "كورساتي المشترك بها",
+      "lessons": "دروس",
+      "contentExperts": "خبراء المحتوى",
+      "noModules": "لا توجد أقسام في هذا الكورس حالياً.",
+      "noCourses": "لا توجد كورسات مشتركة",
+      "noCoursesDesc": "لم تقم بالاشتراك في أي كورس بعد. ابدأ رحلتك التعليمية بالاشتراك في كورس جديد",
+      "browseCourses": "تصفح الكورسات",
+      "cards": {
+        "flashcards": {
+          "title": "البطاقات التعليمية",
+          "subtitle": "ذاكر باستخدام البطاقات"
+        },
+        "qbank": {
+          "title": "بنك الأسئلة",
+          "subtitle": "تدرب على الأسئلة"
+        },
+        "selfAssessment": {
+          "title": "التقييم الذاتي",
+          "subtitle": "اختبر معلوماتك"
+        },
+        "schedule": {
+          "title": "الجدول الزمني",
+          "subtitle": "نظم وقتك"
+        },
+        "performance": {
+          "title": "الأداء",
+          "subtitle": "تابع تقدمك"
+        },
+        "freeze": {
+          "title": "إيقاف الاشتراك",
+          "subtitle": "إيقاف مؤقت للاشتراك"
+        }
+      }
     },
     "account": {
       "title": "الملف الشخصي",

@@ -26,6 +26,7 @@ export default function LessonForm({ showMsg, module, lesson, onBack }) {
   
   const [lessonFile, setLessonFile] = useState(null);
   const [lessonAttachmentFiles, setLessonAttachmentFiles] = useState([]);
+  const [existingAttachments, setExistingAttachments] = useState(isEditing ? parseAttachments(lesson.attachments) : []);
 
   // Bunny Videos
   const [showBunnyModal, setShowBunnyModal] = useState(false);
@@ -80,6 +81,21 @@ export default function LessonForm({ showMsg, module, lesson, onBack }) {
       showMsg('error', err.response?.data?.message || (isEditing ? 'خطأ في التحديث' : 'خطأ في الإضافة')); 
     } finally { 
       setSubmitting(false); 
+    }
+  };
+
+  const handleDeleteExistingAttachment = async (idx) => {
+    if (!window.confirm('هل أنت متأكد من حذف هذا المرفق نهائياً؟')) return;
+    try {
+      const res = await API.delete(`/admin/lessons/${lesson.id}/attachments/${idx}`);
+      showMsg('success', 'تم حذف المرفق بنجاح');
+      if (res.data.attachments) {
+        setExistingAttachments(res.data.attachments);
+      } else {
+        setExistingAttachments(prev => prev.filter((_, i) => i !== idx));
+      }
+    } catch (err) {
+      showMsg('error', 'خطأ في حذف المرفق');
     }
   };
 
@@ -160,32 +176,37 @@ export default function LessonForm({ showMsg, module, lesson, onBack }) {
                 <Paperclip size={18} className="text-amber-500" />
                 <span className="text-sm font-bold text-on-surface">مرفقات الدرس</span>
               </div>
-              {isEditing && parseAttachments(lesson?.attachments).length > 0 && (
+              {isEditing && existingAttachments.length > 0 && (
                 <span className="text-[10px] font-bold text-amber-500 bg-amber-500/10 px-2 py-1 rounded-lg border border-amber-500/20">
-                  {parseAttachments(lesson.attachments).length} مرفقات سابقة
+                  {existingAttachments.length} مرفقات سابقة
                 </span>
               )}
             </div>
             
-            {isEditing && parseAttachments(lesson?.attachments).length > 0 && (
+            {isEditing && existingAttachments.length > 0 && (
               <div className="mb-4 space-y-2">
                 <p className="text-xs text-on-surface-variant font-medium">المرفقات الحالية:</p>
-                {parseAttachments(lesson.attachments).map((att, idx) => (
+                {existingAttachments.map((att, idx) => (
                   <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-surface border border-outline-variant/30 text-xs">
                     <div className="flex items-center gap-2">
                       <FileIcon size={14} className="text-on-surface-variant shrink-0" />
                       <span className="text-on-surface-variant font-medium truncate max-w-[200px] sm:max-w-md" dir="ltr">
-                        {typeof att === 'string' ? att.split('/').pop() : 'Attachment'}
+                        {typeof att === 'string' ? att.split('/').pop() : (att.name || 'Attachment')}
                       </span>
                     </div>
-                    <a href={typeof att === 'string' ? att : '#'} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg text-primary hover:bg-primary/10 transition-colors" title="تحميل">
-                      <Download size={14} />
-                    </a>
+                    <div className="flex items-center gap-2">
+                      <a href={typeof att === 'string' ? att : (att.url || '#')} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg text-primary hover:bg-primary/10 transition-colors" title="تحميل">
+                        <Download size={14} />
+                      </a>
+                      <button type="button" onClick={() => handleDeleteExistingAttachment(idx)} className="p-1.5 rounded-lg text-error hover:bg-error/10 transition-colors" title="إزالة">
+                        <X size={14} />
+                      </button>
+                    </div>
                   </div>
                 ))}
                 <div className="flex items-start gap-1.5 mt-2 bg-amber-500/10 p-2 rounded-lg text-amber-500/90 text-[10px] font-bold">
                   <AlertTriangle size={14} className="shrink-0" />
-                  <span>تنبيه: رفع مرفقات جديدة سيؤدي إلى استبدال المرفقات القديمة بالكامل.</span>
+                  <span>تنبيه: سيتم استبدال المرفقات القديمة في حال قمت برفع ملفات جديدة.</span>
                 </div>
               </div>
             )}

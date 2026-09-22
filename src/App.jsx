@@ -35,7 +35,10 @@ import QuestionBanksSection from './pages/student/QuestionBanksSection';
 import OrdersSection from './pages/student/OrdersSection';
 import LibrarySection from './pages/student/LibrarySection';
 import SupportSection from './pages/student/SupportSection';
+import ModuleSection from './pages/student/ModuleSection';
 import FlashcardsStudentSection from './pages/student/FlashcardsStudentSection';
+import FreezeSection from './pages/student/FreezeSection';
+import PerformanceSection from './pages/student/PerformanceSection';
 import PaymentResultPage from './pages/PaymentResultPage';
 import AdminDashboard from './pages/AdminDashboard';
 import ContactPage from './pages/ContactPage';
@@ -145,15 +148,18 @@ export default function App() {
             <Route path="orders" element={<OrdersSection />} />
             <Route path="library" element={<LibrarySection />} />
             <Route path="support" element={<SupportSection />} />
+            <Route path="course/:courseId/module/:moduleId" element={<ModuleSection />} />
+            <Route path="freeze" element={<FreezeSection />} />
+            <Route path="performance" element={<PerformanceSection />} />
           </Route>
+          <Route path="learn/:courseId" element={<CoursePlayerPage />} />
+          <Route path="learn/:courseId/lesson/:lessonId" element={<CoursePlayerPage />} />
           <Route path="/assessment/:assessmentId" element={<AssessmentPage />} />
           <Route path="/self-assessment/:id" element={<SelfAssessmentPage />} />
           <Route path="/question-bank/:id" element={<QuestionBankPage />} />
           <Route path="/question-bank" element={<QuestionBankPage />} />
           <Route path="/self-assessment" element={<SelfAssessmentPage />} />
           <Route path="/study-flashcards/:productId" element={<FlashcardStudyPage />} />
-          <Route path="/learn/:courseId" element={<CoursePlayerPage />} />
-          <Route path="/learn/:courseId/lesson/:lessonId" element={<CoursePlayerPage />} />
           <Route path="/secure-viewer" element={<SecureViewer />} />
           <Route path="/payment-result" element={<PaymentResultPage />} />
         </Route>
@@ -191,10 +197,6 @@ export default function App() {
           </Route>
 
           {/* Protected Routes (Logged in users) */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/learn/:courseId" element={<CoursePlayerPage />} />
-            <Route path="/learn/:courseId/lesson/:lessonId" element={<CoursePlayerPage />} />
-          </Route>
 
         </Route>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import API from '../api/axios';
 import Toast from '../components/Toast';
 import { 
@@ -195,6 +195,14 @@ export default function CoursePlayerPage() {
   const [lessonReviewData, setLessonReviewData] = useState({ rating: 0, review_text: '' });
   const [submittingLessonReview, setSubmittingLessonReview] = useState(false);
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState('all'); // all, video, quiz
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  
+  const queryParams = new URLSearchParams(useLocation().search);
+  const targetModuleId = queryParams.get('module');
+
+
   // تحديث تقييم الدرس عند تغيير الدرس الحالي
   useEffect(() => {
     if (currentLesson) {
@@ -303,7 +311,7 @@ export default function CoursePlayerPage() {
     if (modId) {
       setOpenModuleIds(prev => prev.includes(modId) ? prev : [...prev, modId]);
     }
-    navigate(`/learn/${courseId}/lesson/${lesson.id}`);
+    navigate(`/learn/${courseId}/lesson/${lesson.id}?module=${modId}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [courseId, navigate]);
 
@@ -594,391 +602,274 @@ export default function CoursePlayerPage() {
     return src;
   };
 
+  
+  // Find current submodule and its lessons
+  const currentSubmodule = course?.modules?.find(m => m.id === parseInt(targetModuleId)) || course?.modules?.[0];
+  const submoduleLessons = currentSubmodule?.lessons || [];
+  
+  const filteredLessons = submoduleLessons.filter(lesson => {
+    if (searchQuery && !lesson.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    if (filterType === 'video' && lesson.lesson_type !== 'video') return false;
+    if (filterType === 'quiz' && lesson.lesson_type !== 'quiz' && lesson.lesson_type !== 'assessment') return false;
+    return true;
+  });
+
+  const completedSubmoduleLessonsCount = submoduleLessons.filter(l => completedLessons.includes(l.id)).length;
+
+
   if (loading) {
     return (
-      <div className="min-h-screen pb-20 pt-6 px-4 sm:px-6 lg:px-12 max-w-container-max mx-auto space-y-8 mt-24" dir="rtl">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <div className="lg:col-span-8 space-y-6">
-            <div className="h-[420px] rounded-3xl bg-surface-container-low/50 border border-outline-variant/30 animate-pulse" />
-            <div className="h-32 rounded-3xl bg-surface-container-low/50 border border-outline-variant/30 animate-pulse" />
-          </div>
-          <div className="lg:col-span-4 h-[550px] rounded-3xl bg-surface-container-low/50 border border-outline-variant/30 animate-pulse" />
-        </div>
+      <div className="flex items-center justify-center min-h-screen bg-[#F8F9FA]">
+        <Loader2 size={48} className="animate-spin text-[#5c4be4]" />
       </div>
     );
   }
 
   if (!course) {
     return (
-      <div className="min-h-[70vh] flex items-center justify-center px-4" dir="rtl">
-        <div className="max-w-md w-full rounded-3xl bg-surface-container-low/60 border border-outline-variant/40 p-8 text-center backdrop-blur-xl space-y-4">
-          <div className="w-16 h-16 rounded-2xl bg-error/10 text-error mx-auto flex items-center justify-center">
-            <BookOpen size={32} />
-          </div>
-          <h2 className="text-xl font-extrabold text-on-surface">عذراً، تعذر تحميل المحتوى</h2>
-          <p className="text-xs text-on-surface-variant">قد تكون الدورة غير متاحة أو تم تغيير الرابط.</p>
-          <Link to="/courses" className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-on-primary font-bold text-xs rounded-2xl shadow-glow">
-            <ArrowRight size={16} /><span>العودة للدورات</span>
-          </Link>
-        </div>
+      <div className="flex items-center justify-center min-h-screen bg-[#F8F9FA]">
+        <p className="text-xl font-bold">عذراً، تعذر تحميل المحتوى</p>
       </div>
     );
   }
 
-  // --- Course Content View (Modules Page) ---
-  if (!lessonId) {
-    return (
-      <div className="min-h-screen pb-24 pt-28 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-10 relative" dir="rtl">
-        <Toast toast={toast} onClose={() => setToast(null)} />
-        
-        {/* Header */}
-        <div className="relative overflow-hidden bg-gradient-to-l from-primary/10 via-surface to-surface border border-outline-variant/40 rounded-[2rem] p-8 sm:p-10 shadow-2xl">
-          {/* Decorative background elements */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-          
-          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-            <div className="flex items-center gap-5">
-              <Link to={`/dashboard`} className="p-3.5 rounded-2xl bg-surface border border-outline-variant/50 text-on-surface-variant hover:text-primary hover:border-primary/50 hover:shadow-lg transition-all" title="العودة">
-                <ArrowRight size={24} />
-              </Link>
-              <div>
-                <span className="text-sm font-bold text-primary flex items-center gap-2 mb-2">
-                  <BookOpen size={18} /> مسار التعلم
-                </span>
-                <h1 className="text-2xl sm:text-3xl font-black text-on-surface leading-tight">
-                  {course.title}
-                </h1>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Modules Tree */}
-        <div className="space-y-6">
-          <div className="flex items-center justify-between px-2">
-             <h3 className="text-xl sm:text-2xl font-extrabold text-on-surface flex items-center gap-3">
-                <CheckCircle className="text-primary" size={28} /> محتوى الكورس
-             </h3>
-             <span className="text-sm font-bold text-on-surface-variant bg-surface-container-low px-4 py-1.5 rounded-xl border border-outline-variant/30 shadow-sm">
-                {course.modules?.length || 0} موديولات
-             </span>
-          </div>
-          
-          <div className="space-y-5">
-             {course.modules?.filter(m => !m.submodule_id).map((mod, idx) => (
-                <PlayerModuleNode 
-                  key={mod.id}
-                  module={mod}
-                  allModules={course.modules}
-                  idx={idx}
-                  level={0}
-                  openModuleIds={openModuleIds}
-                  toggleModule={toggleModule}
-                  currentLesson={null}
-                  completedLessons={completedLessons}
-                  courseId={course.id}
-                  onSelectLesson={handleSelectLesson}
-                  onToggleComplete={handleToggleComplete}
-                />
-              ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // --- Lesson Player View ---
   const isCompleted = completedLessons.includes(currentLesson?.id);
 
   return (
-    <div className="min-h-screen pb-20 pt-6 px-4 sm:px-6 lg:px-12 max-w-5xl mx-auto space-y-8 relative" dir="rtl">
-      <Toast toast={toast} onClose={() => setToast(null)} />
-
-      {/* الشريط العلوي */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-surface-container-low/60 border border-outline-variant/40 rounded-2xl p-4 backdrop-blur-xl mt-20 lg:mt-0">
-        <div className="flex items-center gap-3">
-          <Link to={`/learn/${courseId}`} className="p-2 rounded-xl bg-surface border border-outline-variant/40 text-on-surface-variant hover:text-primary transition-colors" title="العودة لفهرس الكورس">
-            <ArrowRight size={18} />
-          </Link>
-          <div>
-            <span className="text-[11px] font-bold text-primary block">{course.title}</span>
-            <h1 className="text-sm sm:text-base font-extrabold text-on-surface">
-              {currentLesson ? currentLesson.title : 'معاينة الدرس'}
-            </h1>
+    <div className="flex h-screen bg-surface-container-lowest overflow-hidden font-sans" dir="ltr">
+      
+      {/* SIDEBAR (Purple) */}
+      <div className={`${sidebarOpen ? 'w-80' : 'w-20'} transition-all duration-300 flex flex-col bg-[#5c4be4] text-white shrink-0 overflow-hidden relative shadow-2xl z-20`}>
+        
+        {/* Sidebar Header */}
+        <div className="p-4 sm:p-6 pb-4 flex flex-col items-center sm:items-stretch">
+          <div className={`flex items-center ${sidebarOpen ? 'justify-between' : 'justify-center'} mb-6 w-full`}>
+            {sidebarOpen && (
+              <button onClick={() => navigate('/dashboard/overview')} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            )}
+            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+              {sidebarOpen ? (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="11 17 6 12 11 7"></polyline><polyline points="18 17 13 12 18 7"></polyline></svg>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline></svg>
+              )}
+            </button>
           </div>
+          
+          {sidebarOpen && (
+            <>
+              <h2 className="text-xs text-white/70 font-semibold uppercase tracking-wider mb-1">{course.title}</h2>
+              <h1 className="text-xl font-bold mb-4">{currentSubmodule?.name || 'Submodule'}</h1>
+              
+              <div className="mb-4">
+                <div className="text-sm font-semibold mb-2">
+                  {completedSubmoduleLessonsCount}/{submoduleLessons.length} Completed
+                </div>
+                <div className="w-full bg-white/20 h-1.5 rounded-full overflow-hidden">
+                  <div className="bg-white h-full rounded-full transition-all" style={{ width: `${(completedSubmoduleLessonsCount / Math.max(1, submoduleLessons.length)) * 100}%` }} />
+                </div>
+              </div>
+            
+          </>)}
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          {isCompleted && (
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
-              <Check size={14} /><span>تم الإكمال</span>
-            </span>
+        
+        {/* Lesson List */}
+        <div className="flex-1 overflow-y-auto px-4 pb-6 space-y-2 custom-scrollbar">
+          {filteredLessons.map((lesson, idx) => {
+            const isActive = currentLesson?.id === lesson.id;
+            const isCompleted = completedLessons.includes(lesson.id);
+            
+            return (
+              <button
+                key={lesson.id}
+                onClick={() => handleSelectLesson(lesson, currentSubmodule.id)}
+                className={`w-full flex items-start gap-3 p-3 rounded-xl transition-all text-left ${isActive ? 'bg-white text-[#5c4be4] shadow-md' : 'bg-white/5 text-white hover:bg-white/10'} ${!sidebarOpen ? 'justify-center' : ''}`}
+              >
+                <div className="shrink-0 flex items-center justify-center w-5 h-5 mt-0.5">
+                  {isCompleted ? (
+                    <div className={`w-4 h-4 rounded-full flex items-center justify-center ${isActive ? 'bg-[#5c4be4]' : 'bg-white'}`}>
+                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={isActive ? 'white' : '#5c4be4'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                  ) : (
+                    <div className={`w-3 h-3 rounded-full border-2 ${isActive ? 'border-[#5c4be4]' : 'border-white/50'}`} />
+                  )}
+                </div>
+                
+                {sidebarOpen && <div className="flex-1 overflow-hidden">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`text-sm font-bold truncate ${isActive ? 'text-[#5c4be4]' : 'text-white'}`}>
+                      {idx + 1} &nbsp; {lesson.title}
+                    </span>
+                  </div>
+                  {lesson.duration_seconds > 0 && (
+                    <div className={`text-[10px] flex items-center gap-1.5 ${isActive ? 'text-[#5c4be4]/70' : 'text-white/50'}`}>
+                      {lesson.lesson_type === 'video' ? <Play size={10} /> : <FileText size={10} />}
+                      {formatDuration(lesson.duration_seconds)}
+                    </div>
+                  )}
+                </div>}
+              </button>
+            );
+          })}
+          {filteredLessons.length === 0 && (
+            <div className="text-center text-white/50 text-sm mt-4">
+              No lessons found.
+            </div>
           )}
-          <span className="text-[10px] text-on-surface-variant/50 bg-surface/60 px-2.5 py-1 rounded-xl border border-outline-variant/20 hidden sm:block">
-            ⌨️ Space: تشغيل / أسهم يمين-يسار: تقديم وتأخير
-          </span>
         </div>
       </div>
-
-      {/* المحتوى الرئيسي للدرس */}
-      <div className="space-y-6 w-full">
-
-          {/* مشغل الفيديو */}
-          <div className="relative rounded-3xl bg-black border border-outline-variant/50 overflow-hidden shadow-2xl aspect-video flex items-center justify-center">
-            {currentLesson?.video_url ? (
-              currentLesson.video_url.includes('iframe.mediadelivery.net') || 
-              currentLesson.video_url.includes('youtube.com') || 
-              currentLesson.video_url.includes('youtu.be') ? (
-                <iframe
-                  key={currentLesson.id}
-                  ref={iframeRef}
-                  src={getIframeSrc()}
-                  loading="lazy"
-                  className="border-0 absolute top-0 h-full w-full"
-                  allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;"
-                  allowFullScreen
-                />
+      
+      {/* MAIN CONTENT */}
+      <div className="flex-1 flex flex-col relative z-10 w-full overflow-hidden bg-[#F8F9FA]">
+        
+        {/* Main Content Header (Breadcrumb / Show Sidebar) */}
+        <div className="h-16 flex items-center justify-between px-6 border-b border-outline-variant/20 bg-white shrink-0">
+          <div className="flex items-center">
+            {!sidebarOpen && (
+              <button onClick={() => setSidebarOpen(true)} className="p-2 mr-4 rounded-xl hover:bg-surface-container-low transition-colors text-on-surface-variant">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+              </button>
+            )}
+            <span className="text-sm font-bold text-on-surface-variant">
+              {currentLesson?.title || 'Lesson Content'}
+            </span>
+          </div>
+        </div>
+        
+        {/* Video / Content Area */}
+        <div className="flex-1 overflow-y-auto p-6 lg:p-10 pb-32 flex flex-col items-center">
+          <div className="w-full max-w-[95%] xl:max-w-[85%] mx-auto space-y-8">
+            
+            <div className="w-full bg-white border border-outline-variant/30 overflow-hidden shadow-sm aspect-video flex items-center justify-center relative">
+              {currentLesson?.video_url ? (
+                currentLesson.video_url.includes('iframe.mediadelivery.net') || 
+                currentLesson.video_url.includes('youtube.com') || 
+                currentLesson.video_url.includes('youtu.be') ? (
+                  <iframe
+                    key={currentLesson.id}
+                    ref={iframeRef}
+                    src={getIframeSrc()}
+                    loading="lazy"
+                    className="border-0 absolute top-0 h-full w-full"
+                    allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;"
+                    allowFullScreen
+                  />
+                ) : (
+                  <video 
+                    key={currentLesson.id}
+                    ref={videoRef}
+                    src={getFileUrl(currentLesson.video_url)}
+                    controls 
+                    controlsList="nodownload"
+                    className="w-full h-full object-contain"
+                    autoPlay
+                    onLoadedMetadata={() => {
+                      const lp = lessonProgresses[currentLesson.id];
+                      if (lp && lp.progress_seconds > 10 && videoRef.current) {
+                        videoRef.current.currentTime = lp.progress_seconds;
+                      }
+                    }}
+                    onPlay={() => { isPlayingRef.current = true; }}
+                    onPause={() => { isPlayingRef.current = false; }}
+                    onEnded={() => handleVideoEndedRef.current?.()}
+                  />
+                )
               ) : (
-                <video 
-                  key={currentLesson.id}
-                  ref={videoRef}
-                  src={getFileUrl(currentLesson.video_url)}
-                  controls 
-                  controlsList="nodownload"
-                  className="w-full h-full object-contain"
-                  autoPlay
-                  onLoadedMetadata={() => {
-                    const lp = lessonProgresses[currentLesson.id];
-                    if (lp && lp.progress_seconds > 10 && videoRef.current) {
-                      videoRef.current.currentTime = lp.progress_seconds;
-                    }
-                  }}
-                  onPlay={() => { isPlayingRef.current = true; }}
-                  onPause={() => { isPlayingRef.current = false; }}
-                  onEnded={() => handleVideoEndedRef.current?.()}
-                />
-              )
-            ) : (
-              <div className="text-center p-8 space-y-3">
-                <div className="w-16 h-16 rounded-full bg-primary/20 text-primary mx-auto flex items-center justify-center border border-primary/30">
-                  <Play size={32} className="mr-0.5" />
+                <div className="text-center p-12 w-full h-full flex flex-col items-center justify-center">
+                   <div className="w-20 h-20 rounded-full bg-primary/10 text-primary mx-auto flex items-center justify-center mb-6">
+                     <FileText size={40} />
+                   </div>
+                   <h3 className="text-2xl font-extrabold text-on-surface mb-3">{currentLesson?.title}</h3>
+                   <p className="text-sm text-on-surface-variant max-w-md">
+                     Review the content below. Once finished, click Complete and Continue to move to the next lesson.
+                   </p>
                 </div>
-                <h3 className="text-base font-bold text-on-surface">عرض الدرس والتطبيقات النصية</h3>
-                <p className="text-xs text-on-surface-variant max-w-sm">هذا الدرس يعتمد على الشرح النصي والتمارين البرمجية المدرجة أدناه.</p>
+              )}
+            </div>
+
+            {currentLesson?.content && (
+              <div className="bg-white rounded-2xl p-6 sm:p-8 border border-outline-variant/30 shadow-sm">
+                <div className="prose prose-sm max-w-none prose-headings:text-[#5c4be4]" dangerouslySetInnerHTML={{ __html: currentLesson.content }} />
               </div>
             )}
-          </div>
+            
+            {/* Attachments Section */}
+            {(() => {
+              let atts = currentLesson?.attachments;
+              if (!atts) return null;
+              if (typeof atts === 'string') {
+                try { atts = JSON.parse(atts); } catch (e) { atts = []; }
+              }
+              if (!Array.isArray(atts) || atts.length === 0) return null;
 
-          {/* أزرار التحكم بالتقديم والتأخير */}
-          {currentLesson?.video_url && (
-            <div className="flex items-center justify-center gap-4 mt-4">
-              <button
-                  onClick={() => handleSeek(10)}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-surface border border-outline-variant/40 text-on-surface hover:text-primary hover:border-primary/40 hover:bg-primary/5 transition-all font-bold text-xs sm:text-sm shadow-sm"
-              >
-                  <span>تقديم 10 ثواني</span>
-                  <ChevronLeft size={18} />
-              </button>
-              <button
-                  onClick={() => handleSeek(-10)}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-surface border border-outline-variant/40 text-on-surface hover:text-primary hover:border-primary/40 hover:bg-primary/5 transition-all font-bold text-xs sm:text-sm shadow-sm"
-              >
-                  <ChevronRight size={18} />
-                  <span>تأخير 10 ثواني</span>
-              </button>
-            </div>
-          )}
-
-          {/* أزرار التنقل */}
-          <div className="flex items-center justify-between gap-4 mt-6">
-             <button
-                disabled={!nextLesson}
-                onClick={() => handleSelectLesson(nextLesson, nextLesson.module_id)}
-                className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-primary text-on-primary font-bold text-sm shadow-glow disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary-hover transition-colors"
-             >
-                <span>الدرس التالي</span>
-                <ChevronLeft size={18} />
-             </button>
-
-             <button
-                disabled={!prevLesson}
-                onClick={() => handleSelectLesson(prevLesson, prevLesson.module_id)}
-                className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-surface border border-outline-variant/40 text-on-surface font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-container transition-colors"
-             >
-                <ChevronRight size={18} />
-                <span>الدرس السابق</span>
-             </button>
-          </div>
-
-          {/* تفاصيل الدرس */}
-          <div className="rounded-3xl bg-surface-container-low/60 border border-outline-variant/40 p-6 sm:p-8 backdrop-blur-xl space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant/30 pb-5">
-              <div className="space-y-1">
-                <h2 className="text-lg sm:text-xl font-extrabold text-on-surface">
-                  {currentLesson ? currentLesson.title : 'عنوان الدرس'}
-                </h2>
-                <p className="text-xs text-on-surface-variant flex items-center gap-1.5">
-                  <FileText size={14} className="text-primary" />
-                  <span>تفاصيل وملاحظات الدرس</span>
-                </p>
-              </div>
-              <button 
-                  onClick={handleMarkComplete}
-                  disabled={completing || isCompleted}
-                  className={`px-5 py-2.5 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 transition-all ${
-                isCompleted 
-                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 cursor-default'
-                  : 'bg-surface border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
-              }`}>
-                {completing ? <Loader2 size={16} className="animate-spin" /> : (
-                  <><CheckCircle size={16} /><span>{isCompleted ? 'مكتمل' : 'تحديد كمكتمل'}</span></>
-                )}
-              </button>
-            </div>
-
-            <div className="flex gap-4">
-              <button 
-                onClick={() => setIsReviewModalOpen(true)}
-                className="px-5 py-2 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer bg-surface border border-outline-variant/60 text-on-surface hover:bg-surface-container"
-              >
-                <Star size={16} className="text-yellow-400" />
-                <span>تقييم الكورس</span>
-              </button>
-            </div>
-
-            <div className="text-xs sm:text-sm text-on-surface-variant leading-relaxed space-y-4">
-              {currentLesson?.content ? (
-                <div className="prose prose-invert max-w-none">{currentLesson.content}</div>
-              ) : (
-                <p className="text-on-surface-variant/70 italic">لا يوجد محتوى نصي إضافي مرفق مع هذا الدرس.</p>
-              )}
-
-              {currentLesson?.attachments && (() => {
-                let atts = currentLesson.attachments;
-                if (typeof atts === 'string') {
-                  try { atts = JSON.parse(atts); } catch (e) { atts = []; }
-                }
-                if (!Array.isArray(atts)) atts = [];
-                
-                if (atts.length === 0) return null;
-
-                return (
-                  <div className="pt-6 border-t border-outline-variant/30 mt-6 space-y-4">
-                    <h3 className="text-sm font-bold text-on-surface flex items-center gap-2">
-                      <FileText size={16} className="text-primary" />
-                      <span>ملفات ومرفقات الدرس</span>
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {atts.map((file, idx) => {
-                        const fileUrl = typeof file === 'string' ? file : file.url;
-                        const fileName = typeof file === 'string' ? 'ملف مرفق' : (file.name || 'ملف مرفق');
-                        const fileSize = typeof file === 'object' && file.size ? file.size : null;
-                        const fullUrl = getFileUrl(fileUrl);
-                        
-                        return (
-                          <a
-                            key={idx}
-                            href={fullUrl}
-                            onClick={(e) => handleDownloadFile(e, fullUrl, fileName)}
-                            className="flex items-center gap-3 p-3 rounded-xl bg-surface border border-outline-variant/40 hover:bg-surface-container-low hover:border-primary/40 transition-colors group w-full text-right cursor-pointer"
-                            title="تنزيل الملف مباشرة"
-                          >
-                            <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors shrink-0">
-                              <FileText size={18} />
-                            </div>
-                            <div className="flex-1 overflow-hidden">
-                              <p className="text-xs font-bold text-on-surface truncate">{fileName}</p>
-                              {fileSize && <p className="text-[10px] text-on-surface-variant mt-0.5">{fileSize}</p>}
-                            </div>
-                            <div className="p-2 text-on-surface-variant group-hover:text-primary transition-colors shrink-0">
-                              <Download size={18} />
-                            </div>
-                          </a>
-                        );
-                      })}
+              return (
+                <div className="w-full bg-[#3d3393] text-white rounded-2xl p-4 sm:p-6 shadow-lg flex flex-col sm:flex-row items-center justify-between" style={{ marginBottom: '3rem' }}>
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-white/10 rounded-xl">
+                      <FileText size={24} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold">{currentLesson.title} Materials</h3>
+                      <p className="text-sm text-white/70">Click to download the attached materials</p>
                     </div>
                   </div>
-                );
-              })()}
-            </div>
-
-            {/* تقييم الدرس */}
-            <div className="pt-6 border-t border-outline-variant/30 mt-6 space-y-4">
-              <h3 className="text-sm font-bold text-on-surface flex items-center gap-2">
-                <Star size={16} className="text-primary" />
-                <span>قيّم هذا الدرس</span>
-              </h3>
-              <div className="bg-surface border border-outline-variant/40 rounded-2xl p-4 space-y-4">
-                <div className="flex items-center gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button type="button" key={star} onClick={() => setLessonReviewData(prev => ({ ...prev, rating: star }))} className="focus:outline-none transition-transform hover:scale-110">
-                      <Star size={24} className={star <= lessonReviewData.rating ? 'fill-yellow-400 text-yellow-400' : 'text-outline-variant'} />
-                    </button>
-                  ))}
-                  <span className="text-xs text-on-surface-variant font-bold mr-3">{lessonReviewData.rating > 0 ? 'شكراً لتقييمك!' : 'ما رأيك في هذا الدرس؟'}</span>
+                  <div className="mt-4 sm:mt-0 flex flex-wrap gap-3">
+                    {atts.map((file, idx) => {
+                      const fileUrl = typeof file === 'string' ? file : file.url;
+                      const fileName = typeof file === 'string' ? 'Attachment' : (file.name || 'Attachment');
+                      const fullUrl = getFileUrl(fileUrl);
+                      return (
+                        <a
+                          key={idx}
+                          href={fullUrl}
+                          download
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full transition-all text-sm font-semibold text-white cursor-pointer"
+                        >
+                          <Download size={16} />
+                          <span>{fileName}</span>
+                        </a>
+                      );
+                    })}
+                  </div>
                 </div>
-                
-                {lessonReviewData.rating > 0 && (
-                  <div className="space-y-3">
-                    <textarea 
-                      value={lessonReviewData.review_text} 
-                      onChange={e => setLessonReviewData({...lessonReviewData, review_text: e.target.value})}
-                      placeholder="هل لديك أي ملاحظات إضافية على هذا الدرس؟ (اختياري)"
-                      className="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl p-3 text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:ring-1 focus:ring-primary outline-none min-h-[80px]"
-                    />
-                    <div className="flex justify-end">
-                      <button 
-                        onClick={submitLessonReview}
-                        disabled={submittingLessonReview}
-                        className="px-6 py-2 bg-primary text-on-primary rounded-xl text-xs font-bold hover:bg-primary-hover transition-colors disabled:opacity-50 flex items-center gap-2"
-                      >
-                        {submittingLessonReview ? <Loader2 size={16} className="animate-spin mx-auto" /> : 'حفظ تقييم الدرس'}
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
+              );
+            })()}
+            
           </div>
         </div>
-
-      {/* نافذة التقييم */}
-      {isReviewModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-surface border border-outline-variant/30 rounded-3xl p-6 w-full max-w-md shadow-2xl relative">
-            <h3 className="text-xl font-extrabold text-on-surface mb-4">تقييم الكورس</h3>
-            <p className="text-xs text-on-surface-variant mb-6">رأيك يهمنا ويساعد الآخرين على اتخاذ القرار الصحيح.</p>
-            <form onSubmit={submitReview} className="space-y-4">
-              <div className="flex items-center justify-center gap-2 mb-6">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button type="button" key={star} onClick={() => setReviewData(prev => ({ ...prev, rating: star }))} className="focus:outline-none transition-transform hover:scale-110">
-                    <Star size={32} className={star <= reviewData.rating ? 'fill-yellow-400 text-yellow-400' : 'text-outline-variant'} />
-                  </button>
-                ))}
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-on-surface mb-2">تعليقك (اختياري)</label>
-                <textarea 
-                  value={reviewData.review_text}
-                  onChange={e => setReviewData(prev => ({ ...prev, review_text: e.target.value }))}
-                  rows={4}
-                  className="w-full bg-surface-container-low border border-outline-variant/50 rounded-2xl p-3 text-sm text-on-surface focus:outline-none focus:border-primary resize-none"
-                  placeholder="اكتب تعليقك هنا..."
-                />
-              </div>
-              <div className="flex justify-end gap-3 pt-4 border-t border-outline-variant/30">
-                <button type="button" onClick={() => setIsReviewModalOpen(false)} className="px-4 py-2 rounded-xl text-xs font-bold text-on-surface hover:bg-surface-container-low transition-colors">
-                  إلغاء
-                </button>
-                <button type="submit" disabled={submittingReview} className="px-6 py-2 rounded-xl text-xs font-bold bg-primary text-on-primary hover:bg-primary-hover shadow-glow flex items-center gap-2 disabled:opacity-50">
-                  {submittingReview ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
-                  <span>إرسال التقييم</span>
-                </button>
-              </div>
-            </form>
-          </div>
+        
+        {/* Sticky Footer */}
+        <div className="absolute bottom-0 left-0 w-full bg-white border-t border-outline-variant/20 p-4 px-6 flex items-center justify-between shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-10">
+           <div className="flex items-center gap-3">
+             <button 
+               onClick={() => prevLesson && handleSelectLesson(prevLesson, prevLesson.module_id)}
+               disabled={!prevLesson}
+               className="w-10 h-10 flex items-center justify-center rounded-xl border border-outline-variant/40 hover:bg-surface-container-low transition-colors disabled:opacity-50 text-on-surface-variant"
+             >
+               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+             </button>
+             <button 
+               onClick={() => nextLesson && handleSelectLesson(nextLesson, nextLesson.module_id)}
+               disabled={!nextLesson}
+               className="w-10 h-10 flex items-center justify-center rounded-xl border border-outline-variant/40 hover:bg-surface-container-low transition-colors disabled:opacity-50 text-on-surface-variant"
+             >
+               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+             </button>
+           </div>
+           
+           <button 
+              onClick={handleMarkComplete}
+              disabled={completing || isCompleted}
+              className={`px-8 py-3 rounded-xl text-sm font-bold shadow-md transition-all ${isCompleted ? 'bg-emerald-500 text-white cursor-default' : 'bg-[#5c4be4] hover:bg-[#4a3bc6] text-white'}`}
+           >
+              {completing ? <Loader2 size={16} className="animate-spin mx-auto" /> : (isCompleted ? 'Completed' : 'Complete and Continue')}
+           </button>
         </div>
-      )}
+      </div>
     </div>
   );
 }
