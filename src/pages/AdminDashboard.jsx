@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../context/AuthContext';
@@ -7,8 +7,8 @@ import {
   Star, Image, Mail, BookMarked, LayoutDashboard, ChevronLeft,
   ChevronRight, Globe, Handshake, HelpCircle, CheckCircle2, AlertCircle, Database, Target, LogOut
 } from 'lucide-react';
-
-import { Avatar } from './adminComponents/ui/SharedUI';
+import { Avatar, Modal, Input, SubmitBtn } from './adminComponents/ui/SharedUI';
+import API from '../api/axios';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import ThemeToggle from '../components/ThemeToggle';
 
@@ -19,7 +19,7 @@ export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [globalMsg, setGlobalMsg] = useState({ type: '', text: '' });
   
-  const { logout } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const menuGroups = [
@@ -61,6 +61,7 @@ export default function AdminDashboard() {
         { key: 'pages', label: t('admin.dashboard.items.pages'), icon: FileText },
         { key: 'books', label: t('admin.dashboard.items.books'), icon: BookMarked },
         { key: 'messages', label: t('admin.dashboard.items.messages'), icon: Mail },
+        { key: 'footer', label: i18n.language === 'ar' ? 'إعدادات الفوتر' : 'Footer Settings', icon: Globe },
         // { key: 'broken-videos', label: 'فحص الفيديوهات', icon: AlertCircle },
       ]
     }
@@ -104,12 +105,31 @@ export default function AdminDashboard() {
           </button>
         </div>
 
+        {/* Admin Profile Section */}
+        <div className="px-4 py-6 border-b border-outline-variant/20">
+          <div 
+            className={`cursor-pointer transition-all duration-300 ${sidebarOpen ? 'bg-surface shadow-sm border border-outline-variant/30 rounded-[2rem] p-6 flex flex-col items-center justify-center hover:border-primary/40 hover:shadow-glow text-center gap-3' : 'hover:bg-surface-variant/40 p-2 rounded-xl flex justify-center'} ${activeSection === 'profile' ? 'border-primary ring-2 ring-primary/20 bg-primary/5' : ''}`} 
+            onClick={() => navigate('/admin/profile')} 
+            title={!sidebarOpen ? 'إعدادات الملف الشخصي' : undefined}
+          >
+            <div className={`relative ${sidebarOpen ? 'w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center' : ''}`}>
+              <Avatar name={user?.name || 'Admin'} size={sidebarOpen ? "lg" : "md"} />
+            </div>
+            {sidebarOpen && (
+              <div className="flex flex-col w-full">
+                <span className="text-base font-extrabold text-on-surface truncate">{user?.name || 'Admin User'}</span>
+                <span className="text-xs text-on-surface-variant mt-1.5">{user?.status || 'Admin on platform'}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Sidebar Links */}
         <div className="flex-1 overflow-y-auto px-2 py-2 space-y-2.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {menuGroups.map((group, idx) => (
             <div key={idx} className="space-y-0.5">
               {sidebarOpen && (
-                <p className="px-2 text-[9px] font-black uppercase tracking-wider text-on-surface-variant/50 mb-1">
+                <p className="px-3 text-[13px] font-black uppercase tracking-wider text-on-surface-variant/60 mb-2 mt-2">
                   {group.title}
                 </p>
               )}
@@ -121,13 +141,13 @@ export default function AdminDashboard() {
                     key={item.key}
                     onClick={() => navigate(`/admin/${item.key}`)}
                     title={!sidebarOpen ? item.label : undefined}
-                    className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-bold transition-all cursor-pointer ${
                       isActive
-                        ? 'bg-primary text-on-primary shadow-sm font-bold'
-                        : 'text-on-surface-variant hover:bg-surface-variant/30 hover:text-on-surface'
+                        ? 'bg-primary text-on-primary shadow-sm'
+                        : 'text-on-surface-variant hover:bg-surface-variant/50 hover:text-on-surface'
                     }`}
                   >
-                    <Icon size={16} className="shrink-0" />
+                    <Icon size={20} className="shrink-0" />
                     {sidebarOpen && <span className="truncate">{item.label}</span>}
                   </button>
                 );
@@ -137,13 +157,13 @@ export default function AdminDashboard() {
         </div>
         
         {/* Logout Button */}
-        <div className="p-2 border-t border-outline-variant/20">
+        <div className="p-3 border-t border-outline-variant/20">
           <button
             onClick={handleLogout}
             title={!sidebarOpen ? t('admin.dashboard.logout') : undefined}
-            className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-rose-500 hover:bg-rose-500/10 transition-all cursor-pointer"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-rose-500 hover:bg-rose-500/10 transition-all cursor-pointer"
           >
-            <LogOut size={16} className="shrink-0" />
+            <LogOut size={20} className="shrink-0" />
             {sidebarOpen && <span>{t('admin.dashboard.logout')}</span>}
           </button>
         </div>
@@ -161,6 +181,9 @@ export default function AdminDashboard() {
             </span>
           </div>
           <div className="flex items-center gap-3">
+            <LanguageSwitcher />
+            <ThemeToggle />
+            <div className="w-px h-6 bg-outline-variant/30 hidden sm:block"></div>
             <a 
               href="/" 
               target="_blank" 
@@ -171,10 +194,6 @@ export default function AdminDashboard() {
               <Globe size={18} />
               <span className="hidden sm:inline">{i18n.language === 'ar' ? 'عرض الموقع' : 'View Website'}</span>
             </a>
-            <div className="w-px h-6 bg-outline-variant/30 hidden sm:block"></div>
-            <ThemeToggle />
-            <LanguageSwitcher />
-            <Avatar name="Admin User" size="sm" />
           </div>
         </header>
 

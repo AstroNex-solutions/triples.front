@@ -88,7 +88,7 @@ export default function FlashcardsAdminSection() {
                 <tr key={p.id} className="bg-surface/50 hover:bg-surface/80 transition-all">
                   <td className="p-3 font-bold text-on-surface">{p.title}</td>
                   <td className="p-3 text-on-surface-variant">{p.course ? p.course.title : 'عام (بدون كورس)'}</td>
-                  <td className="p-3 font-bold text-on-surface">${p.price}</td>
+                  <td className="p-3 font-bold text-on-surface">{p.price} د.أ</td>
                   <td className="p-3">{p.is_active ? <Badge text="نشط" variant="success" /> : <Badge text="غير نشط" variant="danger" />}</td>
                   <td className="p-3 text-center">
                     <div className="flex items-center justify-center gap-2">
@@ -113,7 +113,7 @@ export default function FlashcardsAdminSection() {
           </Select>
           
           <Textarea label="الوصف" value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
-          <Input label="السعر ($)" type="number" step="0.01" min="0" required value={form.price} onChange={e => setForm({...form, price: e.target.value})} />
+          <Input label="السعر (د.أ)" type="number" step="0.01" min="0" required value={form.price} onChange={e => setForm({...form, price: e.target.value})} />
           <div className="flex items-center gap-2 text-sm font-bold text-on-surface mt-2">
             <input type="checkbox" checked={form.is_active} onChange={e => setForm({...form, is_active: e.target.checked})} className="w-4 h-4 rounded border-outline-variant/30 text-primary bg-surface focus:ring-primary focus:ring-offset-surface" />
             <label>منتج نشط ومتاح للبيع</label>

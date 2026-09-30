@@ -37,9 +37,14 @@ import LibrarySection from './pages/student/LibrarySection';
 import SupportSection from './pages/student/SupportSection';
 import ModuleSection from './pages/student/ModuleSection';
 import FlashcardsStudentSection from './pages/student/FlashcardsStudentSection';
+import CourseFlashcardsSection from './pages/student/CourseFlashcardsSection';
+import CourseQBankSection from './pages/student/CourseQBankSection';
+import CourseSelfAssessmentSection from './pages/student/CourseSelfAssessmentSection';
+import ModuleQuizPlayerPage from './pages/student/ModuleQuizPlayerPage';
 import FreezeSection from './pages/student/FreezeSection';
 import PerformanceSection from './pages/student/PerformanceSection';
 import PaymentResultPage from './pages/PaymentResultPage';
+import FeatureCheckoutPage from './pages/FeatureCheckoutPage';
 import AdminDashboard from './pages/AdminDashboard';
 import ContactPage from './pages/ContactPage';
 import AboutUsPage from './pages/AboutUsPage';
@@ -70,6 +75,8 @@ import AdminSelfAssessmentProductsSection from './pages/adminComponents/sections
 import AdminPartnersSection from './pages/adminComponents/sections/PartnersSection';
 import AdminFaqsSection from './pages/adminComponents/sections/FaqsSection';
 import AdminPagesSection from './pages/adminComponents/sections/PagesSection';
+import AdminFooterSection from './pages/adminComponents/sections/FooterSection';
+import AdminProfileSection from './pages/adminComponents/sections/ProfileSection';
 
 import { useThemeStore } from './store/themeStore';
 import AboutPage from './pages/AboutPage';
@@ -130,6 +137,8 @@ export default function App() {
             <Route path="partners" element={<AdminPartnersSection />} />
             <Route path="faqs" element={<AdminFaqsSection />} />
             <Route path="pages" element={<AdminPagesSection />} />
+            <Route path="footer" element={<AdminFooterSection />} />
+            <Route path="profile" element={<AdminProfileSection />} />
           </Route>
         </Route>
 
@@ -149,6 +158,9 @@ export default function App() {
             <Route path="library" element={<LibrarySection />} />
             <Route path="support" element={<SupportSection />} />
             <Route path="course/:courseId/module/:moduleId" element={<ModuleSection />} />
+            <Route path="course/:courseId/flashcards" element={<CourseFlashcardsSection />} />
+            <Route path="course/:courseId/qbank" element={<CourseQBankSection />} />
+            <Route path="course/:courseId/selfAssessment" element={<CourseSelfAssessmentSection />} />
             <Route path="freeze" element={<FreezeSection />} />
             <Route path="performance" element={<PerformanceSection />} />
           </Route>
@@ -159,9 +171,11 @@ export default function App() {
           <Route path="/question-bank/:id" element={<QuestionBankPage />} />
           <Route path="/question-bank" element={<QuestionBankPage />} />
           <Route path="/self-assessment" element={<SelfAssessmentPage />} />
-          <Route path="/study-flashcards/:productId" element={<FlashcardStudyPage />} />
+          <Route path="/study-flashcards/:deckId" element={<FlashcardStudyPage />} />
+          <Route path="/quiz-player/:moduleId" element={<ModuleQuizPlayerPage />} />
           <Route path="/secure-viewer" element={<SecureViewer />} />
           <Route path="/payment-result" element={<PaymentResultPage />} />
+          <Route path="/checkout/feature/:courseId/:featureType" element={<FeatureCheckoutPage />} />
         </Route>
 
         {/* ===== Instructor Dashboard - بدون Navbar ولا Footer ===== */}

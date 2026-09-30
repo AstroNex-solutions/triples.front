@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import API from '../api/axios';
 import Toast from '../components/Toast';
 import { 
@@ -168,6 +169,7 @@ const PlayerModuleNode = ({
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function CoursePlayerPage() {
+  const { t, i18n } = useTranslation();
   const { courseId, lessonId } = useParams();
   const navigate = useNavigate();
 
@@ -201,6 +203,7 @@ export default function CoursePlayerPage() {
   
   const queryParams = new URLSearchParams(useLocation().search);
   const targetModuleId = queryParams.get('module');
+  const parentModuleId = queryParams.get('parentModule'); // parent module for back navigation
 
 
   // تحديث تقييم الدرس عند تغيير الدرس الحالي
@@ -282,16 +285,33 @@ export default function CoursePlayerPage() {
             }
           }
 
+          // لو مفيش lessonId، جرب تجيب آخر درس من localStorage
+          if (!found) {
+            const savedKey = `lastLesson_${courseId}_${queryParams.get('module') || ''}}`;
+            const savedId = localStorage.getItem(savedKey);
+            if (savedId) {
+              for (const m of cData.modules) {
+                found = m.lessons?.find(l => l.id === parseInt(savedId));
+                if (found) { openMod = m.id; break; }
+              }
+            }
+          }
+
+          // آخر fallback: أول درس في أول موديول
+          if (!found) {
+            const firstMod = cData.modules[0];
+            if (firstMod?.lessons?.length > 0) {
+              found = firstMod.lessons[0];
+              openMod = firstMod.id;
+            }
+          }
+
           if (found) {
             setCurrentLesson(found);
             setOpenModuleIds(prev => prev.includes(openMod) ? prev : [...prev, openMod]);
           } else {
-            // لا يوجد lessonId، أو درس غير موجود، نعرض صفحة الكورس (Course Content View)
             setCurrentLesson(null);
-            // فتح أول موديول كإعداد افتراضي
-            if (cData.modules[0]) {
-               setOpenModuleIds([cData.modules[0].id]);
-            }
+            if (cData.modules[0]) setOpenModuleIds([cData.modules[0].id]);
           }
         }
       } catch (err) {
@@ -311,9 +331,12 @@ export default function CoursePlayerPage() {
     if (modId) {
       setOpenModuleIds(prev => prev.includes(modId) ? prev : [...prev, modId]);
     }
-    navigate(`/learn/${courseId}/lesson/${lesson.id}?module=${modId}`);
+    // حفظ آخر درس في localStorage
+    const savedKey = `lastLesson_${courseId}_${targetModuleId || ''}`;
+    localStorage.setItem(savedKey, lesson.id);
+    navigate(`/learn/${courseId}/lesson/${lesson.id}?module=${modId}${parentModuleId ? '&parentModule=' + parentModuleId : ''}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [courseId, navigate]);
+  }, [courseId, navigate, targetModuleId, parentModuleId]);
 
   const showToast = (message, type = 'success') => setToast({ message, type });
 
@@ -514,6 +537,13 @@ export default function CoursePlayerPage() {
       });
       setCompletedLessons(prev => [...prev, currentLesson.id]);
       showToast('تم إكمال الدرس وزيادة نسبة تقدمك بنجاح! 🎉', 'success');
+      
+      // الانتقال التلقائي للدرس التالي
+      if (nextLesson) {
+        setTimeout(() => handleSelectLesson(nextLesson, nextLesson.module_id), 1000);
+      } else {
+        showToast('مبروك! لقد أكملت جميع دروس الكورس! 🎉', 'success');
+      }
     } catch (err) {
       showToast(err.response?.data?.message || 'حدث خطأ في التسجيل', 'error');
     } finally {
@@ -645,7 +675,18 @@ export default function CoursePlayerPage() {
         <div className="p-4 sm:p-6 pb-4 flex flex-col items-center sm:items-stretch">
           <div className={`flex items-center ${sidebarOpen ? 'justify-between' : 'justify-center'} mb-6 w-full`}>
             {sidebarOpen && (
-              <button onClick={() => navigate('/dashboard/overview')} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+              <button
+                onClick={() => {
+                  const backModuleId = parentModuleId;
+                  if (backModuleId && courseId) {
+                    navigate(`/dashboard/course/${courseId}/module/${backModuleId}`);
+                  } else {
+                    navigate('/dashboard/overview');
+                  }
+                }}
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                title="Back to module"
+              >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               </button>
             )}
@@ -661,11 +702,11 @@ export default function CoursePlayerPage() {
           {sidebarOpen && (
             <>
               <h2 className="text-xs text-white/70 font-semibold uppercase tracking-wider mb-1">{course.title}</h2>
-              <h1 className="text-xl font-bold mb-4">{currentSubmodule?.name || 'Submodule'}</h1>
+              <h1 className="text-xl font-bold mb-4">{currentSubmodule?.name || t('submodule', 'قسم فرعي')}</h1>
               
               <div className="mb-4">
                 <div className="text-sm font-semibold mb-2">
-                  {completedSubmoduleLessonsCount}/{submoduleLessons.length} Completed
+                  {completedSubmoduleLessonsCount}/{submoduleLessons.length} {t('completed_count', 'مكتمل')}
                 </div>
                 <div className="w-full bg-white/20 h-1.5 rounded-full overflow-hidden">
                   <div className="bg-white h-full rounded-full transition-all" style={{ width: `${(completedSubmoduleLessonsCount / Math.max(1, submoduleLessons.length)) * 100}%` }} />
@@ -715,14 +756,14 @@ export default function CoursePlayerPage() {
           })}
           {filteredLessons.length === 0 && (
             <div className="text-center text-white/50 text-sm mt-4">
-              No lessons found.
+              {t('no_lessons_found', 'لا توجد دروس.')}
             </div>
           )}
         </div>
       </div>
       
       {/* MAIN CONTENT */}
-      <div className="flex-1 flex flex-col relative z-10 w-full overflow-hidden bg-[#F8F9FA]">
+      <div className="flex-1 flex flex-col min-h-0 relative z-10 w-full overflow-hidden bg-[#F8F9FA]">
         
         {/* Main Content Header (Breadcrumb / Show Sidebar) */}
         <div className="h-16 flex items-center justify-between px-6 border-b border-outline-variant/20 bg-white shrink-0">
@@ -733,16 +774,16 @@ export default function CoursePlayerPage() {
               </button>
             )}
             <span className="text-sm font-bold text-on-surface-variant">
-              {currentLesson?.title || 'Lesson Content'}
+              {currentLesson?.title || t('lesson_content', 'محتوى الدرس')}
             </span>
           </div>
         </div>
         
         {/* Video / Content Area */}
-        <div className="flex-1 overflow-y-auto p-6 lg:p-10 pb-32 flex flex-col items-center">
+        <div className="flex-1 min-h-0 overflow-y-auto p-6 lg:p-10 pb-32 flex flex-col items-center custom-scrollbar">
           <div className="w-full max-w-[95%] xl:max-w-[85%] mx-auto space-y-8">
             
-            <div className="w-full bg-white border border-outline-variant/30 overflow-hidden shadow-sm aspect-video flex items-center justify-center relative">
+            <div className="w-full bg-white border border-outline-variant/30 overflow-hidden shadow-sm h-[600px] flex items-center justify-center relative">
               {currentLesson?.video_url ? (
                 currentLesson.video_url.includes('iframe.mediadelivery.net') || 
                 currentLesson.video_url.includes('youtube.com') || 
@@ -783,7 +824,7 @@ export default function CoursePlayerPage() {
                    </div>
                    <h3 className="text-2xl font-extrabold text-on-surface mb-3">{currentLesson?.title}</h3>
                    <p className="text-sm text-on-surface-variant max-w-md">
-                     Review the content below. Once finished, click Complete and Continue to move to the next lesson.
+                     {t('review_content_desc', 'قم بمراجعة المحتوى أدناه. عند الانتهاء، انقر فوق إكمال ومتابعة للانتقال إلى الدرس التالي.')}
                    </p>
                 </div>
               )}
@@ -811,8 +852,8 @@ export default function CoursePlayerPage() {
                       <FileText size={24} />
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold">{currentLesson.title} Materials</h3>
-                      <p className="text-sm text-white/70">Click to download the attached materials</p>
+                      <h3 className="text-lg font-bold">{currentLesson.title} {t('materials', 'المرفقات')}</h3>
+                      <p className="text-sm text-white/70">{t('click_to_download', 'انقر لتنزيل المواد المرفقة')}</p>
                     </div>
                   </div>
                   <div className="mt-4 sm:mt-0 flex flex-wrap gap-3">
@@ -844,29 +885,95 @@ export default function CoursePlayerPage() {
         
         {/* Sticky Footer */}
         <div className="absolute bottom-0 left-0 w-full bg-white border-t border-outline-variant/20 p-4 px-6 flex items-center justify-between shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-10">
+           {/* Prev / Next Lesson */}
            <div className="flex items-center gap-3">
              <button 
                onClick={() => prevLesson && handleSelectLesson(prevLesson, prevLesson.module_id)}
                disabled={!prevLesson}
-               className="w-10 h-10 flex items-center justify-center rounded-xl border border-outline-variant/40 hover:bg-surface-container-low transition-colors disabled:opacity-50 text-on-surface-variant"
+               className="flex items-center gap-2 px-4 h-11 rounded-xl border border-outline-variant/40 hover:bg-surface-container-low transition-colors disabled:opacity-30 text-on-surface-variant font-bold text-xs"
+               title="Previous lesson"
              >
-               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="rtl:rotate-180"><polyline points="15 18 9 12 15 6"></polyline></svg>
+               <span>{t('prev', 'السابق')}</span>
              </button>
+             
              <button 
                onClick={() => nextLesson && handleSelectLesson(nextLesson, nextLesson.module_id)}
                disabled={!nextLesson}
-               className="w-10 h-10 flex items-center justify-center rounded-xl border border-outline-variant/40 hover:bg-surface-container-low transition-colors disabled:opacity-50 text-on-surface-variant"
+               className="flex items-center gap-2 px-4 h-11 rounded-xl border border-outline-variant/40 hover:bg-surface-container-low transition-colors disabled:opacity-30 text-on-surface-variant font-bold text-xs"
+               title="Next lesson"
              >
-               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+               <span>{t('next', 'التالي')}</span>
+               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="rtl:rotate-180"><polyline points="9 18 15 12 9 6"></polyline></svg>
              </button>
            </div>
+
+           {/* Video Controls: -10 / Play-Pause / +10 */}
+           {currentLesson?.video_url && (
+             <div className="flex items-center gap-2">
+               {/* -10s */}
+               <div className="flex flex-col items-center gap-1">
+                 <button
+                   onClick={() => handleSeek(-10)}
+                   className="w-10 h-10 flex items-center justify-center rounded-xl border border-outline-variant/40 hover:bg-surface-container-low transition-colors text-on-surface-variant"
+                   title="Rewind 10 seconds (←)"
+                 >
+                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                     <path d="M11 17l-5-5 5-5"/>
+                     <path d="M18 17l-5-5 5-5"/>
+                   </svg>
+                 </button>
+                 <span className="text-[9px] text-on-surface-variant/50 font-semibold">-10s  ←</span>
+               </div>
+
+               {/* Play / Pause */}
+               <div className="flex flex-col items-center gap-1">
+                 <button
+                   onClick={() => {
+                     if (videoRef.current) {
+                       if (videoRef.current.paused) videoRef.current.play();
+                       else videoRef.current.pause();
+                     } else if (iframeRef.current?.contentWindow) {
+                       const cmd = isPlayingRef.current ? 'pause' : 'play';
+                       iframeRef.current.contentWindow.postMessage(
+                         JSON.stringify({ context: 'player.js', version: '0.1.0', method: cmd }), '*'
+                       );
+                       isPlayingRef.current = !isPlayingRef.current;
+                     }
+                   }}
+                   className="w-12 h-12 flex items-center justify-center rounded-xl bg-[#5c4be4] hover:bg-[#4a3bc6] text-white shadow-md shadow-[#5c4be4]/20 transition-all active:scale-95"
+                   title="Play / Pause (Space)"
+                 >
+                   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                     <path d="M8 5v14l11-7z"/>
+                   </svg>
+                 </button>
+                 <span className="text-[9px] text-on-surface-variant/50 font-semibold">Space</span>
+               </div>
+
+               {/* +10s */}
+               <div className="flex flex-col items-center gap-1">
+                 <button
+                   onClick={() => handleSeek(10)}
+                   className="w-10 h-10 flex items-center justify-center rounded-xl border border-outline-variant/40 hover:bg-surface-container-low transition-colors text-on-surface-variant"
+                   title="Forward 10 seconds (→)"
+                 >
+                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                     <path d="M13 17l5-5-5-5"/>
+                     <path d="M6 17l5-5-5-5"/>
+                   </svg>
+                 </button>
+                 <span className="text-[9px] text-on-surface-variant/50 font-semibold">+10s  →</span>
+               </div>
+             </div>
+           )}
            
            <button 
               onClick={handleMarkComplete}
               disabled={completing || isCompleted}
               className={`px-8 py-3 rounded-xl text-sm font-bold shadow-md transition-all ${isCompleted ? 'bg-emerald-500 text-white cursor-default' : 'bg-[#5c4be4] hover:bg-[#4a3bc6] text-white'}`}
            >
-              {completing ? <Loader2 size={16} className="animate-spin mx-auto" /> : (isCompleted ? 'Completed' : 'Complete and Continue')}
+              {completing ? <Loader2 size={16} className="animate-spin mx-auto" /> : (isCompleted ? t('completed_check', 'مكتمل ✓') : t('complete_and_continue', 'إكمال ومتابعة'))}
            </button>
         </div>
       </div>

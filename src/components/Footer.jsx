@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import API from '../api/axios';
 import { 
   Mail, 
   MapPin,
@@ -16,8 +17,18 @@ import { useTranslation } from 'react-i18next';
 export default function Footer() {
   const { t, i18n } = useTranslation();
   const [logoError, setLogoError] = useState(false);
+  const [contactInfo, setContactInfo] = useState(null);
   const isAr = i18n.language === 'ar';
   const ChevronIcon = isAr ? ChevronLeft : ChevronRight;
+
+  useEffect(() => {
+    API.get('/extras/contact-info')
+      .then(res => setContactInfo(res.data.contactInfo || null))
+      .catch(console.error);
+  }, []);
+
+  const desc = isAr ? contactInfo?.description_ar : contactInfo?.description;
+  const address = isAr ? contactInfo?.address_ar : contactInfo?.address;
 
   return (
     <footer className="w-full bg-surface-container-lowest border-t border-outline-variant/30 text-on-surface pt-16 pb-8 relative overflow-hidden">
@@ -44,21 +55,29 @@ export default function Footer() {
               <h3 className="text-2xl font-black text-primary">Triple S</h3>
             )}
             <p className="text-sm text-on-surface-variant leading-relaxed">
-              {t('footer.description') || 'منصة تعليمية رائدة تهدف لتقديم أفضل محتوى لطلاب الكليات الطبية بأحدث التقنيات وأفضل الخبراء.'}
+              {desc || t('footer.description') || 'منصة تعليمية رائدة تهدف لتقديم أفضل محتوى لطلاب الكليات الطبية بأحدث التقنيات وأفضل الخبراء.'}
             </p>
             <div className="flex items-center gap-3">
-              <a href="#" className="w-10 h-10 rounded-xl bg-surface border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary/50 transition-all shadow-sm">
-                <Facebook size={18} />
-              </a>
-              <a href="#" className="w-10 h-10 rounded-xl bg-surface border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-rose-500 hover:border-rose-500/50 transition-all shadow-sm">
-                <Instagram size={18} />
-              </a>
-              <a href="#" className="w-10 h-10 rounded-xl bg-surface border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-sky-500 hover:border-sky-500/50 transition-all shadow-sm">
-                <Twitter size={18} />
-              </a>
-              <a href="#" className="w-10 h-10 rounded-xl bg-surface border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-red-500 hover:border-red-500/50 transition-all shadow-sm">
-                <Youtube size={18} />
-              </a>
+              {contactInfo?.facebook && (
+                <a href={contactInfo.facebook} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-xl bg-surface border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary/50 transition-all shadow-sm">
+                  <Facebook size={18} />
+                </a>
+              )}
+              {contactInfo?.instagram && (
+                <a href={contactInfo.instagram} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-xl bg-surface border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-rose-500 hover:border-rose-500/50 transition-all shadow-sm">
+                  <Instagram size={18} />
+                </a>
+              )}
+              {contactInfo?.twitter && (
+                <a href={contactInfo.twitter} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-xl bg-surface border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-sky-500 hover:border-sky-500/50 transition-all shadow-sm">
+                  <Twitter size={18} />
+                </a>
+              )}
+              {contactInfo?.youtube && (
+                <a href={contactInfo.youtube} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-xl bg-surface border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:text-red-500 hover:border-red-500/50 transition-all shadow-sm">
+                  <Youtube size={18} />
+                </a>
+              )}
             </div>
           </div>
 
@@ -115,13 +134,13 @@ export default function Footer() {
             </h4>
             <ul className="space-y-4">
               <li>
-                <a href="mailto:info@triplesacademy.com" className="flex items-start gap-3 group">
+                <a href={`mailto:${contactInfo?.email || 'info@triplesacademy.com'}`} className="flex items-start gap-3 group">
                   <div className="w-8 h-8 rounded-lg bg-surface border border-outline-variant/30 flex items-center justify-center text-on-surface-variant group-hover:text-primary group-hover:border-primary/50 transition-all shrink-0">
                     <Mail size={14} />
                   </div>
                   <div className="flex flex-col pt-1 text-sm text-on-surface-variant group-hover:text-primary transition-colors">
                     <span className="font-bold text-xs opacity-70 mb-0.5">{isAr ? 'البريد الإلكتروني' : 'Email'}</span>
-                    <span dir="ltr">info@triplesacademy.com</span>
+                    <span dir="ltr">{contactInfo?.email || 'info@triplesacademy.com'}</span>
                   </div>
                 </a>
               </li>
@@ -132,7 +151,7 @@ export default function Footer() {
                   </div>
                   <div className="flex flex-col pt-1 text-sm text-on-surface-variant group-hover:text-primary transition-colors">
                     <span className="font-bold text-xs opacity-70 mb-0.5">{isAr ? 'العنوان' : 'Location'}</span>
-                    <span>{isAr ? 'القاهرة، جمهورية مصر العربية' : 'Cairo, Egypt'}</span>
+                    <span>{address || (isAr ? 'القاهرة، جمهورية مصر العربية' : 'Cairo, Egypt')}</span>
                   </div>
                 </div>
               </li>

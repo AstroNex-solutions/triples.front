@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import API from '../../../../api/axios';
-import { Loader2, Plus, Edit3, Trash2, FolderOpen, Play, FolderPlus, GripVertical } from 'lucide-react';
+import { Loader2, Plus, Edit3, Trash2, FolderOpen, Play, FolderPlus, GripVertical, Zap, Database, Award } from 'lucide-react';
 import { Modal, Input, Textarea, SubmitBtn } from '../../ui/SharedUI';
 import { Reorder } from 'framer-motion';
+import ModuleFlashcardsModal from './ModuleFlashcardsModal';
+import ModuleQBankModal from './ModuleQBankModal';
+import ModuleSAModal from './ModuleSAModal';
 
-export default function ModulesList({ showMsg, course, onManageSubModules, onManageLessons }) {
+export default function ModulesList({ showMsg, course, onManageSubModules, onManageLessons, onManageFlashcards, onManageQBank, onManageSelfAssessments }) {
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -12,6 +15,10 @@ export default function ModulesList({ showMsg, course, onManageSubModules, onMan
   const [showAdd, setShowAdd] = useState(false);
   const [showEdit, setShowEdit] = useState(null);
   const [itemToDelete, setItemToDelete] = useState(null);
+
+  const [manageFlashcardsFor, setManageFlashcardsFor] = useState(null);
+  const [manageQBankFor, setManageQBankFor] = useState(null);
+  const [manageSAFor, setManageSAFor] = useState(null);
 
   const [form, setForm] = useState({ name: '', description: '', order: 1 });
 
@@ -101,6 +108,7 @@ export default function ModulesList({ showMsg, course, onManageSubModules, onMan
   };
 
   return (
+    <>
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-bold text-on-surface">موديولات الكورس: {course.title}</h3>
@@ -130,14 +138,41 @@ export default function ModulesList({ showMsg, course, onManageSubModules, onMan
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-on-surface">{m.name}</h4>
-                  <div className="flex items-center gap-3 mt-1 text-[11px] text-on-surface-variant">
+                  <div className="flex flex-wrap items-center gap-3 mt-2 text-[11px] text-on-surface-variant font-bold">
                     <span className="flex items-center gap-1"><FolderOpen size={12}/> {m.subModulesCount} موديولات فرعية</span>
                     <span className="flex items-center gap-1"><Play size={12}/> {m.lessonsCount} دروس</span>
+                    <span className="flex items-center gap-1 text-cyan-600"><Zap size={12}/> {m.flashcardsCount || 0} فلاش كارد</span>
+                    <span className="flex items-center gap-1 text-indigo-600"><Database size={12}/> {m.qbankCount || 0} بنك أسئلة</span>
+                    <span className="flex items-center gap-1 text-violet-600"><Award size={12}/> {m.saCount || 0} تقييم ذاتي</span>
                   </div>
                 </div>
               </div>
               
-              <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+              <div className="flex flex-wrap items-center gap-2 sm:justify-end mt-3 sm:mt-0">
+                <button 
+                  onClick={() => setManageFlashcardsFor(m)}
+                  className="px-2.5 py-1.5 bg-cyan-500/10 text-cyan-600 hover:bg-cyan-500 hover:text-white rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
+                  title="إدارة الفلاش كارد"
+                >
+                  <Zap size={13} />
+                </button>
+                <button 
+                  onClick={() => setManageQBankFor(m)}
+                  className="px-2.5 py-1.5 bg-indigo-500/10 text-indigo-600 hover:bg-indigo-500 hover:text-white rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
+                  title="إدارة بنك الأسئلة"
+                >
+                  <Database size={13} />
+                </button>
+                <button 
+                  onClick={() => setManageSAFor(m)}
+                  className="px-2.5 py-1.5 bg-violet-500/10 text-violet-600 hover:bg-violet-500 hover:text-white rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
+                  title="إدارة التقييمات الذاتية"
+                >
+                  <Award size={13} />
+                </button>
+
+                <div className="w-[1px] h-6 bg-outline-variant/30 mx-1"></div>
+
                 <button 
                   onClick={() => onManageSubModules(m)}
                   className="px-3 py-1.5 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
@@ -204,5 +239,28 @@ export default function ModulesList({ showMsg, course, onManageSubModules, onMan
       </Modal>
 
     </div>
+
+      <ModuleFlashcardsModal 
+        show={!!manageFlashcardsFor} 
+        onClose={() => setManageFlashcardsFor(null)} 
+        module={manageFlashcardsFor} 
+        course={course} 
+        showMsg={showMsg} 
+      />
+      <ModuleQBankModal 
+        show={!!manageQBankFor} 
+        onClose={() => setManageQBankFor(null)} 
+        module={manageQBankFor} 
+        course={course} 
+        showMsg={showMsg} 
+      />
+      <ModuleSAModal 
+        show={!!manageSAFor} 
+        onClose={() => setManageSAFor(null)} 
+        module={manageSAFor} 
+        course={course} 
+        showMsg={showMsg} 
+      />
+    </>
   );
 }

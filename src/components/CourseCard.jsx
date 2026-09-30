@@ -180,22 +180,12 @@ export default function CourseCard({ course, enrollment, onEnrollmentUpdate }) {
                 ) : (
                   <>
                     <Link 
-                      to={`/learn/${course.id}`} 
+                      to={`/dashboard/overview`} 
                       className="px-3 py-2 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1 shrink-0 border border-emerald-500/30"
                     >
                       <Play size={14} />
                       <span>متابعة</span>
                     </Link>
-                    {enrollment.freeze_count < 2 && (
-                      <button 
-                        onClick={handleFreeze}
-                        disabled={loading}
-                        className="px-2 py-2 bg-surface text-on-surface-variant hover:text-primary hover:bg-primary/10 border border-outline-variant/60 font-bold text-[10px] rounded-xl transition-all flex items-center justify-center gap-1 shrink-0"
-                        title={`تجميد الكورس (متبقي ${2 - enrollment.freeze_count})`}
-                      >
-                        {loading ? <Loader2 size={14} className="animate-spin" /> : <Snowflake size={14} />}
-                      </button>
-                    )}
                   </>
                 )}
               </>

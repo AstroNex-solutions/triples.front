@@ -84,7 +84,7 @@ export default function OrdersSection() {
                       'طلب عام'
                     )}
                   </td>
-                  <td className="p-3 font-bold text-on-surface" dir="ltr">${o.total}</td>
+                  <td className="p-3 font-bold text-on-surface" dir="ltr">{o.total} د.أ</td>
                   <td className="p-3">{statusBadge(o.status)}</td>
                   <td className="p-3 text-xs text-on-surface-variant" dir="ltr">{new Date(o.createdAt).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'ar-EG')}</td>
                   <td className="p-3 text-center">

@@ -52,7 +52,7 @@ export default function Navbar() {
         { name: i18n.language === 'ar' ? 'الطب البشري' : 'Medicine', path: '/courses?category=Medicine', icon: BookOpen },
         { name: i18n.language === 'ar' ? 'طب الأسنان' : 'Dentistry', path: '/courses?category=Dentistry', icon: BookOpen },
         { name: i18n.language === 'ar' ? 'المدونة' : 'Blog', path: '/articles', icon: FileText },
-        { name: i18n.language === 'ar' ? 'من نحن' : 'About us', path: '/about', icon: Info },
+        { name: i18n.language === 'ar' ? 'من نحن' : 'About', path: '/about', icon: Info },
     ];
 
     return (
@@ -85,7 +85,7 @@ export default function Navbar() {
                 </Link>
 
                 {/* روابط الديسktop (تظهر في الشاشات الكبيرة فقط) */}
-                <nav className="hidden lg:flex items-center gap-1 bg-surface-container-low/70 backdrop-blur-md p-1.5 rounded-full border border-outline-variant/30">
+                <nav className="hidden lg:flex items-center gap-6">
                     {navLinks.map((link) => {
                         const active = isActive(link.path);
                         return (
@@ -97,8 +97,8 @@ export default function Navbar() {
                             >
                                 {active && (
                                     <motion.div
-                                        layoutId="activeTabPill"
-                                        className="absolute inset-0 bg-surface shadow-sm rounded-full border border-outline-variant/60 -z-10"
+                                        layoutId="activeTabUnderline"
+                                        className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary rounded-full"
                                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                                     />
                                 )}

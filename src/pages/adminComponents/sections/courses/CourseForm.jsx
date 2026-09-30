@@ -155,7 +155,10 @@ export default function CourseForm({ showMsg, course, categories, onBack, onSave
     subtitle: '', 
     level: 'beginner', 
     category_id: '', 
-    allow_feedback: true 
+    allow_feedback: true,
+    qbank_price: 0,
+    self_assessment_price: 0,
+    flashcard_price: 0
   });
   const [shortDescriptions, setShortDescriptions] = useState([{ ar: '', en: '' }]);
   const [file, setFile] = useState(null);
@@ -210,7 +213,10 @@ export default function CourseForm({ showMsg, course, categories, onBack, onSave
         subtitle: course.subtitle || '', 
         level: course.level || 'beginner', 
         category_id: course.category_id || '',
-        allow_feedback: course.allow_feedback !== false
+        allow_feedback: course.allow_feedback !== false,
+        qbank_price: course.qbank_price || 0,
+        self_assessment_price: course.self_assessment_price || 0,
+        flashcard_price: course.flashcard_price || 0
       });
 
       let parsedShortDesc = [{ ar: '', en: '' }];
@@ -654,27 +660,6 @@ export default function CourseForm({ showMsg, course, categories, onBack, onSave
       count: packages.length
     },
     { 
-      id: 'flashcards', 
-      label: t('adminCourseForm.tabs.flashcards') || 'الفلاش كارد', 
-      icon: Zap,
-      count: courseFlashcards.length,
-      disabled: !course?.id
-    },
-    { 
-      id: 'question_banks', 
-      label: t('adminCourseForm.tabs.questionBanks') || 'بنك الأسئلة', 
-      icon: Database,
-      count: courseQBProducts.length,
-      disabled: !course?.id
-    },
-    { 
-      id: 'self_assessments', 
-      label: t('adminCourseForm.tabs.selfAssessments') || 'التقييمات الذاتية', 
-      icon: Award,
-      count: courseSAProducts.length,
-      disabled: !course?.id
-    },
-    { 
       id: 'course_reviews', 
       label: t('adminCourseForm.tabs.courseReviews') || 'تقييمات الكورس', 
       icon: Star,
@@ -1030,6 +1015,46 @@ export default function CourseForm({ showMsg, course, categories, onBack, onSave
                     </span>
                   </div>
                 </label>
+              </div>
+
+              {/* Pricing Settings Card */}
+              <div className="rounded-3xl bg-surface-container-low/70 border border-outline-variant/40 p-6 shadow-md space-y-4 backdrop-blur-md">
+                <div className="flex items-center gap-2 border-b border-outline-variant/20 pb-3">
+                  <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center font-bold">
+                    <CreditCard size={18} />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black text-on-surface">تسعير الميزات الإضافية</h3>
+                    <p className="text-xs text-on-surface-variant">الأسعار الخاصة بكل ميزة عند شرائها مع الكورس</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <Input 
+                    label="سعر بنك الأسئلة (Q-Bank Price) $" 
+                    type="number" 
+                    step="0.01" 
+                    min="0"
+                    value={form.qbank_price} 
+                    onChange={e => setForm({ ...form, qbank_price: e.target.value })} 
+                  />
+                  <Input 
+                    label="سعر التقييم الذاتي (Self Assessment) $" 
+                    type="number" 
+                    step="0.01" 
+                    min="0"
+                    value={form.self_assessment_price} 
+                    onChange={e => setForm({ ...form, self_assessment_price: e.target.value })} 
+                  />
+                  <Input 
+                    label="سعر البطاقات التعليمية (Flashcards) $" 
+                    type="number" 
+                    step="0.01" 
+                    min="0"
+                    value={form.flashcard_price} 
+                    onChange={e => setForm({ ...form, flashcard_price: e.target.value })} 
+                  />
+                </div>
               </div>
 
             </div>
@@ -1576,331 +1601,7 @@ export default function CourseForm({ showMsg, course, categories, onBack, onSave
           </div>
         )}
 
-        {/* -----------------------------------------------------------------------
-            5. FLASHCARDS TAB
-           ----------------------------------------------------------------------- */}
-        {activeTab === 'flashcards' && (
-          <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-container-low/60 p-5 rounded-3xl border border-outline-variant/40">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center font-bold">
-                  <Zap size={22} />
-                </div>
-                <div>
-                  <h3 className="font-black text-on-surface text-lg">منتجات الفلاش كارد</h3>
-                  <p className="text-xs text-on-surface-variant">ربط بطاقات استذكار تفاعلية سريعة بالكورس لتسهيل المراجعة للطلاب</p>
-                </div>
-              </div>
 
-              {course?.id && (
-                <button 
-                  type="button" 
-                  onClick={() => { 
-                    setFlashcardForm({ id: null, title: `${course.title} - Flashcards`, description: '', price: 0, is_active: true }); 
-                    setShowAddFlashcard(true); 
-                  }} 
-                  className="flex items-center justify-center gap-2 text-xs sm:text-sm font-black bg-primary text-white px-5 py-2.5 rounded-2xl hover:bg-primary-hover shadow-lg shadow-primary/20 transition-all cursor-pointer shrink-0"
-                >
-                  <Plus size={18} /> إضافة فلاش كارد جديد
-                </button>
-              )}
-            </div>
-
-            {!course?.id ? (
-              <div className="p-8 text-center rounded-3xl border-2 border-dashed border-outline-variant/40 bg-surface-container-low/30 space-y-3">
-                <AlertCircle size={32} className="mx-auto text-amber-500" />
-                <h4 className="text-sm font-black text-on-surface">يرجى حفظ الكورس أولاً</h4>
-                <p className="text-xs text-on-surface-variant max-w-sm mx-auto">لربط منتجات الفلاش كارد، يلزم حفظ الكورس للحصول على معرف رسمي له في النظام.</p>
-              </div>
-            ) : flashcardLoading ? (
-              <div className="py-16 flex justify-center"><Loader2 size={32} className="animate-spin text-primary" /></div>
-            ) : courseFlashcards.length === 0 ? (
-              <div className="text-center py-16 px-4 border-2 border-dashed border-outline-variant/40 rounded-3xl bg-surface-container-low/30 space-y-4">
-                <div className="w-16 h-16 rounded-3xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center mx-auto shadow-inner">
-                  <Zap size={32} />
-                </div>
-                <div className="max-w-md mx-auto space-y-1">
-                  <h4 className="text-base font-black text-on-surface">لا توجد منتجات فلاش كارد مضافة بعد.</h4>
-                  <p className="text-xs text-on-surface-variant">قم بإنشاء مجموعة بطاقات فلاش كارد لمساعدة الطلاب على تذكر المصطلحات والمفاهيم.</p>
-                </div>
-                <button 
-                  type="button" 
-                  onClick={() => { setFlashcardForm({ id: null, title: `${course.title} - Flashcards`, description: '', price: 0, is_active: true }); setShowAddFlashcard(true); }} 
-                  className="inline-flex items-center gap-2 text-xs font-black bg-primary text-white px-5 py-2.5 rounded-2xl shadow-md hover:bg-primary-hover transition-all cursor-pointer"
-                >
-                  <Plus size={16} /> إضافة فلاش كارد الآن
-                </button>
-              </div>
-            ) : (
-              <div className="overflow-hidden rounded-3xl border border-outline-variant/40 bg-surface-container-low/70 shadow-sm">
-                <table className="w-full text-start text-xs sm:text-sm">
-                  <thead className="bg-surface-container-low/90 border-b border-outline-variant/30 text-on-surface-variant">
-                    <tr>
-                      <th className="p-4 text-start font-black">المنتج</th>
-                      <th className="p-4 text-start font-black">السعر</th>
-                      <th className="p-4 text-start font-black">الحالة</th>
-                      <th className="p-4 text-center font-black">الإجراءات</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-outline-variant/20">
-                    {courseFlashcards.map(p => (
-                      <tr key={p.id} className="hover:bg-surface/60 transition-colors">
-                        <td className="p-4 font-black text-on-surface">{p.title}</td>
-                        <td className="p-4 font-black text-emerald-600">${p.price}</td>
-                        <td className="p-4">{p.is_active ? <Badge text="نشط" variant="success" /> : <Badge text="غير نشط" variant="danger" />}</td>
-                        <td className="p-4 text-center">
-                          <div className="flex items-center justify-center gap-2">
-                            <button 
-                              type="button" 
-                              onClick={() => setManageCardsFor(p)} 
-                              className="px-3 py-1.5 rounded-xl text-primary bg-primary/10 hover:bg-primary hover:text-white font-black text-xs transition-colors cursor-pointer"
-                            >
-                              إدارة الكروت
-                            </button>
-                            <button 
-                              type="button" 
-                              onClick={() => { setFlashcardForm({ id: p.id, title: p.title, description: p.description || '', price: p.price, is_active: p.is_active }); setShowAddFlashcard(true); }} 
-                              className="p-2 rounded-xl text-primary hover:bg-primary/10 cursor-pointer"
-                              title="تعديل"
-                            >
-                              <Edit size={15} />
-                            </button>
-                            <button 
-                              type="button" 
-                              onClick={() => handleDeleteFlashcard(p.id)} 
-                              className="p-2 rounded-xl text-rose-500 hover:bg-rose-500/10 cursor-pointer"
-                              title="حذف"
-                            >
-                              <Trash2 size={15} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* -----------------------------------------------------------------------
-            6. QUESTION BANKS TAB
-           ----------------------------------------------------------------------- */}
-        {activeTab === 'question_banks' && (
-          <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-container-low/60 p-5 rounded-3xl border border-outline-variant/40">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center font-bold">
-                  <Database size={22} />
-                </div>
-                <div>
-                  <h3 className="font-black text-on-surface text-lg">بنوك الأسئلة التدريبية</h3>
-                  <p className="text-xs text-on-surface-variant">ربط بنوك أسئلة واختبارات تدريبية مع إمكانية تحديد أسعار مستقلة لها</p>
-                </div>
-              </div>
-
-              {course?.id && (
-                <button 
-                  type="button" 
-                  onClick={() => { 
-                    setQbForm({ id: null, title: `بنك أسئلة ${course.title}`, description: '', price: 0, is_free: false, status: 'published' }); 
-                    setShowAddQB(true); 
-                  }} 
-                  className="flex items-center justify-center gap-2 text-xs sm:text-sm font-black bg-primary text-white px-5 py-2.5 rounded-2xl hover:bg-primary-hover shadow-lg shadow-primary/20 transition-all cursor-pointer shrink-0"
-                >
-                  <Plus size={18} /> إضافة بنك أسئلة
-                </button>
-              )}
-            </div>
-
-            {!course?.id ? (
-              <div className="p-8 text-center rounded-3xl border-2 border-dashed border-outline-variant/40 bg-surface-container-low/30 space-y-3">
-                <AlertCircle size={32} className="mx-auto text-amber-500" />
-                <h4 className="text-sm font-black text-on-surface">يرجى حفظ الكورس أولاً</h4>
-                <p className="text-xs text-on-surface-variant max-w-sm mx-auto">لربط بنك الأسئلة، يلزم حفظ الكورس للحصول على معرف رسمي له في النظام.</p>
-              </div>
-            ) : qbLoading ? (
-              <div className="py-16 flex justify-center"><Loader2 size={32} className="animate-spin text-primary" /></div>
-            ) : courseQBProducts.length === 0 ? (
-              <div className="text-center py-16 px-4 border-2 border-dashed border-outline-variant/40 rounded-3xl bg-surface-container-low/30 space-y-4">
-                <div className="w-16 h-16 rounded-3xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center mx-auto shadow-inner">
-                  <Database size={32} />
-                </div>
-                <div className="max-w-md mx-auto space-y-1">
-                  <h4 className="text-base font-black text-on-surface">لا يوجد بنك أسئلة مضاف لهذا الكورس بعد.</h4>
-                  <p className="text-xs text-on-surface-variant">أضف بنك أسئلة تدريبي متعدد الخيارات لقياس استيعاب الطلاب.</p>
-                </div>
-                <button 
-                  type="button" 
-                  onClick={() => { setQbForm({ id: null, title: `بنك أسئلة ${course.title}`, description: '', price: 0, is_free: false, status: 'published' }); setShowAddQB(true); }} 
-                  className="inline-flex items-center gap-2 text-xs font-black bg-primary text-white px-5 py-2.5 rounded-2xl shadow-md hover:bg-primary-hover transition-all cursor-pointer"
-                >
-                  <Plus size={16} /> إضافة بنك أسئلة الآن
-                </button>
-              </div>
-            ) : (
-              <div className="overflow-hidden rounded-3xl border border-outline-variant/40 bg-surface-container-low/70 shadow-sm">
-                <table className="w-full text-start text-xs sm:text-sm">
-                  <thead className="bg-surface-container-low/90 border-b border-outline-variant/30 text-on-surface-variant">
-                    <tr>
-                      <th className="p-4 text-start font-black">عنوان البنك</th>
-                      <th className="p-4 text-start font-black">السعر</th>
-                      <th className="p-4 text-start font-black">الحالة</th>
-                      <th className="p-4 text-center font-black">الإجراءات</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-outline-variant/20">
-                    {courseQBProducts.map(p => (
-                      <tr key={p.id} className="hover:bg-surface/60 transition-colors">
-                        <td className="p-4 font-black text-on-surface">{p.title}</td>
-                        <td className="p-4 font-black">{p.is_free ? <Badge text="مجاني" variant="success" /> : `$${p.price}`}</td>
-                        <td className="p-4">{p.status === 'published' ? <Badge text="منشور" variant="success" /> : <Badge text="مسودة" variant="warning" />}</td>
-                        <td className="p-4 text-center">
-                          <div className="flex items-center justify-center gap-2">
-                            <button 
-                              type="button" 
-                              onClick={() => setManageQBQuestionsFor(p)} 
-                              className="px-3 py-1.5 rounded-xl text-emerald-600 bg-emerald-500/10 hover:bg-emerald-500 hover:text-white font-black text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
-                            >
-                              <ClipboardList size={14} /> إدارة الأسئلة
-                            </button>
-                            <button 
-                              type="button" 
-                              onClick={() => { setQbForm({ id: p.id, title: p.title, description: p.description || '', price: p.price, is_free: p.is_free, status: p.status }); setShowAddQB(true); }} 
-                              className="p-2 rounded-xl text-primary hover:bg-primary/10 cursor-pointer"
-                              title="تعديل"
-                            >
-                              <Edit size={15} />
-                            </button>
-                            <button 
-                              type="button" 
-                              onClick={() => handleDeleteQB(p.id)} 
-                              className="p-2 rounded-xl text-rose-500 hover:bg-rose-500/10 cursor-pointer"
-                              title="حذف"
-                            >
-                              <Trash2 size={15} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* -----------------------------------------------------------------------
-            7. SELF ASSESSMENTS TAB
-           ----------------------------------------------------------------------- */}
-        {activeTab === 'self_assessments' && (
-          <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-container-low/60 p-5 rounded-3xl border border-outline-variant/40">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-violet-500/10 text-violet-500 flex items-center justify-center font-bold">
-                  <Award size={22} />
-                </div>
-                <div>
-                  <h3 className="font-black text-on-surface text-lg">التقييمات الذاتية المحددة بالوقت</h3>
-                  <p className="text-xs text-on-surface-variant">اختبارات محاكاة وتقييم نهائي بوقت زمني محدد لحصول الطالب على النتائج</p>
-                </div>
-              </div>
-
-              {course?.id && (
-                <button 
-                  type="button" 
-                  onClick={() => { 
-                    setSaForm({ id: null, title: `تقييم ذاتي - ${course.title}`, description: '', price: 0, is_free: false, duration_minutes: 120, status: 'published' }); 
-                    setShowAddSA(true); 
-                  }} 
-                  className="flex items-center justify-center gap-2 text-xs sm:text-sm font-black bg-primary text-white px-5 py-2.5 rounded-2xl hover:bg-primary-hover shadow-lg shadow-primary/20 transition-all cursor-pointer shrink-0"
-                >
-                  <Plus size={18} /> إضافة تقييم ذاتي
-                </button>
-              )}
-            </div>
-
-            {!course?.id ? (
-              <div className="p-8 text-center rounded-3xl border-2 border-dashed border-outline-variant/40 bg-surface-container-low/30 space-y-3">
-                <AlertCircle size={32} className="mx-auto text-amber-500" />
-                <h4 className="text-sm font-black text-on-surface">يرجى حفظ الكورس أولاً</h4>
-                <p className="text-xs text-on-surface-variant max-w-sm mx-auto">لربط التقييمات الذاتية، يلزم حفظ الكورس للحصول على معرف رسمي له في النظام.</p>
-              </div>
-            ) : saLoading ? (
-              <div className="py-16 flex justify-center"><Loader2 size={32} className="animate-spin text-primary" /></div>
-            ) : courseSAProducts.length === 0 ? (
-              <div className="text-center py-16 px-4 border-2 border-dashed border-outline-variant/40 rounded-3xl bg-surface-container-low/30 space-y-4">
-                <div className="w-16 h-16 rounded-3xl bg-violet-500/10 text-violet-500 flex items-center justify-center mx-auto shadow-inner">
-                  <Award size={32} />
-                </div>
-                <div className="max-w-md mx-auto space-y-1">
-                  <h4 className="text-base font-black text-on-surface">لا يوجد تقييم ذاتي مضاف لهذا الكورس بعد.</h4>
-                  <p className="text-xs text-on-surface-variant">أنشئ اختبار تقييم ذاتي شامل محدد بالدقائق لقياس جاهزية الطالب.</p>
-                </div>
-                <button 
-                  type="button" 
-                  onClick={() => { setSaForm({ id: null, title: `تقييم ذاتي - ${course.title}`, description: '', price: 0, is_free: false, duration_minutes: 120, status: 'published' }); setShowAddSA(true); }} 
-                  className="inline-flex items-center gap-2 text-xs font-black bg-primary text-white px-5 py-2.5 rounded-2xl shadow-md hover:bg-primary-hover transition-all cursor-pointer"
-                >
-                  <Plus size={16} /> إنشاء أول تقييم ذاتي الآن
-                </button>
-              </div>
-            ) : (
-              <div className="overflow-hidden rounded-3xl border border-outline-variant/40 bg-surface-container-low/70 shadow-sm">
-                <table className="w-full text-start text-xs sm:text-sm">
-                  <thead className="bg-surface-container-low/90 border-b border-outline-variant/30 text-on-surface-variant">
-                    <tr>
-                      <th className="p-4 text-start font-black">عنوان التقييم</th>
-                      <th className="p-4 text-start font-black">المدة</th>
-                      <th className="p-4 text-start font-black">السعر</th>
-                      <th className="p-4 text-start font-black">الحالة</th>
-                      <th className="p-4 text-center font-black">الإجراءات</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-outline-variant/20">
-                    {courseSAProducts.map(p => (
-                      <tr key={p.id} className="hover:bg-surface/60 transition-colors">
-                        <td className="p-4 font-black text-on-surface">{p.title}</td>
-                        <td className="p-4 font-bold text-on-surface-variant">{p.duration_minutes} دقيقة</td>
-                        <td className="p-4 font-black">{p.is_free ? <Badge text="مجاني" variant="success" /> : `$${p.price}`}</td>
-                        <td className="p-4">{p.status === 'published' ? <Badge text="منشور" variant="success" /> : <Badge text="مسودة" variant="warning" />}</td>
-                        <td className="p-4 text-center">
-                          <div className="flex items-center justify-center gap-2">
-                            <button 
-                              type="button" 
-                              onClick={() => setManageSAQuestionsFor(p)} 
-                              className="px-3 py-1.5 rounded-xl text-emerald-600 bg-emerald-500/10 hover:bg-emerald-500 hover:text-white font-black text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
-                            >
-                              <ClipboardList size={14} /> إدارة الأسئلة
-                            </button>
-                            <button 
-                              type="button" 
-                              onClick={() => { setSaForm({ id: p.id, title: p.title, description: p.description || '', price: p.price, is_free: p.is_free, duration_minutes: p.duration_minutes, status: p.status }); setShowAddSA(true); }} 
-                              className="p-2 rounded-xl text-primary hover:bg-primary/10 cursor-pointer"
-                              title="تعديل"
-                            >
-                              <Edit size={15} />
-                            </button>
-                            <button 
-                              type="button" 
-                              onClick={() => handleDeleteSA(p.id)} 
-                              className="p-2 rounded-xl text-rose-500 hover:bg-rose-500/10 cursor-pointer"
-                              title="حذف"
-                            >
-                              <Trash2 size={15} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        )}
 
         {/* -----------------------------------------------------------------------
             8. COURSE REVIEWS TAB
@@ -2089,7 +1790,7 @@ export default function CourseForm({ showMsg, course, categories, onBack, onSave
         {/* =========================================================================
             BOTTOM FLOATING GLASS DOCK
            ========================================================================= */}
-        <div className="fixed bottom-4 left-0 right-0 z-40 px-4 max-w-5xl mx-auto pointer-events-none">
+        {/* <div className="fixed bottom-4 left-0 right-0 z-40 px-4 max-w-5xl mx-auto pointer-events-none">
           <div className="pointer-events-auto p-3.5 sm:p-4 rounded-3xl bg-surface/90 border border-outline-variant/40 shadow-2xl backdrop-blur-2xl flex items-center justify-between gap-4">
             
             <div className="hidden sm:flex items-center gap-3">
@@ -2126,7 +1827,7 @@ export default function CourseForm({ showMsg, course, categories, onBack, onSave
             </div>
 
           </div>
-        </div>
+        </div> */}
 
       </form>
 

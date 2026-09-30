@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import API from '../api/axios';
 import { 
@@ -25,11 +25,74 @@ const getMedicalIcon = (chapter = '', topic = '') => {
   return Stethoscope;
 };
 
+// UI Sound Synthesis using Web Audio API (Clinical & Elegant Tones)
+const playSound = (type) => {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+
+    if (type === 'flip') {
+      // Smooth "shwip" (digital swipe)
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      
+      // Triangle wave gives a softer, warmer tone
+      osc.type = 'triangle';
+      
+      // Sweep frequency up for a "lifting" or "flipping" feel
+      osc.frequency.setValueAtTime(300, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.15);
+      
+      // Smooth Envelope
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.15);
+      
+    } else if (type === 'nav') {
+      // Elegant clinical UI chime (glassy pop)
+      const osc = ctx.createOscillator();
+      const osc2 = ctx.createOscillator();
+      const gain = ctx.createGain();
+      
+      osc.type = 'sine';
+      osc2.type = 'sine';
+      
+      // C6 and E6 (Major third interval, clean and positive)
+      osc.frequency.setValueAtTime(1046.50, ctx.currentTime);
+      osc2.frequency.setValueAtTime(1318.51, ctx.currentTime);
+      
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+      
+      osc.connect(gain);
+      osc2.connect(gain);
+      gain.connect(ctx.destination);
+      
+      osc.start();
+      osc2.start();
+      osc.stop(ctx.currentTime + 0.15);
+      osc2.stop(ctx.currentTime + 0.15);
+    }
+  } catch (e) {
+    // Ignore audio errors (e.g. autoplay blocked)
+  }
+};
+
 
 export default function FlashcardStudyPage() {
   const { t } = useTranslation();
-  const { productId } = useParams();
+  const { deckId } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const moduleId = searchParams.get('moduleId');
+  
   const [decks, setDecks] = useState([]);
   const [selectedDeck, setSelectedDeck] = useState(null);
   const [items, setItems] = useState([]);
@@ -38,36 +101,47 @@ export default function FlashcardStudyPage() {
   const [loading, setLoading] = useState(true);
   const [isFinished, setIsFinished] = useState(false);
   const [showDiagram, setShowDiagram] = useState(true);
-
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+ 
   useEffect(() => {
-    API.get(`/student/flashcards/${productId}/decks`)
-      .then(res => {
-        const fetched = res.data.decks || [];
-        setDecks(fetched);
-        if (fetched.length > 0 && !selectedDeck) {
-          loadItems(fetched[0]);
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        let fetchedDecks = [];
+        if (moduleId) {
+          const decksRes = await API.get(`/student/flashcards/${moduleId}/decks`);
+          fetchedDecks = decksRes.data.decks || [];
+          setDecks(fetchedDecks);
         }
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [productId]);
 
-  const loadItems = (deck) => {
-    setLoading(true);
-    setSelectedDeck(deck);
-    API.get(`/student/flashcards/decks/${deck.id}/items`)
-      .then(res => {
-        setItems(res.data.items || []);
+        const itemsRes = await API.get(`/student/flashcards/${deckId}/items`);
+        setItems(itemsRes.data.items || []);
+        
+        let initialDeck = fetchedDecks.find(d => String(d.id) === String(deckId));
+        if (!initialDeck) {
+            initialDeck = { id: deckId, chapter_name: 'Current Deck', topic_name: 'Topic' };
+        }
+
+        setSelectedDeck(initialDeck);
         setCurrentIndex(0);
         setIsFlipped(false);
         setIsFinished(false);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [deckId, moduleId]);
+
+  const loadItems = (deck) => {
+    navigate(`/study-flashcards/${deck.id}${moduleId ? `?moduleId=${moduleId}` : ''}`);
   };
 
   const nextCard = useCallback(() => {
     if (currentIndex < items.length - 1) {
+      playSound('nav');
       setIsFlipped(false);
       setTimeout(() => setCurrentIndex(prev => prev + 1), 150);
     } else if (currentIndex === items.length - 1) {
@@ -77,6 +151,7 @@ export default function FlashcardStudyPage() {
 
   const prevCard = useCallback(() => {
     if (currentIndex > 0) {
+      playSound('nav');
       setIsFlipped(false);
       setIsFinished(false);
       setTimeout(() => setCurrentIndex(prev => prev - 1), 150);
@@ -84,6 +159,7 @@ export default function FlashcardStudyPage() {
   }, [currentIndex]);
 
   const flipCard = useCallback(() => {
+    playSound('flip');
     setIsFlipped(prev => !prev);
   }, []);
 
@@ -123,339 +199,180 @@ export default function FlashcardStudyPage() {
             <Atom size={32} className="animate-spin" />
           </div>
         </div>
-        <p className="mt-5 font-bold text-on-surface-variant/70 text-sm tracking-wide">{t('flashcards.study.loadingPlatform')}</p>
+        <p className="mt-5 font-bold text-on-surface-variant/70 text-sm tracking-wide">{t('flashcards.study.loadingPlatform', 'جاري تحميل المنصة...')}</p>
       </div>
     );
   }
 
   return (
-    <div 
-      className="min-h-screen bg-background  text-on-background py-3 sm:py-4 px-3 sm:px-6 lg:px-8 relative overflow-x-hidden flex flex-col transition-colors" 
-      dir="rtl"
-      style={{
-        backgroundImage: `radial-gradient(#cbd5e1 0.75px, transparent 0.75px), radial-gradient(#cbd5e1 0.75px, transparent 0.75px)`,
-        backgroundSize: `30px 30px`,
-        backgroundPosition: `0 0, 15px 15px`
-      }}
-    >
-      {/* Soft Clinical Ambient Light Orbs */}
-      <div className="absolute top-6 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-6 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col gap-3.5 relative z-10">
+    <div className="flex h-screen bg-surface-container-lowest overflow-hidden font-sans" dir="ltr">
+      
+      {/* MAIN CONTENT */}
+      <div className="flex-1 flex flex-col min-h-0 relative z-10 w-full overflow-hidden bg-[#F8F9FA]" dir="rtl">
         
-        {/* Top Navigation Bar: الرجوع للوحة الطالب */}
-        <div className="flex items-center justify-between bg-surface/95 backdrop-blur-xl border border-outline-variant/30 px-4 py-2.5 rounded-2xl shadow-sm transition-colors">
-          <div className="flex items-center gap-2.5">
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface-variant hover:bg-surface-container text-on-surface-variant hover:text-on-surface dark:hover:text-white text-xs font-black transition-all cursor-pointer border border-outline-variant/30 shadow-2xs"
-            >
-              <LayoutDashboard size={15} className="text-primary" />
-              <span>{t('flashcards.study.backToDashboard')}</span>
-            </button>
+        {/* Flashcard Area */}
+        <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 lg:p-10 flex flex-col items-center custom-scrollbar">
+          <div className="w-full max-w-4xl mx-auto flex-1 flex flex-col justify-between gap-6">
+            
+            {/* Top Section: Back Button + Progress */}
+            <div className="space-y-4 w-full">
+              <button
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-2 px-5 py-2.5 bg-white border border-outline-variant/30 text-on-surface-variant hover:text-[#5c4be4] hover:bg-[#5c4be4]/5 rounded-xl shadow-sm transition-all cursor-pointer font-bold text-sm w-max"
+              >
+                <ArrowRight size={18} />
+                <span>{t('flashcards.study.backBtn', 'العودة')}</span>
+              </button>
 
-            <button
-              onClick={() => navigate('/flashcards-store')}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-primary/5 hover:bg-primary/10 text-primary text-xs font-bold transition-all cursor-pointer border border-primary/20"
-            >
-              <Bookmark size={14} className="text-primary" />
-              <span className="hidden sm:inline">{t('flashcards.study.storeBtn')}</span>
-            </button>
-          </div>
+              {/* Top Header: Progress */}
+              <div className="bg-white border border-outline-variant/30 rounded-2xl px-6 py-4 shadow-sm transition-colors">
+              <div className="flex items-center justify-between gap-4 mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#5c4be4]/50 animate-pulse"></span>
+                  <span className="text-sm font-black text-on-surface uppercase tracking-wide">
+                    {t('flashcards.study.progressInChapter', 'التقدم في هذا القسم')}
+                  </span>
+                </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-black text-on-surface hidden sm:inline">
-              {t('flashcards.study.studyPlatform')}
-            </span>
-            <span className="text-[10px] font-mono text-primary bg-primary/5 px-2.5 py-0.5 rounded-md border border-primary/20">
-              {t('flashcards.study.studentMode')}
-            </span>
-          </div>
-        </div>
-
-        <div className="flex-1 flex flex-col lg:flex-row gap-5">
-        
-        {/* ═════════════════════════════════════════════
-            1. Sidebar: فصول المادة مع أيقونات طبية متخصصة
-           ═════════════════════════════════════════════ */}
-        <aside className="w-full lg:w-72 xl:w-80 shrink-0 bg-surface/95 backdrop-blur-xl border border-outline-variant/30 rounded-3xl p-4 flex flex-col h-auto lg:h-[calc(100vh-85px)] shadow-[0_10px_30px_rgba(0,0,0,0.02)] transition-colors">
-          <div className="flex items-center justify-between mb-4 px-1 border-b border-outline-variant/30 pb-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-primary/5 border border-primary/20 text-primary flex items-center justify-center shadow-sm">
-                <Microscope size={18} />
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-mono font-black text-[#5c4be4] bg-[#5c4be4]/10 px-3 py-1 rounded-full">
+                    {progressPercent}%
+                  </span>
+                  <span className="text-xs font-bold text-on-surface-variant bg-surface-variant px-3 py-1 rounded-full border border-outline-variant/30">
+                    {isFinished ? items.length : currentIndex + 1} / {items.length} {t('flashcards.study.cardUnit', 'بطاقة')}
+                  </span>
+                </div>
               </div>
-              <div>
-                <h2 className="text-base font-black text-on-surface leading-tight">{t('flashcards.study.chaptersTitle')}</h2>
-                <p className="text-[10px] text-on-surface-variant/50 font-medium">{t('flashcards.study.chapterSubtitle')}</p>
+
+              {/* Progress Line */}
+              <div className="w-full h-2.5 bg-surface-variant rounded-full overflow-hidden p-0.5 border border-outline-variant/30/60">
+                <div 
+                  className="h-full bg-gradient-to-l from-[#5c4be4] to-[#7a6df1] rounded-full transition-all duration-500 ease-out shadow-sm"
+                  style={{ width: `${progressPercent}%` }}
+                />
               </div>
             </div>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-surface-variant text-on-surface-variant border border-outline-variant/30">
-              {decks.length}
-            </span>
-          </div>
-          
-          <div className="space-y-2 overflow-y-auto pr-1 flex-1 custom-scrollbar">
-            {decks.map((deck, index) => {
-              const isActive = selectedDeck?.id === deck.id;
-              const MedicalIcon = getMedicalIcon(deck.chapter_name, deck.topic_name);
 
-              return (
-                <button
-                  key={deck.id}
-                  onClick={() => loadItems(deck)}
-                  className={`w-full text-start p-3.5 rounded-2xl transition-all duration-300 flex items-center gap-3.5 group relative border text-right cursor-pointer ${
-                    isActive 
-                    ? 'bg-gradient-to-l from-primary to-secondary text-white border-teal-600 shadow-md shadow-teal-700/20 scale-[1.01]' 
-                    : 'bg-surface hover:bg-slate-50/90 dark:hover:bg-surface-variant/90 border-outline-variant/30/70  hover:border-teal-300 dark:hover:border-teal-600 text-on-surface-variant'
-                  }`}
+            {/* Main Flashcard Core */}
+            <div className="flex-1 flex flex-col items-center justify-center relative w-full perspective-1000 my-4 py-1">
+              {isFinished ? (
+                <div className="w-full max-w-xl bg-white border border-outline-variant/30 rounded-3xl p-10 text-center shadow-md animate-in fade-in zoom-in-95 duration-500">
+                  <div className="w-20 h-20 bg-[#5c4be4]/10 text-[#5c4be4] rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Award size={40} />
+                  </div>
+                  <h2 className="text-3xl font-black text-on-surface mb-3">{t('flashcards.study.congratsTitle', 'تهانينا!')}</h2>
+                  <p className="text-on-surface-variant/70 text-base mb-8 max-w-sm mx-auto">
+                    {t('flashcards.study.congratsDesc', 'لقد أكملت جميع البطاقات في هذا القسم بنجاح.')}
+                  </p>
+                  <div className="flex items-center justify-center gap-3">
+                    <button 
+                      onClick={() => { setIsFinished(false); setCurrentIndex(0); setIsFlipped(false); }}
+                      className="bg-[#5c4be4] hover:bg-[#4a3bc6] text-white px-8 py-3.5 rounded-xl font-bold text-sm transition-all shadow-md flex items-center gap-2 cursor-pointer"
+                    >
+                      <RotateCcw size={18} /> {t('flashcards.study.reviewAgain', 'مراجعة مرة أخرى')}
+                    </button>
+                  </div>
+                </div>
+              ) : items.length === 0 ? (
+                <div className="w-full max-w-xl bg-white border border-outline-variant/30 rounded-3xl p-10 text-center shadow-md">
+                   <h3 className="text-xl font-bold text-on-surface-variant">{t('flashcards.study.noCards', 'لا توجد بطاقات تعليمية متاحة.')}</h3>
+                </div>
+              ) : (
+                <div 
+                  className="relative w-full h-[320px] sm:h-[400px] cursor-pointer group select-none"
+                  onClick={flipCard}
                 >
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 ${
-                    isActive 
-                      ? 'bg-surface/20 text-white' 
-                      : 'bg-primary/5 text-primary border border-teal-100 '
-                  }`}>
-                    <MedicalIcon size={20} />
-                  </div>
-
-                  <div className="truncate flex-1 min-w-0">
-                    <div className={`text-[10px] font-bold uppercase tracking-wider mb-0.5 truncate ${
-                      isActive ? 'text-teal-100' : 'text-primary'
-                    }`}>
-                      {deck.chapter_name || `Chapter ${index + 1}`}
-                    </div>
-                    <div className={`text-xs font-bold truncate ${
-                      isActive ? 'text-white' : 'text-on-surface'
-                    }`}>
-                      {deck.topic_name || 'Topic'}
-                    </div>
-                  </div>
-
-                  <ChevronRight size={16} className={`shrink-0 transition-transform ${
-                    isActive ? 'text-white translate-x-[-2px]' : 'text-slate-300 dark:text-on-surface-variant group-hover:text-primary dark:group-hover:text-teal-400 group-hover:translate-x-[-2px]'
-                  }`} />
-                </button>
-              );
-            })}
-          </div>
-        </aside>
-
-        {/* ═════════════════════════════════════════════
-            2. Main Study Zone: بطاقة المذاكرة الطبية
-           ═════════════════════════════════════════════ */}
-        <main className="flex-1 flex flex-col relative h-auto lg:h-[calc(100vh-85px)] justify-between">
-          {!selectedDeck ? (
-            <div className="flex-1 flex flex-col items-center justify-center bg-surface/90 dark:bg-surface/90 border border-outline-variant/30 rounded-3xl p-8 text-center shadow-sm transition-colors">
-              <div className="w-20 h-20 bg-primary/5 border border-primary/20  rounded-3xl flex items-center justify-center mb-5 text-primary shadow-inner">
-                <Sparkles size={36} className="animate-pulse" />
-              </div>
-              <h3 className="text-2xl font-black text-on-surface mb-2">{t('flashcards.study.startPromptTitle')}</h3>
-              <p className="text-on-surface-variant/70 max-w-md mx-auto text-sm leading-relaxed">
-                {t('flashcards.study.startPromptDesc')}
-              </p>
-            </div>
-          ) : loading ? (
-            <div className="flex-1 flex flex-col items-center justify-center">
-              <Loader2 size={44} className="animate-spin text-primary mb-3" />
-              <span className="text-xs font-bold text-on-surface-variant/50">{t('flashcards.study.loadingCards')}</span>
-            </div>
-          ) : items.length === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center bg-surface border border-outline-variant/30  rounded-3xl p-8 text-center">
-              <h3 className="text-lg font-bold text-on-surface-variant">{t('flashcards.study.noCards')}</h3>
-            </div>
-          ) : (
-            <div className="flex-1 flex flex-col w-full max-w-4xl mx-auto h-full justify-between gap-3">
-              
-              {/* ── Top Header: تقدمك في هذا الفصل ── */}
-              <div className="bg-surface/95 backdrop-blur-md border border-outline-variant/30 rounded-2xl px-4 py-3 shadow-sm transition-colors">
-                <div className="flex items-center justify-between gap-4 mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-primary/50 animate-pulse"></span>
-                    <span className="text-xs font-black text-on-surface uppercase tracking-wide">
-                      {t('flashcards.study.progressInChapter')}
-                    </span>
-                    <span className="text-[11px] text-on-surface-variant/50 font-medium hidden sm:inline">
-                      • {selectedDeck.chapter_name}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono font-black text-primary bg-primary/5 px-2.5 py-0.5 rounded-full border border-primary/20">
-                      {progressPercent}%
-                    </span>
-                    <span className="text-xs font-bold text-on-surface-variant bg-surface-variant px-3 py-0.5 rounded-full border border-outline-variant/30">
-                      {isFinished ? items.length : currentIndex + 1} / {items.length} {t('flashcards.study.cardUnit')}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Precision Progress Line */}
-                <div className="w-full h-2 bg-surface-variant rounded-full overflow-hidden p-0.5 border border-outline-variant/30/60">
-                  <div 
-                    className="h-full bg-gradient-to-l from-teal-500 via-cyan-500 to-emerald-400 rounded-full transition-all duration-500 ease-out shadow-sm"
-                    style={{ width: `${progressPercent}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* ── Main Flashcard Core ── */}
-              <div className="flex-1 flex flex-col items-center justify-center relative w-full perspective-1000 my-auto py-1">
-                {isFinished ? (
-                  <div className="w-full max-w-xl bg-surface border-2 border-primary/30 rounded-3xl p-8 sm:p-10 text-center shadow-xl animate-in fade-in zoom-in-95 duration-500">
-                    <div className="w-16 h-16 bg-primary/5 text-primary border border-primary/20  rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
-                      <Award size={36} />
-                    </div>
-                    <h2 className="text-2xl font-black text-on-surface mb-2">{t('flashcards.study.congratsTitle')}</h2>
-                    <p className="text-on-surface-variant/70 text-sm mb-6 max-w-sm mx-auto">
-                      {t('flashcards.study.congratsDesc')}
-                    </p>
-                    <div className="flex items-center justify-center gap-3">
-                      <button 
-                        onClick={() => { setIsFinished(false); setCurrentIndex(0); setIsFlipped(false); }}
-                        className="bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-xl font-bold text-xs transition-all shadow-md flex items-center gap-2 cursor-pointer"
-                      >
-                        <RotateCcw size={15} /> {t('flashcards.study.reviewAgain')}
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div 
-                    className="relative w-full max-w-3xl h-[280px] sm:h-[340px] lg:h-[370px] cursor-pointer group select-none"
-                    onClick={flipCard}
-                  >
-                    {/* The 3D Flip Card Container */}
-                    <div className={`w-full h-full transition-transform duration-600 ease-[cubic-bezier(0.2,0.8,0.2,1)] transform-style-preserve-3d rounded-3xl shadow-[0_20px_50px_rgba(15,23,42,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)] ${isFlipped ? 'rotate-y-180' : ''}`}>
-                      
-                      {/* ── Front Face: Question / وجه السؤال ── */}
-                      <div className="absolute inset-0 backface-hidden bg-surface border border-outline-variant/30 hover:border-primary/50 dark:hover:border-primary/50 rounded-3xl p-6 sm:p-9 flex flex-col justify-between overflow-y-auto transition-colors shadow-sm">
-                        {/* Top Badge & Header */}
-                        <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
-                          <div className="flex items-center gap-2">
-                            <span className="px-2.5 py-1 rounded-lg bg-primary/5 border border-primary/20 text-primary text-[11px] font-black tracking-wide">
-                              {t('flashcards.study.questionBadge')}
-                            </span>
-                            <span className="text-[11px] text-on-surface-variant/50 font-mono">
-                              MEDICAL QUESTION #{currentIndex + 1}
-                            </span>
-                          </div>
-                          <span className="text-[11px] font-bold text-outline-variant dark:text-outline-variant bg-surface-variant px-2.5 py-1 rounded-md">
-                            {t('flashcards.study.clickToFlip')}
-                          </span>
-                        </div>
-
-                        {/* Middle: Question Text */}
-                        <div className="my-auto py-3 text-center">
-                          <h2 
-                            className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-on-background leading-snug tracking-tight font-sans" 
-                            dir="ltr"
-                          >
-                            {currentItem?.front_text}
-                          </h2>
-                        </div>
-                        {/* Footer Indicator */}
-                        <div className="flex items-center justify-between text-[11px] text-on-surface-variant/50 pt-2 border-t border-outline-variant/30">
-                          <span className="flex items-center gap-1.5 font-medium">
-                            <Atom size={13} className="text-primary" /> {selectedDeck?.topic_name || selectedDeck?.chapter_name}
-                          </span>
-                          <span className="text-primary font-bold hover:underline">
-                            {t('flashcards.study.showFullAnswer')}
-                          </span>
-                        </div>
+                  <div className={`w-full h-full transition-transform duration-600 ease-[cubic-bezier(0.2,0.8,0.2,1)] transform-style-preserve-3d rounded-3xl shadow-lg ${isFlipped ? 'rotate-y-180' : ''}`}>
+                    
+                    {/* Front Face: Question */}
+                    <div className="absolute inset-0 backface-hidden bg-white border-2 border-outline-variant/30 group-hover:border-[#5c4be4]/30 rounded-3xl p-8 sm:p-12 flex flex-col justify-between overflow-y-auto transition-colors">
+                      <div className="flex items-center justify-between border-b border-outline-variant/30 pb-4">
+                        <span className="px-3 py-1.5 rounded-lg bg-[#5c4be4]/10 text-[#5c4be4] text-xs font-black tracking-wide">
+                          {t('flashcards.study.questionBadge', 'سؤال')}
+                        </span>
+                        <span className="text-xs font-bold text-on-surface-variant bg-surface-variant px-3 py-1.5 rounded-md">
+                          {t('flashcards.study.clickToFlip', 'انقر للقلب')}
+                        </span>
                       </div>
-                      
-                      {/* ── Back Face: Answer / وجه الإجابة ── */}
-                      <div className="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-br from-teal-950 via-slate-900 to-slate-950 text-white border border-primary/40 rounded-3xl p-6 sm:p-9 flex flex-col justify-between overflow-y-auto shadow-2xl">
-                        {/* Top Header */}
-                        <div className="flex items-center justify-between border-b border-teal-800/60 pb-3">
-                          <div className="flex items-center gap-2">
-                            <span className="px-2.5 py-1 rounded-lg bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[11px] font-black tracking-wide">
-                              {t('flashcards.study.answerBadge')}
-                            </span>
-                            <span className="text-[11px] text-teal-300/60 font-mono">
-                              CLINICAL ANSWER EXPLANATION
-                            </span>
-                          </div>
-                          <span className="text-[11px] font-bold text-teal-200/70 bg-surface/10 px-2.5 py-1 rounded-md">
-                            {t('flashcards.study.clickToReturn')}
-                          </span>
-                        </div>
-
-                        {/* Middle: Answer Content */}
-                        <div className="my-auto py-4 text-center">
-                          <p 
-                            className="text-lg sm:text-2xl font-extrabold text-teal-50 leading-relaxed font-sans"
-                            dir="ltr"
-                          >
-                            {currentItem?.back_text}
-                          </p>
-                        </div>
-
-                        {/* Scientific Context Footer */}
-                        <div className="bg-surface/5 border border-white/10 rounded-xl p-3 text-xs text-slate-300 flex items-center justify-between">
-                          <span className="font-bold text-teal-300 flex items-center gap-1.5">
-                            <ShieldCheck size={15} /> {t('flashcards.study.verifiedConcept')}
-                          </span>
-                          <span className="text-[10px] text-outline-variant font-mono">
-                            {t('flashcards.study.highYield')}
-                          </span>
-                        </div>
+                      <div className="my-auto py-4 text-center">
+                        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-on-surface leading-snug tracking-tight font-sans" dir="ltr">
+                          {currentItem?.front_text}
+                        </h2>
                       </div>
-
+                      <div className="flex items-center justify-between text-xs text-on-surface-variant/50 pt-3 border-t border-outline-variant/30">
+                        <span className="font-medium">
+                           {selectedDeck?.topic_name || selectedDeck?.chapter_name}
+                        </span>
+                        <span className="text-[#5c4be4] font-bold hover:underline">
+                          {t('flashcards.study.showFullAnswer', 'عرض الإجابة الكاملة')}
+                        </span>
+                      </div>
                     </div>
+                    
+                    {/* Back Face: Answer */}
+                    <div className="absolute inset-0 backface-hidden rotate-y-180 bg-[#5c4be4] text-white border-2 border-[#5c4be4] rounded-3xl p-8 sm:p-12 flex flex-col justify-between overflow-y-auto shadow-xl">
+                      <div className="flex items-center justify-between border-b border-white/20 pb-4">
+                        <span className="px-3 py-1.5 rounded-lg bg-white/20 text-white text-xs font-black tracking-wide">
+                          {t('flashcards.study.answerBadge', 'إجابة')}
+                        </span>
+                        <span className="text-xs font-bold text-white/80 bg-black/10 px-3 py-1.5 rounded-md">
+                          {t('flashcards.study.clickToReturn', 'انقر للعودة')}
+                        </span>
+                      </div>
+                      <div className="my-auto py-6 text-center">
+                        <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-white leading-relaxed font-sans" dir="ltr">
+                          {currentItem?.back_text}
+                        </p>
+                      </div>
+                      <div className="bg-black/10 rounded-xl p-4 text-sm text-white/90 flex items-center justify-between">
+                        <span className="font-bold flex items-center gap-2">
+                          <CheckCircle2 size={18} /> {t('flashcards.study.verifiedConcept', 'مفهوم مؤكد')}
+                        </span>
+                        <span className="text-xs opacity-70 font-mono">
+                          {t('flashcards.study.highYield', 'عالي الأهمية')}
+                        </span>
+                      </div>
+                    </div>
+
                   </div>
-                )}
-              </div>
-
-              {/* ═════════════════════════════════════════════
-                  3. Bottom Navigation: وحدة التحكم الطبية
-                 ═════════════════════════════════════════════ */}
-              {!isFinished && (
-                <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 bg-surface/95 backdrop-blur-xl border border-outline-variant/30 p-3.5 rounded-2xl shadow-sm transition-colors">
-                  
-                  {/* Previous Button (السابق) */}
-                  <button 
-                    onClick={prevCard} 
-                    disabled={currentIndex === 0}
-                    className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-outline-variant/30 bg-slate-50 dark:bg-surface-variant hover:bg-surface-variant  text-on-surface-variant font-bold text-xs flex items-center justify-center gap-2 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    <ArrowRight size={16} />
-                    <span>{t('flashcards.study.prevBtn')}</span>
-                  </button>
-                  
-                  {/* Flip Action Button */}
-                  <button
-                    onClick={flipCard}
-                    className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-primary/5 hover:bg-primary/10 border border-primary/20 text-primary font-black text-xs flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer"
-                  >
-                    <RotateCcw size={15} className="text-primary" />
-                    <span>{t('flashcards.study.flipBtn')}</span>
-                  </button>
-
-                  {/* Next Button (التالي) */}
-                  <button 
-                    onClick={nextCard} 
-                    className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-l from-primary to-secondary hover:from-teal-700 hover:to-cyan-800 text-white font-black text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-teal-600/20 cursor-pointer"
-                  >
-                    <span>{t('flashcards.study.nextBtn')}</span>
-                    <ArrowLeft size={16} />
-                  </button>
                 </div>
               )}
-
-              {/* Keyboard Hints Badge */}
-              <div className="mt-3 text-center text-[11px] font-bold text-on-surface-variant/50 flex items-center justify-center gap-4">
-                <span>{t('flashcards.study.spaceHint')} <kbd className="bg-surface dark:bg-surface-variant px-1.5 py-0.5 rounded border border-outline-variant/30  font-mono text-on-surface-variant shadow-2xs">Space</kbd> {t('flashcards.study.spaceAction')}</span>
-                <span>•</span>
-                <span>{t('flashcards.study.arrowsHint')} <kbd className="bg-surface dark:bg-surface-variant px-1.5 py-0.5 rounded border border-outline-variant/30  font-mono text-on-surface-variant shadow-2xs">→</kbd> <kbd className="bg-surface dark:bg-surface-variant px-1.5 py-0.5 rounded border border-outline-variant/30  font-mono text-on-surface-variant shadow-2xs">←</kbd> {t('flashcards.study.arrowsAction')}</span>
-              </div>
-
             </div>
-          )}
-        </main>
+
+            {/* Bottom Navigation */}
+            {!isFinished && items.length > 0 && (
+              <div className="mt-2 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border border-outline-variant/30 p-4 rounded-2xl shadow-sm">
+                
+                <button 
+                  onClick={prevCard} 
+                  disabled={currentIndex === 0}
+                  className="w-full sm:w-auto px-6 py-3 rounded-xl bg-surface-variant hover:bg-surface-container-low text-on-surface-variant font-bold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  <ArrowRight size={18} />
+                  <span>{t('flashcards.study.prevBtn', 'السابق')}</span>
+                </button>
+                
+                <button
+                  onClick={flipCard}
+                  className="w-full sm:w-auto px-8 py-3 rounded-xl bg-[#5c4be4]/10 hover:bg-[#5c4be4]/20 text-[#5c4be4] font-black text-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  <RotateCcw size={18} />
+                  <span>{t('flashcards.study.flipBtn', 'اقلب البطاقة')}</span>
+                </button>
+
+                <button 
+                  onClick={nextCard} 
+                  className="w-full sm:w-auto px-8 py-3 rounded-xl bg-[#5c4be4] hover:bg-[#4a3bc6] text-white font-black text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-[#5c4be4]/20 cursor-pointer"
+                >
+                  <span>{t('flashcards.study.nextBtn', 'التالي')}</span>
+                  <ArrowLeft size={18} />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
-  );
+  </div>
+  )
 }
-
-

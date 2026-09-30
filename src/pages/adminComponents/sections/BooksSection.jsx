@@ -14,6 +14,14 @@ export default function BooksSection() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [editingBook, setEditingBook] = useState(null);
+  const [libraryEnabled, setLibraryEnabled] = useState(true);
+
+  const fetchSettings = () => {
+    API.get('/admin/settings').then(res => {
+      const libSet = res.data.settings.find(s => s.key === 'library_enabled');
+      if (libSet) setLibraryEnabled(libSet.value === 'true');
+    }).catch(console.error);
+  };
 
   const fetchBooks = () => { 
     setLoading(true); 
@@ -23,7 +31,18 @@ export default function BooksSection() {
       .finally(() => setLoading(false)); 
   };
   
-  useEffect(() => { fetchBooks(); }, []);
+  useEffect(() => { fetchBooks(); fetchSettings(); }, []);
+
+  const toggleLibrary = async () => {
+    try {
+      const newValue = !libraryEnabled;
+      await API.put('/admin/settings', { key: 'library_enabled', value: newValue.toString() });
+      setLibraryEnabled(newValue);
+      showMsg('success', 'تم تحديث حالة المكتبة بنجاح');
+    } catch {
+      showMsg('error', 'حدث خطأ أثناء تحديث الإعدادات');
+    }
+  };
 
   const handleAddSubmit = async (form, files) => {
     setSubmitting(true);
@@ -76,6 +95,20 @@ export default function BooksSection() {
 
   return (
     <div className="space-y-6">
+      {/* Library Global Toggle */}
+      <div className="bg-surface rounded-2xl border border-outline-variant/30 p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+        <div>
+          <h2 className="text-xl font-bold text-on-surface">إعدادات المكتبة (Library Settings)</h2>
+          <p className="text-sm text-on-surface-variant">إظهار أو إخفاء المكتبة من لوحة تحكم الطالب</p>
+        </div>
+        <button
+          onClick={toggleLibrary}
+          className={`relative inline-flex h-7 w-14 items-center rounded-full transition-colors ${libraryEnabled ? 'bg-primary' : 'bg-outline-variant/40'}`}
+        >
+          <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${libraryEnabled ? 'translate-x-8' : 'translate-x-1'}`} />
+        </button>
+      </div>
+
       {viewState === 'list' && (
         <BooksList 
           books={books} 

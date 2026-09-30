@@ -38,7 +38,7 @@ export default function DashboardSection() {
         <StatCard label={t('admin.sections.courses')} value={stats.totalCourses} icon={BookOpen} color="cyan" to="/admin/courses" />
         <StatCard label={t('admin.sections.enrollments')} value={stats.totalEnrollments} icon={Layers} color="amber" to="/admin/enrollments" />
         <StatCard label={t('admin.sections.completedOrders')} value={stats.totalOrders} icon={Package} color="emerald" to="/admin/orders" />
-        <StatCard label={t('admin.sections.totalRevenue')} value={`${stats.totalRevenue?.toFixed(2) || '0.00'}`} icon={DollarSign} color="cyan" to="/admin/orders" />
+        <StatCard label={t('admin.sections.totalRevenue')} value={`${stats.totalRevenue?.toFixed(2) || '0.00'} د.أ`} icon={DollarSign} color="cyan" to="/admin/orders" />
         <StatCard label={t('admin.sections.pendingCourses')} value={stats.pendingCourses} icon={ClipboardList} color="amber" to="/admin/courses" />
         <StatCard label={t('admin.sections.articlesLabel')} value={stats.totalArticles} icon={FileText} color="violet" to="/admin/articles" />
         <StatCard label={t('admin.sections.booksLabel')} value={stats.totalBooks} icon={BookMarked} color="primary" to="/admin/books" />
@@ -52,7 +52,7 @@ export default function DashboardSection() {
         <div className="bg-surface border border-outline-variant/30 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center gap-2 mb-6 text-on-surface">
             <TrendingUp className="text-emerald-500" size={20} />
-            <h3 className="font-extrabold text-lg">Revenue Overview</h3>
+            <h3 className="font-extrabold text-lg">{t('admin.sections.charts.revenueOverview')}</h3>
           </div>
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -71,7 +71,7 @@ export default function DashboardSection() {
         <div className="bg-surface border border-outline-variant/30 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center gap-2 mb-6 text-on-surface">
             <BarChart3 className="text-primary" size={20} />
-            <h3 className="font-extrabold text-lg">New Enrollments</h3>
+            <h3 className="font-extrabold text-lg">{t('admin.sections.charts.newEnrollments')}</h3>
           </div>
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -90,7 +90,7 @@ export default function DashboardSection() {
         <div className="bg-surface border border-outline-variant/30 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow lg:col-span-2">
           <div className="flex items-center gap-2 mb-6 text-on-surface">
             <PieChartIcon className="text-violet-500" size={20} />
-            <h3 className="font-extrabold text-lg">Courses by Category</h3>
+            <h3 className="font-extrabold text-lg">{t('admin.sections.charts.coursesByCategory')}</h3>
           </div>
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">

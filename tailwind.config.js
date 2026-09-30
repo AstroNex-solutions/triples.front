@@ -23,7 +23,7 @@ export default {
           DEFAULT: '#663399',
           hover: '#8b5cf6', // a lighter purple for hover
           light: '#A2C9E4', // using the light blue as light
-          dark: '#333879',  // dark blue
+          dark: '#333679',  // dark blue
           darkest: '#1B1B48', // very dark blue
         },
         'on-primary': '#ffffff',
@@ -39,7 +39,7 @@ export default {
         'on-secondary-container': 'rgb(var(--color-on-secondary-container) / <alpha-value>)',
         'secondary-fixed': '#4DBFB3',
         'on-secondary-fixed': '#1B1B48',
-        tertiary: '#333879',
+        tertiary: '#333679',
         'on-tertiary': '#ffffff',
         error: '#ef4444',
         'on-error': '#ffffff',

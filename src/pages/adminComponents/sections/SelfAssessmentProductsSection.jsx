@@ -81,7 +81,7 @@ export default function SelfAssessmentProductsSection() {
                     <td className="p-3 font-bold text-on-surface">{pTitle}</td>
                     <td className="p-3 text-on-surface-variant">{cTitle || '—'}</td>
                     <td className="p-3 text-on-surface-variant">{p.duration_minutes} min / دقيقة</td>
-                    <td className="p-3 font-bold text-on-surface">{p.is_free ? <Badge text="Free / مجاني" variant="success" /> : `$${p.price}`}</td>
+                    <td className="p-3 font-bold text-on-surface">{p.is_free ? <Badge text="Free / مجاني" variant="success" /> : `${p.price} د.أ`}</td>
                     <td className="p-3">{statusBadge(p.status)}</td>
                     <td className="p-3 text-center">
                       <div className="flex items-center justify-center gap-2">
@@ -111,7 +111,7 @@ export default function SelfAssessmentProductsSection() {
           <Textarea label="Description / الوصف" value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
           <div className="grid grid-cols-2 gap-3">
             <Input label="Duration (min) / المدة بالدقائق" type="number" min="1" value={form.duration_minutes} onChange={e => setForm({...form, duration_minutes: e.target.value})} />
-            <Input label="Price ($) / السعر" type="number" step="0.01" min="0" value={form.price} onChange={e => setForm({...form, price: e.target.value})} disabled={form.is_free} />
+            <Input label="Price (JOD) / السعر (د.أ)" type="number" step="0.01" min="0" value={form.price} onChange={e => setForm({...form, price: e.target.value})} disabled={form.is_free} />
             <div className="flex items-center gap-2 mt-6">
               <input type="checkbox" id="sa_free" checked={form.is_free} onChange={e => setForm({...form, is_free: e.target.checked, price: e.target.checked ? 0 : form.price})} className="w-4 h-4 cursor-pointer" />
               <label htmlFor="sa_free" className="text-sm font-bold text-on-surface cursor-pointer">Free / مجاني</label>

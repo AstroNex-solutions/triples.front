@@ -40,8 +40,8 @@ export default function CouponsSection() {
               <tbody>{coupons.map(c => (
                 <tr key={c.id} className="bg-surface/50 hover:bg-surface/80 transition-all">
                   <td className="p-3 font-extrabold text-primary" dir="ltr">{c.code}</td>
-                  <td className="p-3">{c.discount_type === 'percentage' ? 'Percentage %' : 'Fixed Amount $'}</td>
-                  <td className="p-3 font-bold text-on-surface">{c.discount_value}{c.discount_type === 'percentage' ? '%' : '$'}</td>
+                  <td className="p-3">{c.discount_type === 'percentage' ? 'Percentage %' : 'Fixed Amount JOD'}</td>
+                  <td className="p-3 font-bold text-on-surface">{c.discount_value}{c.discount_type === 'percentage' ? '%' : ' د.أ'}</td>
                   <td className="p-3">{c.used_count} / {c.max_uses}</td>
                   <td className="p-3">{c.is_active ? <Badge text="Active / نشط" variant="success" /> : <Badge text="Inactive / غير نشط" variant="default" />}</td>
                   <td className="p-3 text-center">
@@ -61,7 +61,7 @@ export default function CouponsSection() {
             <Input label="Coupon Code / كود الكوبون *" required value={form.code} onChange={e => setForm({...form, code: e.target.value.toUpperCase()})} dir="ltr" placeholder="SAVE20" />
             <Select label="Discount Type / نوع الخصم" value={form.discount_type} onChange={e => setForm({...form, discount_type: e.target.value})}>
               <option value="percentage">Percentage / نسبة مئوية %</option>
-              <option value="fixed">Fixed Amount / مبلغ ثابت $</option>
+              <option value="fixed">Fixed Amount / مبلغ ثابت د.أ</option>
             </Select>
             <Input label="Discount Value / القيمة *" required type="number" value={form.discount_value} onChange={e => setForm({...form, discount_value: e.target.value})} />
             <Input label="Max Uses / الحد الأقصى للاستخدام" type="number" value={form.max_uses} onChange={e => setForm({...form, max_uses: e.target.value})} />

@@ -87,11 +87,11 @@ export default function FlashcardsManager({ product, onClose, showMsg }) {
           </div>
           {!selectedDeck && (
             <div className="flex gap-2">
-              <label className="px-4 py-2 bg-emerald-500/10 text-emerald-500 font-bold rounded-xl flex items-center gap-2 hover:bg-emerald-500/20 transition-all cursor-pointer">
+              {/* <label className="px-4 py-2 bg-emerald-500/10 text-emerald-500 font-bold rounded-xl flex items-center gap-2 hover:bg-emerald-500/20 transition-all cursor-pointer">
                 {uploading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
                 استيراد Excel
                 <input type="file" accept=".xlsx, .xls" className="hidden" onChange={handleFileUpload} disabled={uploading} />
-              </label>
+              </label> */}
               <button type="button" onClick={() => { setDeckForm({ id: null, chapter_name: '', topic_name: '', order: decks.length + 1 }); setShowDeckModal(true); }} className="px-4 py-2 bg-primary text-on-primary font-bold rounded-xl flex items-center gap-2 hover:bg-primary/90 transition-all">
                 <Plus size={18} /> إضافة فصل
               </button>
@@ -218,11 +218,11 @@ function ItemsManager({ deck, goBack, showMsg }) {
           <span className="font-bold text-on-surface truncate max-w-md">{deck.chapter_name} / {deck.topic_name} (الكروت)</span>
         </div>
         <div className="flex items-center gap-2">
-          <label className="px-4 py-2 bg-emerald-500/10 text-emerald-500 text-sm font-bold rounded-xl flex items-center gap-2 hover:bg-emerald-500/20 transition-all cursor-pointer">
+          {/* <label className="px-4 py-2 bg-emerald-500/10 text-emerald-500 text-sm font-bold rounded-xl flex items-center gap-2 hover:bg-emerald-500/20 transition-all cursor-pointer">
             {uploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
             استيراد Excel
             <input type="file" accept=".xlsx, .xls" className="hidden" onChange={handleItemsUpload} disabled={uploading} />
-          </label>
+          </label> */}
           <button type="button" onClick={() => { setItemForm({ id: null, front_text: '', back_text: '', order: items.length + 1 }); setShowItemModal(true); }} className="px-4 py-2 bg-primary text-on-primary text-sm font-bold rounded-xl flex items-center gap-2 hover:bg-primary/90">
             <Plus size={16} /> كارت جديد
           </button>

@@ -18,7 +18,7 @@ export default function PerformanceSection() {
         const res = await API.get('/student/assessment-results');
         setAssessmentResults(res.data.results || []);
       } catch (error) {
-        toast.error('Failed to load performance data');
+        toast.error(t('performanceSection.loadError', 'Failed to load performance data'));
       } finally {
         setLoading(false);
       }
@@ -40,10 +40,10 @@ export default function PerformanceSection() {
           <div className="space-y-2">
             <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white flex items-center gap-2">
               <TrendingUp size={28} />
-              {t('student.dashboard.performance') || 'My Performance'}
+              {t('performanceSection.title', 'My Performance')}
             </h2>
             <p className="text-xs sm:text-sm text-white/90 max-w-xl leading-relaxed">
-              Track your academic progress, assessment scores, and achievements.
+              {t('performanceSection.description', 'Track your academic progress, assessment scores, and achievements.')}
             </p>
           </div>
         </div>
@@ -56,7 +56,7 @@ export default function PerformanceSection() {
             <FileText size={24} />
           </div>
           <div>
-            <p className="text-xs text-on-surface-variant font-bold uppercase tracking-wider">Total Enrollments</p>
+            <p className="text-xs text-on-surface-variant font-bold uppercase tracking-wider">{t('performanceSection.totalEnrollments', 'Total Enrollments')}</p>
             <h3 className="text-2xl font-black text-on-surface">{totalEnrollments}</h3>
           </div>
         </div>
@@ -65,7 +65,7 @@ export default function PerformanceSection() {
             <CheckCircle2 size={24} />
           </div>
           <div>
-            <p className="text-xs text-on-surface-variant font-bold uppercase tracking-wider">Completed Courses</p>
+            <p className="text-xs text-on-surface-variant font-bold uppercase tracking-wider">{t('performanceSection.completedCourses', 'Completed Courses')}</p>
             <h3 className="text-2xl font-black text-on-surface">{completedCourses}</h3>
           </div>
         </div>
@@ -74,7 +74,7 @@ export default function PerformanceSection() {
             <Target size={24} />
           </div>
           <div>
-            <p className="text-xs text-on-surface-variant font-bold uppercase tracking-wider">Pending Assessments</p>
+            <p className="text-xs text-on-surface-variant font-bold uppercase tracking-wider">{t('performanceSection.pendingAssessments', 'Pending Assessments')}</p>
             <h3 className="text-2xl font-black text-on-surface">{pendingAssessments}</h3>
           </div>
         </div>
@@ -85,18 +85,18 @@ export default function PerformanceSection() {
         <div className="lg:col-span-2 bg-surface rounded-[2rem] border border-outline-variant/30 p-6 sm:p-8 shadow-sm">
           <h3 className="text-lg font-bold text-on-surface mb-6 flex items-center gap-2">
             <FileText size={20} className="text-primary" />
-            Recent Assessment Results
+            {t('performanceSection.recentResults', 'Recent Assessment Results')}
           </h3>
           
           {loading ? (
             <div className="flex flex-col items-center justify-center py-10">
               <Loader2 size={30} className="animate-spin text-primary mb-2" />
-              <p className="text-xs text-on-surface-variant">Loading results...</p>
+              <p className="text-xs text-on-surface-variant">{t('performanceSection.loading', 'Loading results...')}</p>
             </div>
           ) : assessmentResults.length === 0 ? (
             <div className="text-center py-10 bg-surface-container-lowest rounded-2xl border border-dashed border-outline-variant/50">
               <FileText size={32} className="text-on-surface-variant/30 mx-auto mb-2" />
-              <p className="text-sm text-on-surface-variant">No assessments completed yet.</p>
+              <p className="text-sm text-on-surface-variant">{t('performanceSection.noResults', 'No assessments completed yet.')}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -106,7 +106,7 @@ export default function PerformanceSection() {
                     <h4 className="font-bold text-sm text-on-surface">{result.title}</h4>
                     <div className="flex items-center gap-3 mt-1">
                       <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded uppercase">
-                        {result.type === 'self_assessment' ? 'Self Assessment' : result.type}
+                        {result.type === 'self_assessment' ? t('performanceSection.selfAssessment', 'Self Assessment') : result.type}
                       </span>
                       <span className="text-[10px] text-on-surface-variant flex items-center gap-1">
                         <Calendar size={12} />
@@ -116,7 +116,7 @@ export default function PerformanceSection() {
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <p className="text-[10px] text-on-surface-variant font-bold uppercase">Score</p>
+                      <p className="text-[10px] text-on-surface-variant font-bold uppercase">{t('performanceSection.score', 'Score')}</p>
                       <p className="text-lg font-black text-on-surface">{result.score.toFixed(1)}%</p>
                     </div>
                     <div className={`w-2 h-10 rounded-full ${result.passed ? 'bg-success' : 'bg-error'}`} />
@@ -131,13 +131,13 @@ export default function PerformanceSection() {
         <div className="bg-surface rounded-[2rem] border border-outline-variant/30 p-6 sm:p-8 shadow-sm">
           <h3 className="text-lg font-bold text-on-surface mb-6 flex items-center gap-2">
             <Award size={20} className="text-amber-500" />
-            Achievements
+            {t('performanceSection.achievements', 'Achievements')}
           </h3>
 
           {achievements.length === 0 ? (
             <div className="text-center py-10 bg-surface-container-lowest rounded-2xl border border-dashed border-outline-variant/50">
               <Award size={32} className="text-on-surface-variant/30 mx-auto mb-2" />
-              <p className="text-sm text-on-surface-variant">Complete courses and assessments to earn badges.</p>
+              <p className="text-sm text-on-surface-variant">{t('performanceSection.noAchievements', 'Complete courses and assessments to earn badges.')}</p>
             </div>
           ) : (
             <div className="space-y-4">

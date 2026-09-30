@@ -7,21 +7,23 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        try {
-          const res = await API.get('/auth/profile');
-          setUser(res.data.user);
-        } catch (err) {
-          console.error('Session expired');
-          localStorage.removeItem('token');
-        }
+  const checkAuth = async () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const res = await API.get('/auth/profile');
+        setUser(res.data.user);
+      } catch (err) {
+        console.error('Session expired');
+        localStorage.removeItem('token');
+        setUser(null);
       }
-      setLoading(false);
-    };
-    fetchUser();
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    checkAuth();
   }, []);
 
   const login = async (email, password) => {
@@ -64,7 +66,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, verifyLogin, register, logout, setUser }}>
+    <AuthContext.Provider value={{ user, loading, login, verifyLogin, register, logout, setUser, checkAuth }}>
       {children}
     </AuthContext.Provider>
   );

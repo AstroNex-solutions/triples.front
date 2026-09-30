@@ -9,6 +9,7 @@ import {
   Brain, Sparkles, ChevronDown, Activity, Dna,
   Quote, Database, Layers, Calendar, ClipboardCheck
 } from 'lucide-react';
+import TripleSMotif from './adminComponents/ui/TripleSMotif';
 
 export default function HomePage() {
   const { t, i18n } = useTranslation();
@@ -121,6 +122,7 @@ export default function HomePage() {
                     <div className="absolute inset-0 bg-[radial-gradient(#6D02A5_1.2px,transparent_1.2px)] [background-size:20px_20px] opacity-[0.05] dark:opacity-[0.1]"></div>
                     <div className="absolute -top-20 -right-20 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[100px]"></div>
                     <div className="absolute bottom-0 -left-20 w-[400px] h-[400px] bg-secondary/15 rounded-full blur-[100px]"></div>
+                    <TripleSMotif className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] text-primary/10" />
                   </div>
 
                   {/* Content Container */}
@@ -133,7 +135,7 @@ export default function HomePage() {
                     >
                       <Sparkles className="w-4 h-4 text-primary" />
                       <span className="text-on-primary-container font-bold text-sm">
-                        {i18n.language === 'ar' ? 'رحلتك نحو التميز تبدأ هنا' : 'Your journey to excellence starts here'}
+                        {i18n.language === 'ar' ? 'مستقبلك تصنعه قراراتك اليوم' : 'Empowering Your Path'}
                       </span>
                     </motion.div>
 

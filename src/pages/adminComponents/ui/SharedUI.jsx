@@ -51,11 +51,12 @@ export function SectionHeader({ title, count, onAdd, addLabel }) {
   );
 }
 
-export function Modal({ open, onClose, title, children }) {
+export function Modal({ open, onClose, title, children, size = "2xl" }) {
   if (!open) return null;
+  const maxWidthClass = size.startsWith('max-w-') ? size : `max-w-${size}`;
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} className="w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl bg-surface-container-low border border-outline-variant/50 p-6 sm:p-8 shadow-2xl space-y-5">
+      <div onClick={e => e.stopPropagation()} className={`w-full ${maxWidthClass} max-h-[85vh] overflow-y-auto rounded-3xl bg-surface-container-low border border-outline-variant/50 p-6 sm:p-8 shadow-2xl space-y-5`}>
         <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
           <h3 className="text-lg font-extrabold text-on-surface">{title}</h3>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-surface/50 text-on-surface-variant hover:text-on-surface transition-all cursor-pointer"><X size={20} /></button>

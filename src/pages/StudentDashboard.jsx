@@ -48,7 +48,7 @@ export default function StudentDashboard() {
     {
       title: '', // Single main group based on request
       items: [
-        { key: 'overview', label: t('student.dashboard.overview'), icon: Award },
+        { key: 'overview', label: t('student.overview.myCourses'), icon: Award },
         ...(hasCourses ? activeCourses.map(course => {
           const courseFeatures = course.features || {};
           return {
@@ -67,7 +67,7 @@ export default function StudentDashboard() {
         { key: 'performance', label: t('student.dashboard.performance'), icon: TrendingUp, locked: !hasCourses || features.performance === false },
         { key: 'freeze', label: t('student.dashboard.freeze'), icon: Lock, locked: !hasCourses || features.freeze === false },
         { key: 'orders', label: t('student.dashboard.purchaseHistory'), icon: ShoppingBag },
-        { key: 'library', label: t('student.dashboard.myLibrary'), icon: BookMarked },
+        ...(features.library !== false ? [{ key: 'library', label: t('student.dashboard.myLibrary'), icon: BookMarked }] : []),
         { key: 'support', label: t('student.dashboard.supportTickets'), icon: MessageSquare },
       ]
     }
@@ -252,7 +252,7 @@ export default function StudentDashboard() {
           <div className="flex items-center gap-3">
             <button onClick={() => navigate('/')} className="px-3 py-2 rounded-xl bg-surface/50 border border-outline-variant/30 text-on-surface-variant hover:bg-primary hover:border-primary hover:text-on-primary transition-all shadow-sm cursor-pointer flex items-center gap-2" title="زيارة الموقع / Visit Site">
               <Home size={16} />
-              <span className="hidden sm:inline text-xs font-bold">Visit Site</span>
+              <span className="hidden sm:inline text-xs font-bold">{t('student.dashboard.visitSite', 'زيارة الموقع')}</span>
             </button>
             <ThemeToggle />
             <button onClick={toggleLanguage} className="p-2 rounded-xl bg-surface/50 border border-outline-variant/30 text-on-surface-variant hover:bg-surface hover:text-primary transition-all shadow-sm cursor-pointer" title="تغيير اللغة / Change Language">

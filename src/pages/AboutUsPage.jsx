@@ -48,8 +48,6 @@ export default function AboutUsPage() {
           </div>
         )}
       </main>
-
-      <Footer />
     </div>
   );
 }
