@@ -342,16 +342,16 @@ export default function FlashcardStudyPage() {
             {/* Bottom Navigation */}
             {!isFinished && items.length > 0 && (
               <div className="mt-2 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border border-outline-variant/30 p-4 rounded-2xl shadow-sm">
-                
+              
+
                 <button 
-                  onClick={prevCard} 
-                  disabled={currentIndex === 0}
-                  className="w-full sm:w-auto px-6 py-3 rounded-xl bg-surface-variant hover:bg-surface-container-low text-on-surface-variant font-bold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  onClick={nextCard} 
+                  className="w-full sm:w-auto px-8 py-3 rounded-xl bg-[#5c4be4] hover:bg-[#4a3bc6] text-white font-black text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-[#5c4be4]/20 cursor-pointer"
                 >
                   <ArrowRight size={18} />
-                  <span>{t('flashcards.study.prevBtn', 'السابق')}</span>
+                  <span>{t('flashcards.study.nextBtn', 'التالي')}</span>
                 </button>
-                
+                                
                 <button
                   onClick={flipCard}
                   className="w-full sm:w-auto px-8 py-3 rounded-xl bg-[#5c4be4]/10 hover:bg-[#5c4be4]/20 text-[#5c4be4] font-black text-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
@@ -361,12 +361,14 @@ export default function FlashcardStudyPage() {
                 </button>
 
                 <button 
-                  onClick={nextCard} 
-                  className="w-full sm:w-auto px-8 py-3 rounded-xl bg-[#5c4be4] hover:bg-[#4a3bc6] text-white font-black text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-[#5c4be4]/20 cursor-pointer"
+                  onClick={prevCard} 
+                  disabled={currentIndex === 0}
+                  className="w-full sm:w-auto px-6 py-3 rounded-xl bg-surface-variant hover:bg-surface-container-low text-on-surface-variant font-bold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                 >
-                  <span>{t('flashcards.study.nextBtn', 'التالي')}</span>
+                  <span>{t('flashcards.study.prevBtn', 'السابق')}</span>
                   <ArrowLeft size={18} />
                 </button>
+                
               </div>
             )}
           </div>

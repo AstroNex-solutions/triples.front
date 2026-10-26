@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { BookOpen, Award, CheckCircle2, ShoppingBag, Loader2, Play, Calendar as CalendarIcon, Clock, TrendingUp, Sparkles, BrainCircuit, ExternalLink, Lock, HelpCircle, BarChart2, Book, GraduationCap, ChevronRight } from 'lucide-react';
+import { BookOpen, Award, CheckCircle2, ShoppingBag, Loader2, Play, Calendar as CalendarIcon, Clock, TrendingUp, Sparkles, BrainCircuit, ExternalLink, Lock, HelpCircle, BarChart2, Book, GraduationCap, ChevronRight, Layers } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import API from '../../api/axios';
@@ -201,11 +201,13 @@ export default function OverviewSection() {
                 const selectedCourse = activeCourses.find(c => c.id === selectedCourseId) || activeCourses[0];
                 if (!selectedCourse) return null;
 
-                return selectedCourse.modules && selectedCourse.modules.length > 0 ? selectedCourse.modules.map((module) => {
-                  const qTotal = selectedCourse.questionsCount || 0;
-                  const qDone = selectedCourse.completedQuestions || 0;
+                const rawModules = selectedCourse.modules || [];
+                const sortedModules = [...rawModules].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+                return sortedModules.length > 0 ? sortedModules.map((module, idx) => {
                   const lTotal = module.lessonsCount || 0;
                   const lDone = module.completedLessons || 0;
+                  const progressPercent = lTotal > 0 ? Math.min(100, Math.round((lDone / lTotal) * 100)) : 0;
                   const instructors = selectedCourse.instructors || [];
 
                   return (
@@ -218,68 +220,88 @@ export default function OverviewSection() {
                           navigate(`/learn/${selectedCourse.id}`);
                         }
                       }}
-                      className="flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-2xl bg-surface shadow-sm hover:shadow-md transition-all cursor-pointer border border-outline-variant/20 gap-6"
+                      className="group flex flex-col md:flex-row md:items-center justify-between p-4 sm:p-5 rounded-2xl bg-surface-container-lowest hover:bg-surface border border-outline-variant/30 hover:border-primary/40 shadow-sm hover:shadow-md transition-all duration-200 gap-4 sm:gap-6 cursor-pointer"
                     >
-                      {/* Left: Icon and Title */}
-                      <div className="flex items-center gap-4 min-w-[200px]">
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0">
-                          {/* Placeholder Icon representing organ/subject */}
-                          <div className="text-2xl">🧠</div>
-                        </div>
-                        <h4 className="font-extrabold text-base text-on-surface">{module.name}</h4>
-                      </div>
-
-                      {/* Middle: Progress Bars */}
-                      <div className="flex-1 flex flex-col sm:flex-row gap-6 lg:gap-12 w-full">
-                        {/* Questions Progress */}
-                        <div className="flex-1">
-                          <div className="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden mb-2">
-                            <div className="h-full bg-primary rounded-full" style={{ width: `${qTotal > 0 ? (qDone / qTotal) * 100 : 0}%` }}></div>
-                          </div>
-                          <p className="text-[11px] text-on-surface-variant font-medium">
-                            {i18n.language === 'ar' ? (
-                              <><span className="font-bold text-on-surface">{qDone}</span> من أصل {qTotal} سؤال</>
-                            ) : (
-                              <><span className="font-bold text-on-surface">{qDone}</span> of {qTotal} questions tagged</>
-                            )}
-                          </p>
+                      {/* Left / Start: Order Number & Module Info (NO EMOJI) */}
+                      <div className="flex items-center gap-3.5 flex-1 min-w-0">
+                        <div className="w-11 h-11 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center font-black text-sm shrink-0 group-hover:scale-105 group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
+                          {String(module.order ?? (idx + 1)).padStart(2, '0')}
                         </div>
 
-                        {/* Lessons Progress */}
-                        <div className="flex-1">
-                          <div className="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden mb-2">
-                            <div className="h-full bg-secondary rounded-full" style={{ width: `${lTotal > 0 ? (lDone / lTotal) * 100 : 0}%` }}></div>
-                          </div>
-                          <p className="text-[11px] text-on-surface-variant font-medium">
-                            {i18n.language === 'ar' ? (
-                              <><span className="font-bold text-on-surface">{lDone}</span> من أصل {lTotal} درس مكتمل</>
-                            ) : (
-                              <><span className="font-bold text-on-surface">{lDone}</span> of {lTotal} lessons completed</>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-extrabold text-sm sm:text-base text-on-surface group-hover:text-primary transition-colors truncate mb-1">
+                            {module.name}
+                          </h4>
+                          
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-surface-container-high text-[11px] font-bold text-on-surface-variant border border-outline-variant/30">
+                              <BookOpen size={12} className="text-primary shrink-0" />
+                              <span>{lTotal} {i18n.language === 'ar' ? 'درس' : 'Lessons'}</span>
+                            </span>
+
+                            {module.submodulesCount > 0 && (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-surface-container-high text-[11px] font-bold text-on-surface-variant border border-outline-variant/30">
+                                <Layers size={12} className="text-secondary shrink-0" />
+                                <span>{module.submodulesCount} {i18n.language === 'ar' ? 'فصل فرعي' : 'Submodules'}</span>
+                              </span>
                             )}
-                          </p>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Right: Instructors */}
-                      <div className="flex items-center gap-4 shrink-0 sm:min-w-[180px] justify-end">
+                      {/* Middle: Professional Progress Gauge */}
+                      <div className="w-full md:w-60 lg:w-72 shrink-0">
+                        <div className="flex items-center justify-between text-xs mb-1.5 font-bold">
+                          <span className="text-[11px] text-on-surface-variant flex items-center gap-1">
+                            <span>{i18n.language === 'ar' ? 'إنجاز الدروس:' : 'Progress:'}</span>
+                            <span className="font-extrabold text-on-surface">{lDone}</span>
+                            <span className="text-on-surface-variant/60 font-medium">/ {lTotal}</span>
+                          </span>
+                          <span className="font-mono font-black text-xs text-primary">
+                            {progressPercent}%
+                          </span>
+                        </div>
+                        <div className="h-2 w-full bg-surface-container-high rounded-full overflow-hidden border border-outline-variant/20">
+                          <div
+                            className="h-full bg-gradient-to-r from-primary via-[#4DBFB3] to-primary rounded-full transition-all duration-500 ease-out"
+                            style={{ width: `${progressPercent}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Right / End: Instructors Stack or Action Prompt */}
+                      <div className="flex items-center gap-3 shrink-0 sm:min-w-[140px] justify-between sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-outline-variant/20">
                         {instructors.length > 0 ? (
-                          <div className="flex items-center gap-3">
-                            <div className="flex -space-x-3 rtl:space-x-reverse">
-                              {instructors.slice(0, 3).map((inst, idx) => (
-                                <img key={idx} src={inst.image_profile || `https://ui-avatars.com/api/?name=${encodeURIComponent(inst.name)}&background=random`} alt={inst.name} className="w-9 h-9 rounded-full border-2 border-surface object-cover z-10" style={{ zIndex: 3 - idx }} />
+                          <div className="flex items-center gap-2">
+                            <div className="flex -space-x-2 rtl:space-x-reverse">
+                              {instructors.slice(0, 3).map((inst, i) => (
+                                <img
+                                  key={i}
+                                  src={inst.image_profile || `https://ui-avatars.com/api/?name=${encodeURIComponent(inst.name)}&background=random`}
+                                  alt={inst.name}
+                                  className="w-8 h-8 rounded-full border-2 border-surface object-cover shadow-sm shrink-0"
+                                  title={inst.name}
+                                />
                               ))}
                             </div>
-                            <div className="flex flex-col">
-                              <span className="text-[8px] font-bold text-on-surface-variant/70 tracking-wider uppercase mb-0.5">{t('student.overview.contentExperts', 'خبراء المحتوى')}</span>
-                              <span className="text-[11px] font-semibold text-on-surface line-clamp-1">{instructors.map(i => i.name.split(' ')[0]).join(', ')}</span>
+                            <div className="hidden xl:flex flex-col text-left rtl:text-right">
+                              <span className="text-[8px] font-bold text-on-surface-variant/70 uppercase leading-none mb-0.5">
+                                {t('student.overview.contentExperts', 'المحاضرين')}
+                              </span>
+                              <span className="text-[11px] font-semibold text-on-surface truncate max-w-[90px]">
+                                {instructors.map(i => i.name.split(' ')[0]).join(', ')}
+                              </span>
                             </div>
                           </div>
                         ) : (
-                          <div className="text-[11px] text-on-surface-variant">
-                            {i18n.language === 'ar' ? 'لا يوجد محاضرين' : 'No instructors'}
+                          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-high text-on-surface-variant group-hover:bg-primary/10 group-hover:text-primary transition-colors text-xs font-bold">
+                            <span>{i18n.language === 'ar' ? 'عرض المحتوى' : 'Explore'}</span>
                           </div>
                         )}
-                        <ChevronRight size={18} className="text-on-surface-variant/40 rtl:rotate-180" />
+
+                        <div className="w-8 h-8 rounded-xl bg-surface-container group-hover:bg-primary group-hover:text-white text-on-surface-variant flex items-center justify-center transition-all shadow-sm shrink-0">
+                          <ChevronRight size={16} className="rtl:rotate-180" />
+                        </div>
                       </div>
                     </div>
                   );

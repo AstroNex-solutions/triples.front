@@ -249,7 +249,7 @@ export default function ModulesList({ showMsg, course, onManageSubModules, onMan
       />
       <ModuleQBankModal 
         show={!!manageQBankFor} 
-        onClose={() => setManageQBankFor(null)} 
+        onClose={() => { setManageQBankFor(null); fetchModules(); }} 
         module={manageQBankFor} 
         course={course} 
         showMsg={showMsg} 

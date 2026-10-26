@@ -23,6 +23,10 @@ export default function ModuleSection() {
   const [loadingFlashcards, setLoadingFlashcards] = useState(false);
   const [expandedFlashcardSystems, setExpandedFlashcardSystems] = useState([]);
 
+  const [qbankChapters, setQbankChapters] = useState([]);
+  const [qbankTotalQuestions, setQbankTotalQuestions] = useState(0);
+  const [loadingQbank, setLoadingQbank] = useState(false);
+
   const activeCourse = stats?.activeCourses?.find(c => String(c.id) === String(courseId));
   const courseFeatures = activeCourse?.features || {};
 
@@ -53,6 +57,19 @@ export default function ModuleSection() {
         .finally(() => setLoadingFlashcards(false));
     }
   }, [activeTab, courseId]);
+
+  useEffect(() => {
+    if (activeTab === 'qbank' && qbankChapters.length === 0 && !loadingQbank) {
+      setLoadingQbank(true);
+      API.get(`/student/modules/${moduleId}/questions?type=qbank`)
+        .then(res => {
+          setQbankChapters(res.data.chapters || []);
+          setQbankTotalQuestions(res.data.questions?.length || 0);
+        })
+        .catch(console.error)
+        .finally(() => setLoadingQbank(false));
+    }
+  }, [activeTab, moduleId]);
 
   const toggleFlashcardSystem = (systemName) => {
     setExpandedFlashcardSystems(prev => 
@@ -177,7 +194,7 @@ export default function ModuleSection() {
           { id: 'videos', label: t('moduleSection.videos', 'الفيديوهات'), icon: Video, locked: false },
           { id: 'flashcards', label: t('moduleSection.flashcards', 'البطاقات التعليمية'), icon: BookMarked, locked: !courseFeatures.flashcards },
           { id: 'qbank', label: t('moduleSection.qbank', 'بنك الأسئلة'), icon: HelpCircle, locked: !courseFeatures.qbank },
-          { id: 'selfAssessment', label: t('moduleSection.selfAssessment', 'التقييم الذاتي'), icon: CheckCircle2, locked: !courseFeatures.selfAssessment },
+          // { id: 'selfAssessment', label: t('moduleSection.selfAssessment', 'التقييم الذاتي'), icon: CheckCircle2, locked: !courseFeatures.selfAssessment },
         ].map(tab => (
           <button
             key={tab.id}
@@ -374,24 +391,94 @@ export default function ModuleSection() {
         </div>
       )}
 
-      {/* 5. Tab Content: Q-Bank Placeholder */}
+      {/* 5. Tab Content: Q-Bank with Chapters */}
       {activeTab === 'qbank' && (
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="bg-surface rounded-2xl p-12 text-center border border-outline-variant/30 shadow-sm">
-            <div className="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-              <HelpCircle size={40} className="text-secondary" />
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
+          {loadingQbank ? (
+            <div className="flex justify-center items-center py-20">
+              <Loader2 size={32} className="animate-spin text-secondary" />
             </div>
-            <h2 className="text-2xl font-extrabold text-on-surface mb-3" dir="auto">{t('student.dashboard.questionsBank', 'بنك الأسئلة (Q-Bank)')}</h2>
-            <p className="text-on-surface-variant max-w-md mx-auto mb-6">
-              {t('moduleSection.qbankPlaceholderDesc', 'هنا سيتم عرض بنك الأسئلة (Q-Bank) الخاص بهذا الموديول للتدرب على الأسئلة واختبار المعرفة.')}
-            </p>
-            <button 
-              onClick={() => navigate(`/quiz-player/${moduleId}?type=qbank`)}
-              className="px-6 py-2.5 bg-secondary text-white font-bold rounded-xl shadow-md hover:opacity-90 transition-opacity cursor-pointer"
-            >
-              {t('moduleSection.startTraining', 'بدء التدريب')}
-            </button>
-          </div>
+          ) : (
+            <>
+              {/* Header Banner */}
+              <div className="bg-surface rounded-3xl p-6 sm:p-8 border border-outline-variant/30 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+                <div className="flex items-center gap-4 relative z-10">
+                  <div className="w-14 h-14 bg-secondary/10 rounded-2xl flex items-center justify-center shrink-0 text-secondary border border-secondary/20">
+                    <HelpCircle size={30} />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-extrabold text-on-surface mb-1" dir="auto">{t('student.dashboard.questionsBank', 'بنك أسئلة الموديول')}</h2>
+                    <p className="text-xs text-on-surface-variant font-medium">
+                      {qbankTotalQuestions > 0 
+                        ? t('moduleSection.qbankTotalAvailable', 'يتوفر {{total}} سؤال تدريبي مقسمة على {{chapters}} فصول.', { total: qbankTotalQuestions, chapters: qbankChapters.length })
+                        : t('moduleSection.qbankTrainDesc', 'تدرب على أسئلة بنك الأسئلة واختبر معلوماتك السريرية.')}
+                    </p>
+                  </div>
+                </div>
+
+                {qbankTotalQuestions > 0 && (
+                  <button
+                    onClick={() => navigate(`/quiz-player/${moduleId}?type=qbank`)}
+                    className="px-6 py-3 bg-secondary hover:bg-secondary-hover text-on-secondary font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer self-start md:self-center shrink-0"
+                  >
+                    <PlayCircle size={16} />
+                    <span>{t('moduleSection.qbankStartComprehensive', 'بدء تدريب شامل (جميع الفصول)')}</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Chapters List */}
+              {qbankChapters.length > 0 ? (
+                <div className="space-y-3">
+                  <h3 className="text-sm font-extrabold text-on-surface px-1">{t('moduleSection.qbankChooseChapter', 'اختر فصلاً للتدرب على أسئلته:')}</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {qbankChapters.map((ch, idx) => (
+                      <div
+                        key={ch.id}
+                        className="bg-surface rounded-2xl p-5 border border-outline-variant/30 hover:border-secondary/50 flex flex-col justify-between transition-all duration-200 hover:shadow-md"
+                      >
+                        <div className="mb-4">
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <span className="w-6 h-6 rounded-lg bg-surface-container text-on-surface-variant font-mono font-bold text-xs flex items-center justify-center">
+                              {idx + 1}
+                            </span>
+                            <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-secondary/10 text-secondary border border-secondary/20">
+                              {ch.questionsCount || 0} {t('moduleSection.questions', 'سؤال')}
+                            </span>
+                          </div>
+                          <h4 className="font-extrabold text-on-surface text-base mb-1">
+                            {ch.title}
+                          </h4>
+                          {ch.description && (
+                            <p className="text-xs text-on-surface-variant line-clamp-2 leading-relaxed">
+                              {ch.description}
+                            </p>
+                          )}
+                        </div>
+
+                        <button
+                          onClick={() => navigate(`/quiz-player/${moduleId}?type=qbank&chapterId=${ch.id}`)}
+                          disabled={!ch.questionsCount}
+                          className="w-full py-2.5 px-4 bg-secondary/10 hover:bg-secondary hover:text-white text-secondary font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          <PlayCircle size={15} />
+                          <span>{ch.questionsCount ? t('moduleSection.qbankStartChapter', 'بدء التدريب على هذا الفصل') : t('moduleSection.qbankNoQuestionsChapter', 'لا توجد أسئلة حالياً')}</span>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : qbankTotalQuestions === 0 ? (
+                <div className="bg-surface rounded-2xl p-12 text-center border border-outline-variant/30 shadow-sm">
+                  <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-secondary">
+                    <HelpCircle size={32} />
+                  </div>
+                  <p className="text-sm font-bold text-on-surface mb-1">{t('moduleSection.qbankEmptyModuleTitle', 'لا توجد أسئلة متاحة في بنك أسئلة هذا الموديول حالياً')}</p>
+                  <p className="text-xs text-on-surface-variant">{t('moduleSection.qbankEmptyModuleDesc', 'سيتم إضافة وتحديث الفصول والأسئلة قريباً من قبل إدارة الأكاديمية.')}</p>
+                </div>
+              ) : null}
+            </>
+          )}
         </div>
       )}
 

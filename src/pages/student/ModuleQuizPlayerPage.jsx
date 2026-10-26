@@ -25,6 +25,7 @@ export default function ModuleQuizPlayerPage() {
   
   const queryParams = new URLSearchParams(location.search);
   const type = queryParams.get('type') || 'qbank'; // 'qbank' or 'sa'
+  const chapterId = queryParams.get('chapterId');
   
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -41,7 +42,9 @@ export default function ModuleQuizPlayerPage() {
     const fetchQuestions = async () => {
       setLoading(true);
       try {
-        const res = await API.get(`/student/modules/${moduleId}/questions?type=${type}`);
+        let url = `/student/modules/${moduleId}/questions?type=${type}`;
+        if (chapterId) url += `&chapterId=${chapterId}`;
+        const res = await API.get(url);
         setQuestions(res.data.questions || []);
       } catch (err) {
         console.error(err);
@@ -51,7 +54,7 @@ export default function ModuleQuizPlayerPage() {
       }
     };
     fetchQuestions();
-  }, [moduleId, type]);
+  }, [moduleId, type, chapterId]);
 
   const handleOptionSelect = (qId, option) => {
     setAnswers(prev => ({ ...prev, [qId]: option }));
@@ -115,29 +118,53 @@ export default function ModuleQuizPlayerPage() {
   let evalBullets = [];
 
   if (scorePercentage >= 90) {
-    evalComment = "Excellent! Outstanding performance indicating a strong grasp of the material. You are well-prepared to move forward.";
-    evalBullets = [
+    evalComment = isRTL
+      ? "ممتاز! أداء استثنائي يوضح استيعاباً قوياً وشاملاً للمادة العلمية. أنت مؤهل وجاهز تماماً للانتقال للمستوى التالي."
+      : "Excellent! Outstanding performance indicating a strong grasp of the material. You are well-prepared to move forward.";
+    evalBullets = isRTL ? [
+      "انتقل إلى الموديول التالي بثقة كاملة.",
+      "استكشف الموضوعات المتقدمة والمراجع الإضافية لتعميق فهمك.",
+      "ساعد زملاءك الذين قد يواجهون صعوبة في هذه المفاهيم."
+    ] : [
       "Proceed to the next module with confidence.",
       "Consider exploring advanced topics or supplementary materials for deeper understanding.",
       "Help peers who might be struggling with these concepts."
     ];
   } else if (scorePercentage >= 75) {
-    evalComment = "Good job! You have a solid understanding of most concepts, but there is some room for improvement.";
-    evalBullets = [
+    evalComment = isRTL
+      ? "أحسنت! لديك فهم جيد جداً لمعظم المفاهيم، مع وجود بعض النقاط البسيطة التي تتطلب المراجعة."
+      : "Good job! You have a solid understanding of most concepts, but there is some room for improvement.";
+    evalBullets = isRTL ? [
+      "راجع الموضوعات المحددة للأسئلة التي أجبت عليها بشكل خاطئ.",
+      "ألقِ نظرة سريعة على المواد الأساسية لترسيخ معلوماتك.",
+      "أجرِ مزيداً من الأسئلة التدريبية للتأكد من إتقانك الكامل."
+    ] : [
       "Review the specific topics corresponding to the questions you answered incorrectly.",
       "Take a quick look at the core study materials to solidify your knowledge.",
       "Try a few more practice quizzes to ensure complete mastery."
     ];
   } else if (scorePercentage >= 50) {
-    evalComment = "Fair performance. You have grasped some concepts, but foundational gaps remain that need to be addressed.";
-    evalBullets = [
+    evalComment = isRTL
+      ? "أداء متوسط. لقد استوعبت بعض المفاهيم الأساسية، ولكن لا تزال هناك فجوات معرفية تحتاج إلى معالجة."
+      : "Fair performance. You have grasped some concepts, but foundational gaps remain that need to be addressed.";
+    evalBullets = isRTL ? [
+      "أعد مراجعة المحاضرات ومقاطع الفيديو الأساسية لهذا الموديول.",
+      "استفد من الموارد الإضافية وبنك الأسئلة في الأكاديمية للتدرب.",
+      "أعد إجراء هذا التقييم بعد المراجعة لضمان تحسن مستواك."
+    ] : [
       "Revisit the primary lecture notes and videos for this module.",
       "Utilize the Triple S Academy supplementary resources and practice quizzes.",
       "Re-take this assessment after reviewing to ensure improvement."
     ];
   } else {
-    evalComment = "Based on this self-assessment, the foundational concepts evaluated require further review. It is highly recommended to revisit the core study materials provided in the Triple S Academy modules before attempting the assessment again.";
-    evalBullets = [
+    evalComment = isRTL
+      ? "بناءً على هذا التقييم الذاتي، تحتاج المفاهيم الأساسية إلى مراجعة شاملة. نوصي بشدة بالعودة لدراسة المواد الأساسية في موديولات الأكاديمية قبل المحاولة مرة أخرى."
+      : "Based on this self-assessment, the foundational concepts evaluated require further review. It is highly recommended to revisit the core study materials provided in the Triple S Academy modules before attempting the assessment again.";
+    evalBullets = isRTL ? [
+      "راجع ملاحظات المحاضرات الأساسية الخاصة بالموضوعات التي أخطأت فيها.",
+      "استفد من شروحات الإجابات ومصادر الأكاديمية الإضافية.",
+      "تواصل مع المشرف الأكاديمي إذا كانت بعض المفاهيم غير واضحة."
+    ] : [
       "Review the primary lecture notes corresponding to the incorrectly answered topics.",
       "Utilize the Triple S Academy supplementary resources and practice quizzes.",
       "Schedule a brief consultation with your academic advisor if concepts remain unclear."
@@ -275,25 +302,29 @@ export default function ModuleQuizPlayerPage() {
 
               {/* Main Titles */}
               <div className="text-center mb-10 print:mb-4">
-                <h1 className="text-4xl sm:text-5xl print:text-3xl font-black text-slate-900 mb-2 print:mb-1 tracking-tight">Self Assessment Result</h1>
-                <p className="text-slate-500 font-medium text-lg print:text-sm">Official Student Performance Evaluation</p>
+                <h1 className="text-3xl sm:text-5xl print:text-3xl font-black text-slate-900 mb-2 print:mb-1 tracking-tight">
+                  {t('moduleQuiz.reportTitle', 'نتيجة التقييم الذاتي')}
+                </h1>
+                <p className="text-slate-500 font-medium text-base sm:text-lg print:text-sm">
+                  {t('moduleQuiz.reportSubtitle', 'التقييم الرسمي لأداء الطالب')}
+                </p>
               </div>
 
               {/* Student Info */}
-              <div className="flex bg-[#f8f5ff] rounded-xl mb-10 print:mb-6 relative overflow-hidden" dir="ltr">
-                <div className="absolute left-0 top-0 bottom-0 w-2 bg-primary"></div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 w-full p-6 print:p-4 pl-8 print:pl-6 gap-6 sm:gap-4 print:gap-2">
+              <div className="flex bg-[#f8f5ff] rounded-xl mb-10 print:mb-6 relative overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
+                <div className="absolute left-0 rtl:left-auto rtl:right-0 top-0 bottom-0 w-2 bg-primary"></div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 w-full p-6 print:p-4 pl-8 rtl:pl-4 rtl:pr-8 print:pl-6 gap-6 sm:gap-4 print:gap-2">
                    <div>
-                     <p className="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-1 print:mb-0.5">Student Name</p>
+                     <p className="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-1 print:mb-0.5">{t('moduleQuiz.studentName', 'اسم الطالب')}</p>
                      <p className="text-lg print:text-sm font-black text-slate-800 leading-none">{user?.name}</p>
                    </div>
                    <div>
-                     <p className="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-1 print:mb-0.5">Email Address</p>
+                     <p className="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-1 print:mb-0.5">{t('moduleQuiz.email', 'البريد الإلكتروني')}</p>
                      <p className="text-lg print:text-sm font-black text-slate-800 leading-none">{user?.email}</p>
                    </div>
                    <div>
-                     <p className="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-1 print:mb-0.5">Assessment Date</p>
-                     <p className="text-lg print:text-sm font-black text-slate-800 leading-none">{new Date().toLocaleDateString()}</p>
+                     <p className="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-1 print:mb-0.5">{t('moduleQuiz.date', 'تاريخ الاختبار')}</p>
+                     <p className="text-lg print:text-sm font-black text-slate-800 leading-none">{new Date().toLocaleDateString(isRTL ? 'ar-EG' : 'en-US')}</p>
                    </div>
                 </div>
               </div>
@@ -313,28 +344,28 @@ export default function ModuleQuizPlayerPage() {
                  </div>
 
                  {/* Cards */}
-                 <div className="md:col-span-7 flex flex-col justify-center gap-5 print:gap-3">
+                 <div className="md:col-span-7 flex flex-col justify-center gap-5 print:gap-3" dir={isRTL ? 'rtl' : 'ltr'}>
                     <div className="flex items-center justify-between bg-[#f0fdf4] border-2 border-[#bbf7d0] rounded-2xl p-6 print:p-4">
-                       <span className="text-sm print:text-xs font-extrabold text-[#16a34a] uppercase tracking-widest">Correct Answers</span>
-                       <span className="text-5xl print:text-3xl font-black text-[#14532d] leading-none">{correctCount}</span>
+                       <span className="text-sm print:text-xs font-extrabold text-[#16a34a] uppercase tracking-widest">{t('moduleQuiz.correctAnswersCount', 'الإجابات الصحيحة')}</span>
+                       <span className="text-5xl print:text-3xl font-black text-[#14532d] leading-none font-mono">{correctCount}</span>
                     </div>
                     <div className="flex items-center justify-between bg-[#fff1f2] border-2 border-[#fecdd3] rounded-2xl p-6 print:p-4">
-                       <span className="text-sm print:text-xs font-extrabold text-[#e11d48] uppercase tracking-widest">Incorrect Answers</span>
-                       <span className="text-5xl print:text-3xl font-black text-[#be123c] leading-none">{Object.keys(answers).length - correctCount}</span>
+                       <span className="text-sm print:text-xs font-extrabold text-[#e11d48] uppercase tracking-widest">{t('moduleQuiz.incorrectAnswersCount', 'الإجابات الخاطئة')}</span>
+                       <span className="text-5xl print:text-3xl font-black text-[#be123c] leading-none font-mono">{Object.keys(answers).length - correctCount}</span>
                     </div>
                  </div>
               </div>
 
               {/* Comments section */}
-              <div className="mb-12 print:mb-4" dir="ltr">
+              <div className="mb-12 print:mb-4" dir={isRTL ? 'rtl' : 'ltr'}>
                 <h3 className="text-xl print:text-lg font-black text-slate-800 flex items-center gap-3 print:gap-2 mb-4 print:mb-2">
                   <span className="flex items-center justify-center w-6 h-6 print:w-5 print:h-5 rounded-full border-2 border-primary text-primary font-bold text-sm print:text-xs">i</span> 
-                  Evaluator Comments & Next Steps
+                  {t('moduleQuiz.evaluatorComments', 'ملاحظات وتوصيات التقييم')}
                 </h3>
                 <p className="text-slate-600 print:text-xs leading-relaxed mb-4 print:mb-2 font-medium">
                   {evalComment}
                 </p>
-                <ul className="list-disc list-outside text-slate-600 print:text-xs space-y-3 print:space-y-1 ml-5 font-medium marker:text-primary">
+                <ul className="list-disc list-outside text-slate-600 print:text-xs space-y-3 print:space-y-1 mx-5 font-medium marker:text-primary">
                   {evalBullets.map((bullet, idx) => (
                     <li key={idx}>{bullet}</li>
                   ))}
@@ -380,10 +411,11 @@ export default function ModuleQuizPlayerPage() {
               {/* Options */}
               <div className="space-y-4" dir="auto">
                 {parsedOptions.map((opt, i) => {
-                  const isSelected = answers[currentQ.id] === opt;
-                  const isCorrectOpt = currentQ.correct_answer === opt;
+                  const optText = typeof opt === 'object' && opt !== null ? opt.text : opt;
                   const optionLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-                  const letter = optionLetters[i] || (i + 1);
+                  const letter = (typeof opt === 'object' && opt !== null && opt.id) ? opt.id : (optionLetters[i] || (i + 1));
+                  const isSelected = answers[currentQ.id] === optText;
+                  const isCorrectOpt = (typeof opt === 'object' && opt !== null && opt.isCorrect) || currentQ.correct_answer === optText;
                   
                   let optClass = "bg-surface-container-lowest border-outline-variant/30 hover:border-outline-variant hover:bg-surface-container-low text-on-surface";
                   
@@ -403,7 +435,7 @@ export default function ModuleQuizPlayerPage() {
                     <button
                       key={i}
                       disabled={revealed}
-                      onClick={() => handleOptionSelect(currentQ.id, opt)}
+                      onClick={() => handleOptionSelect(currentQ.id, optText)}
                       className={`w-full text-start p-4 rounded-xl border transition-all cursor-pointer flex items-start gap-4 group ${optClass}`}
                     >
                       <div className={`w-8 h-8 rounded-lg border-2 flex items-center justify-center shrink-0 font-bold text-sm transition-colors ${
@@ -418,7 +450,7 @@ export default function ModuleQuizPlayerPage() {
                       
                       <div className="flex-1 pt-1">
                         <span className={`text-base font-medium leading-relaxed block ${revealed && isSelected && !isCorrectOpt ? 'line-through text-rose-700/70' : ''}`}>
-                          {opt}
+                          {optText}
                         </span>
                       </div>
                     </button>

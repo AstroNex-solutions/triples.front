@@ -41,6 +41,7 @@ import CourseFlashcardsSection from './pages/student/CourseFlashcardsSection';
 import CourseQBankSection from './pages/student/CourseQBankSection';
 import CourseSelfAssessmentSection from './pages/student/CourseSelfAssessmentSection';
 import ModuleQuizPlayerPage from './pages/student/ModuleQuizPlayerPage';
+import CourseQuizPlayerPage from './pages/student/CourseQuizPlayerPage';
 import FreezeSection from './pages/student/FreezeSection';
 import PerformanceSection from './pages/student/PerformanceSection';
 import PaymentResultPage from './pages/PaymentResultPage';
@@ -173,6 +174,7 @@ export default function App() {
           <Route path="/self-assessment" element={<SelfAssessmentPage />} />
           <Route path="/study-flashcards/:deckId" element={<FlashcardStudyPage />} />
           <Route path="/quiz-player/:moduleId" element={<ModuleQuizPlayerPage />} />
+          <Route path="/course-quiz-player/:courseId" element={<CourseQuizPlayerPage />} />
           <Route path="/secure-viewer" element={<SecureViewer />} />
           <Route path="/payment-result" element={<PaymentResultPage />} />
           <Route path="/checkout/feature/:courseId/:featureType" element={<FeatureCheckoutPage />} />

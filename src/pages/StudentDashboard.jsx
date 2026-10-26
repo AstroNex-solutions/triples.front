@@ -5,7 +5,8 @@ import {
   BookOpen, Award, Shield, Settings,
   Calendar, CheckCircle2, AlertCircle, MessageSquare, BookMarked, ShoppingBag,
   ChevronRight, ChevronLeft, FileText, Globe, LogOut, Home, Menu, X,
-  Lock, TrendingUp, BarChart2, HelpCircle, ChevronDown, ChevronUp
+  Lock, TrendingUp, BarChart2, HelpCircle, ChevronDown, ChevronUp,
+  AlertTriangle, Play
 } from 'lucide-react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle';
@@ -31,6 +32,14 @@ export default function StudentDashboard() {
 
   const [stats, setStats] = useState(null);
   const [expandedCourses, setExpandedCourses] = useState({});
+  const [saConfirmModal, setSaConfirmModal] = useState({ show: false, courseId: null, courseTitle: '' });
+
+  const handleConfirmStartSA = () => {
+    if (saConfirmModal.courseId) {
+      navigate(`/course-quiz-player/${saConfirmModal.courseId}`);
+      setSaConfirmModal({ show: false, courseId: null, courseTitle: '' });
+    }
+  };
 
   useEffect(() => {
     API.get('/student/stats').then(r => setStats(r.data)).catch(console.error);
@@ -58,9 +67,9 @@ export default function StudentDashboard() {
             isCourse: true,
             courseId: course.id,
             subItems: [
-              { key: `course/${course.id}/flashcards`, label: t('student.dashboard.flashcards'), icon: BookMarked, locked: courseFeatures.flashcards === false },
-              { key: `course/${course.id}/qbank`, label: t('student.dashboard.questionsBank'), icon: HelpCircle, locked: courseFeatures.qbank === false },
-              { key: `course/${course.id}/selfAssessment`, label: t('student.dashboard.selfAssessment'), icon: CheckCircle2, locked: courseFeatures.selfAssessment === false },
+              { key: `dashboard/course/${course.id}/flashcards`, label: t('student.dashboard.flashcards'), icon: BookMarked, locked: courseFeatures.flashcards === false, name: "flashcards" },
+              { key: `dashboard/course/${course.id}/qbank`, label: t('student.dashboard.questionsBank'), icon: HelpCircle, locked: courseFeatures.qbank === false, name: "qbank" },
+              { key: `/course-quiz-player/${course.id}`, label: t('student.dashboard.selfAssessment'), icon: CheckCircle2, locked: courseFeatures.selfAssessment === false, name: "selfAssessment" },
             ]
           };
         }) : []),
@@ -96,7 +105,7 @@ export default function StudentDashboard() {
     <div className="flex min-h-screen bg-background text-on-background font-sans transition-colors duration-300" dir={i18n.language === 'en' ? 'ltr' : 'rtl'}>
       {/* Mobile Overlay */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-30 md:hidden backdrop-blur-sm"
           onClick={() => setSidebarOpen(false)}
         ></div>
@@ -117,8 +126,8 @@ export default function StudentDashboard() {
             </div>
             <span className="text-sm font-black text-on-surface tracking-wide">{t('student.dashboard.title')}</span>
           </div>
-          <button 
-            onClick={() => setSidebarOpen(!sidebarOpen)} 
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
             className="p-2 rounded-xl hover:bg-surface-variant/40 text-on-surface-variant transition-colors cursor-pointer hidden md:block"
           >
             {sidebarOpen ? (
@@ -127,17 +136,17 @@ export default function StudentDashboard() {
               i18n.language === 'en' ? <ChevronRight size={18} /> : <ChevronLeft size={18} />
             )}
           </button>
-          <button 
-            onClick={() => setSidebarOpen(false)} 
+          <button
+            onClick={() => setSidebarOpen(false)}
             className="p-2 rounded-xl hover:bg-surface-variant/40 text-on-surface-variant transition-colors cursor-pointer md:hidden"
           >
             <X size={18} />
           </button>
         </div>
         <div className="flex-1 overflow-y-auto px-3 py-4 space-y-4 custom-scrollbar">
-          
+
           {/* Profile Section (Desktop Expanded & Mobile) */}
-          <div 
+          <div
             onClick={() => navigate('/dashboard/account')}
             className={`flex flex-col items-center p-4 rounded-3xl bg-surface-container-low border border-outline-variant/30 shadow-sm mb-6 cursor-pointer hover:border-primary/40 hover:bg-surface-variant/20 transition-all ${!sidebarOpen ? 'md:hidden' : ''}`}
           >
@@ -149,7 +158,7 @@ export default function StudentDashboard() {
           </div>
 
           {/* Profile Section (Desktop Collapsed) */}
-          <div 
+          <div
             onClick={() => navigate('/dashboard/account')}
             className={`hidden ${!sidebarOpen ? 'md:flex' : ''} flex-col items-center p-2 rounded-2xl bg-surface-container-low border border-outline-variant/30 shadow-sm mb-6 cursor-pointer hover:border-primary/40 transition-all`}
             title={t('student.dashboard.studentRole')}
@@ -167,13 +176,13 @@ export default function StudentDashboard() {
               {group.items.map(item => {
                 const Icon = item.icon;
                 const isActive = activeSection === item.key;
-                
+
                 if (item.isCourse) {
                   const isExpanded = expandedCourses[item.courseId];
                   return (
                     <div key={item.key} className="space-y-1 mt-2 mb-2">
-                      <button 
-                        onClick={() => toggleCourse(item.courseId)} 
+                      <button
+                        onClick={() => toggleCourse(item.courseId)}
                         title={!sidebarOpen ? item.label : undefined}
                         className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer bg-primary/5 text-primary hover:bg-primary/10 ${!sidebarOpen ? 'md:justify-center' : ''}`}
                       >
@@ -181,13 +190,24 @@ export default function StudentDashboard() {
                         <span className={`truncate flex-1 text-left rtl:text-right ${!sidebarOpen ? 'md:hidden' : ''}`}>{item.label}</span>
                         {sidebarOpen && (isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
                       </button>
-                      
+
                       {isExpanded && sidebarOpen && (
                         <div className="pl-9 rtl:pl-0 rtl:pr-9 space-y-1 mt-1">
                           {item.subItems.map(sub => (
-                            <button 
+                            <button
                               key={sub.key}
-                              onClick={() => !sub.locked && navigate(`/dashboard/${sub.key}`)}
+                              onClick={() => {
+                                if (sub.locked) return;
+                                if (sub.name === 'selfAssessment') {
+                                  setSaConfirmModal({
+                                    show: true,
+                                    courseId: item.courseId,
+                                    courseTitle: item.label
+                                  });
+                                } else {
+                                  navigate(`/${sub.key.replace(/^\//, '')}`);
+                                }
+                              }}
                               className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium transition-all ${sub.locked ? 'opacity-50 cursor-not-allowed text-on-surface-variant' : 'cursor-pointer hover:bg-surface-variant/30 text-on-surface'}`}
                             >
                               <sub.icon size={14} className="shrink-0" />
@@ -213,9 +233,9 @@ export default function StudentDashboard() {
                 }
 
                 return (
-                  <button 
-                    key={item.key} 
-                    onClick={() => !item.locked && navigate(`/dashboard/${item.key}`)} 
+                  <button
+                    key={item.key}
+                    onClick={() => !item.locked && navigate(`/dashboard/${item.key}`)}
                     title={!sidebarOpen ? item.label : undefined}
                     className={itemClasses}
                   >
@@ -235,8 +255,8 @@ export default function StudentDashboard() {
         {/* Top Nav */}
         <header className="h-16 border-b border-outline-variant/20 bg-surface/40 backdrop-blur-xl px-4 sm:px-6 flex items-center justify-between sticky top-0 z-20">
           <div className="flex items-center gap-2 sm:gap-3">
-            <button 
-              onClick={() => setSidebarOpen(true)} 
+            <button
+              onClick={() => setSidebarOpen(true)}
               className="p-2 -ml-2 rounded-xl text-on-surface-variant hover:bg-surface-variant/40 transition-colors md:hidden"
             >
               <Menu size={20} />
@@ -276,6 +296,70 @@ export default function StudentDashboard() {
           <Outlet context={{ showMsg, stats }} />
         </div>
       </main>
+
+      {/* ⚠️ Self Assessment Start Confirmation Modal */}
+      {saConfirmModal.show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-surface border border-outline-variant/30 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl relative overflow-hidden animate-in zoom-in-95 duration-200 text-on-surface">
+            {/* Top red/amber warning accent */}
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-500 via-rose-500 to-red-600" />
+
+            <div className="flex flex-col items-center text-center mb-6">
+              <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-600 flex items-center justify-center mb-4 shadow-inner">
+                <AlertTriangle size={36} />
+              </div>
+
+              <span className="text-[11px] font-black uppercase tracking-wider text-rose-600 mb-1">
+                {t('courseSA.warningTitle', 'تنبيه هام ومشدد قبل بدء الامتحان')}
+              </span>
+              <h3 className="text-xl font-black text-on-surface mb-2">
+                {t('courseSA.warningSubtitle', 'التقييم الذاتي الشامل (Self Assessment)')}
+              </h3>
+              {saConfirmModal.courseTitle && (
+                <p className="text-xs font-bold text-primary mb-3 px-3 py-1 bg-primary/10 rounded-lg inline-block">
+                  {saConfirmModal.courseTitle}
+                </p>
+              )}
+              
+              <div className="bg-surface-container-low rounded-2xl p-4 border border-outline-variant/30 text-start space-y-3 w-full text-xs">
+                <div className="flex items-start gap-2.5">
+                  <span className="text-rose-500 font-black text-base shrink-0 leading-none mt-0.5">•</span>
+                  <p className="text-on-surface leading-relaxed">
+                    <strong className="text-rose-600 font-extrabold">{t('courseQuizPlayer.cancelExamBtn', 'إلغاء الامتحان')}: </strong>
+                    {t('courseSA.cancelRule', 'عند الرغبة في الخروج وإلغاء الامتحان، لن يتم احتساب أي نتيجة أو حفظ إجاباتك، وستتم إعادتك مباشرة إلى الصفحة الرئيسية.')}
+                  </p>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <span className="text-indigo-500 font-black text-base shrink-0 leading-none mt-0.5">•</span>
+                  <p className="text-on-surface leading-relaxed">
+                    <strong className="text-indigo-600 font-extrabold">{t('courseQuizPlayer.timeUsed', 'مؤقت زمني')}: </strong>
+                    {t('courseSA.timerRule', 'الاختبار محدد بوقت دقيقة واحدة لكل سؤال، ويبدأ العد التنازلي فور بدء التقييم.')}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 w-full">
+              <button
+                type="button"
+                onClick={() => setSaConfirmModal({ show: false, courseId: null, courseTitle: '' })}
+                className="flex-1 py-3 px-4 rounded-xl bg-surface-container border border-outline-variant/30 text-on-surface font-bold text-xs hover:bg-surface-container-high transition-all cursor-pointer"
+              >
+                {t('courseSA.cancelReturnBtn', 'إلغاء والعودة')}
+              </button>
+              
+              <button
+                type="button"
+                onClick={handleConfirmStartSA}
+                className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-black text-xs shadow-md shadow-rose-500/20 hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Play size={16} className="fill-current" />
+                <span>{t('courseSA.readyStartBtn', 'أنا جاهز، ابدأ الامتحان الآن')}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
